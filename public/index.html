@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-SQL-Chat</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+    }
+    button {
+      padding: 8px 16px;
+      margin: 8px 4px 0 0;
+    }
+    table {
+      border-collapse: collapse;
+      margin-top: 20px;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px;
+    }
+    th {
+      background: #f0f0f0;
+    }
+    #loading {
+      margin-top: 10px;
+      font-style: italic;
+      color: #666;
+    }
+    #output {
+      margin-top: 20px;
+    }
+    #sqlSection, #resultSection {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>AI-SQL-Chat</h1>
+
+  <textarea id="q" placeholder="Zadaj pytanie…"></textarea><br />
+  <button onclick="ask()">Wyślij</button>
+  <button onclick="clearAll()">Wyczyść</button>
+
+  <div id="loading"></div>
+
+  <div id="output">
+    <div id="sqlSection">
+      <h3>SQL:</h3>
+      <pre id="sql" style="background:#fafafa;padding:10px;"></pre>
+    </div>
+
+    <div id="resultSection">
+      <h3>Wyniki:</h3>
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <script>
+  async function ask() {
+    const question = document.getElementById('q')?.value.trim();
+    const loading = document.getElementById('loading');
+    const sqlBox = document.getElementById('sql');
+    const resultBox = document.getElementById('result');
+    const sqlSection = document.getElementById('sqlSection');
+    const resultSection = document.getElementById('resultSection');
+
+    if (!question) {
+      alert('Wpisz pytanie przed wysłaniem.');
+      return;
+    }
+
+    sqlBox.textContent = '';
+    resultBox.innerHTML = '';
+    sqlSection.style.display = 'none';
+    resultSection.style.display = 'none';
+    loading.textContent = '⏳ AI analizuje strukturę bazy danych i generuje zapytanie SQL...';
+
+    try {
+      const resp = await fetch('http://192.168.5.109:8080/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+
+      const data = await resp.json();
+      if (data.error) {
+        alert(`Błąd: ${data.error}`);
+        return;
+      }
+
+      sqlBox.textContent = data.sql;
+      sqlSection.style.display = 'block';
+
+      const rows = data.rows;
+      if (!rows || !rows.length) {
+        resultBox.innerHTML = '<p>Brak wyników.</p>';
+      } else {
+        const cols = Object.keys(rows[0]);
+        let html = '<table><thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+        rows.forEach(r => {
+          html += '<tr>' + cols.map(c => `<td>${r[c]}</td>`).join('') + '</tr>';
+        });
+        html += '</tbody></table>';
+        resultBox.innerHTML = html;
+      }
+      resultSection.style.display = 'block';
+    } catch (err) {
+      console.error('❌ Błąd zapytania:', err);
+      alert('Nie udało się połączyć z serwerem.');
+    } finally {
+      loading.textContent = '';
+    }
+  }
+
+  function clearAll() {
+    document.getElementById('q').value = '';
+    document.getElementById('sql').textContent = '';
+    document.getElementById('result').innerHTML = '';
+    document.getElementById('loading').textContent = '';
+    document.getElementById('sqlSection').style.display = 'none';
+    document.getElementById('resultSection').style.display = 'none';
+  }
+  </script>
+</body>
+</html>

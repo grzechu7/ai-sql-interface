@@ -1,0 +1,51 @@
+{
+  "cena_projekt": [
+    "id_projekt",
+    "powierzchnia",
+    "cena_netto_projekt",
+    "programowanie"
+  ],
+  "ceny_modulow": [
+    "id_cenaModuow",
+    "modulyCzesci",
+    "cenaNetto",
+    "cenaBrutto",
+    "maxPoborPradu"
+  ],
+  "dane_domu": [
+    "id_dane_wyceny",
+    "id_dane_klienta",
+    "rodzaj_domu",
+    "powierzchnia",
+    "lokalizacja",
+    "nazwa_wyceny"
+  ],
+  "dane_klienta": [
+    "id_dane_klient",
+    "email",
+    "telefon",
+    "zgodaMarketing",
+    "_dataRejestracji"
+  ],
+  "s_rodzajDomu": [
+    "id_rodzajDomu",
+    "rodzajDomu"
+  ],
+  "wycena_koncNetto": [
+    "id_wycenaKoncowa",
+    "id_klienta",
+    "moduly",
+    "programowanie",
+    "rozdielnica",
+    "projekt"
+  ],
+  "wynik_wycenyModuly": [
+    "id_wynikWyceny",
+    "id_dane_klienta",
+    "id_cenyModulow",
+    "liczbaModulow",
+    "cenNetto",
+    "cenaBrutto"
+  ]
+}
+
