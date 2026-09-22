@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Docs — database schema and safe SELECT | AI-SQL-Chat</title>
+  <meta name="description" content="How to prepare a JSON schema for AI-SQL-Chat: queries for MySQL, PostgreSQL, SQL Server, Oracle, and SQLite, plus SELECT-only rules." />
+  <link rel="canonical" href="https://aisql.pl/en/docs.html" />
+  <link rel="alternate" hreflang="pl" href="https://aisql.pl/docs.html">
+  <link rel="alternate" hreflang="en" href="https://aisql.pl/en/docs.html">
+  <meta name="robots" content="index,follow" />
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"/>
+</head>
+<body class="page-docs">
+  <div class="bg-grid"></div>
+  <div data-include="/en/partials/header.html"></div>
+  <main class="container">
+    <header class="docs-hero">
+      <p class="kicker">Docs</p>
+      <h1>Schema, questions, safe SELECT</h1>
+      <p class="lead">This is the material that used to fill the homepage: how to extract your database structure, and what the tool will not do with data.</p>
+      <div class="doc-links">
+        <a class="btn btn-primary" href="/en/sql-query.html">Try the demo</a>
+        <a class="btn btn-secondary" href="/en/schema-paste.html">Paste schema</a>
+        <a class="btn btn-ghost" href="/en/schema-to-json.html">Guide: schema → JSON</a>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>How to start</h2>
+      <ol>
+        <li>Pull table and column names with the query for your engine (below), or follow the <a href="/en/schema-copy.html">paste-schema guide</a>.</li>
+        <li>On <a href="/en/schema-paste.html">Paste schema</a> you can generate SQL without an account.</li>
+        <li>To keep the same schema, sign in and upload JSON on <a href="/en/schema-query.html">Load schema</a>.</li>
+      </ol>
+    </section>
+
+    <section class="card" id="faq">
+      <h2>FAQ</h2>
+      <details class="mt-12" open>
+        <summary>Do you modify data in the database?</summary>
+        <p class="sub">No. Only one SELECT is allowed, with a forced LIMIT and filters on statements that change data.</p>
+      </details>
+      <details class="mt-12">
+        <summary>Where do query results go?</summary>
+        <p class="sub">To the browser. We do not store them permanently.</p>
+      </details>
+      <details class="mt-12">
+        <summary>Can I run this on my own infrastructure?</summary>
+        <p class="sub">Yes, as an on-prem / VPC consultation. Protection details are on the <a href="/en/security.html">Security</a> page.</p>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>How to generate a schema (tables and columns)</h2>
+      <p class="sub">Run the matching query in your database and export the result. Replace the database or schema name.</p>
+
+      <h3>MySQL / MariaDB</h3>
+<pre class="code">SELECT
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  IS_NULLABLE,
+  COLUMN_KEY
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'your_database'
+ORDER BY TABLE_NAME, ORDINAL_POSITION;</pre>
+
+      <h3>PostgreSQL</h3>
+<pre class="code">SELECT
+  table_name,
+  column_name,
+  data_type,
+  is_nullable
+FROM information_schema.columns
+WHERE table_schema = 'public'
+ORDER BY table_name, ordinal_position;</pre>
+
+      <h3>SQL Server</h3>
+<pre class="code">SELECT
+  TABLE_SCHEMA,
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS
+ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION;</pre>
+
+      <h3>SQLite</h3>
+<pre class="code">SELECT name AS table_name
+FROM sqlite_master
+WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
+ORDER BY name;
+
+PRAGMA table_info('your_table');</pre>
+
+      <h3>Oracle — your tables</h3>
+<pre class="code">SELECT
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  DATA_LENGTH,
+  DATA_PRECISION,
+  DATA_SCALE,
+  NULLABLE
+FROM USER_TAB_COLUMNS
+ORDER BY TABLE_NAME, COLUMN_ID;</pre>
+
+      <h3>Oracle — a specific OWNER</h3>
+      <p class="sub">OWNER is the schema name, usually uppercase, for example <code>HR</code>. Check it with <code>SELECT USER FROM dual;</code></p>
+<pre class="code">SELECT
+  OWNER,
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  NULLABLE
+FROM ALL_TAB_COLUMNS
+WHERE OWNER = 'HR'
+ORDER BY TABLE_NAME, COLUMN_ID;</pre>
+    </section>
+  </main>
+  <div data-include="/en/partials/footer.html"></div>
+  <script src="/js/include.js"></script>
+  <script src="/js/header.js"></script>
+  <script defer src="/js/cookie-consent.js"></script>
+</body>
+</html>

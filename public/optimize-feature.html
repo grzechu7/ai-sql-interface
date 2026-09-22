@@ -1,0 +1,260 @@
+<!DOCTYPE html> 
+<html lang="pl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Optymalizacja SQL na podstawie schematu | AI-SQL-Chat</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/style.css"/>
+
+  <!-- SEO -->
+<link rel="canonical" href="https://aisql.pl/en/index.html">
+<link rel="alternate" hreflang="pl" href="https://aisql.pl/index.html">
+<link rel="alternate" hreflang="en" href="https://aisql.pl/en/index.html">
+<link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/index.html">
+
+  <style>
+    .grid-2 { display:grid; gap:16px; grid-template-columns:1fr; }
+    @media(min-width:980px){ .grid-2{ grid-template-columns:1.2fr .8fr; } }
+    .mono { font-family: "JetBrains Mono", monospace; }
+  </style>
+
+</head>
+
+<body>
+
+  <!-- HEADER -->
+ <div data-include="/partials/header.html"></div>
+  <script src="/js/include.js"></script>
+  <script src="/js/header.js"></script>
+  <!-- END HEADER -->
+
+  <div class="bg-grid"></div>
+
+  <main class="container">
+
+    <!-- HERO -->
+    <section class="hero" style="padding-top:28px; padding-bottom:8px">
+      <h1 class="h1">Wklej schemat i <span class="grad">optymalizuj zapytanie</span></h1>
+      <p class="lead">
+        Wklej strukturę bazy, zamień ją na JSON, a potem wklej SELECT.
+        Narzędzie obejrzy zapytanie w kontekście tabel i zaproponuje poprawioną wersję.
+      </p>
+      <p class="sub" style="margin-top:8px; font-size:15px;">
+        Nie wiesz, jak wyjąć schemat?
+        <a href="/docs.html">Zobacz dokumentację</a>
+      </p>
+    </section>
+
+    <!-- TWO COLUMNS -->
+    <section class="grid-2">
+
+      <!-- LEFT COLUMN -->
+      <div>
+        <!-- 1) SCHEMA -->
+        <div class="card">
+          <div class="card-head">
+            <h2>1) Wklej schemat bazy</h2>
+            <span class="note">TSV, CSV, kolumny oddzielone spacją albo JSON</span>
+          </div>
+
+          <textarea id="schemaInput" class="input mono" rows="12" placeholder="Example:
+TABLE_NAME  COLUMN_NAME  DATA_TYPE
+users       id           int
+users       name         varchar
+..."></textarea>
+
+          <div class="mt-12" style="display:flex; gap:10px; flex-wrap:wrap">
+            <button class="btn btn-secondary" id="parseBtn" type="button">Zamień na JSON</button>
+            <button class="btn btn-ghost" id="downloadBtn" type="button">Pobierz schema.json</button>
+            <span id="parseState" class="note"></span>
+          </div>
+        </div>
+
+        <!-- 2) CODE TO OPTIMIZE -->
+        <div class="card mt-16">
+          <div class="card-head">
+            <h3>2) Wklej zapytanie</h3>
+            <span class="note">SELECT, ewentualnie kod, który je buduje</span>
+          </div>
+
+          <textarea id="codeInput" class="input mono" rows="10" placeholder="Wklej SELECT do optymalizacji..."></textarea>
+
+          <div class="mt-12" style="display:flex; gap:10px; align-items:center">
+            <button class="btn btn-primary" id="optBtn" type="button">Optymalizuj</button>
+            <span id="optState" class="note"></span>
+          </div>
+
+          <div class="mt-12">
+            <div style="display:flex; gap:8px">
+              <h3>3) Poprawione zapytanie</h3>
+              <button class="btn btn-secondary" type="button" onclick="copySql()">Kopiuj</button>
+              <button class="btn btn-secondary" type="button" onclick="downloadSql()">Pobierz</button>
+            </div>
+            <pre id="optOut" class="code mono" style="min-height:160px; white-space:pre-wrap">— brak —</pre>
+          </div>
+
+          <div class="mt-16">
+            <label class="sub">Co zostało zmienione i dlaczego</label>
+            <pre id="optExplain" class="code mono" style="min-height:160px; white-space:pre-wrap">— brak —</pre>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="card">
+        <div class="card-head">
+          <h2>Podgląd schematu</h2>
+          <span class="note">JSON</span>
+        </div>
+
+        <pre id="schemaPreview" class="code mono" style="min-height:400px; white-space:pre-wrap">— brak —</pre>
+      </div>
+
+    </section>
+
+    <section class="card mt-16">
+      <h2>Optimizer SQL</h2>
+      <p class="sub">
+        Optimizer patrzy na zapytanie i strukturę tabel, potem proponuje poprawki.
+        Nie łączy się z bazą — pracuje na wklejonym schemacie.
+      </p>
+    </section>
+
+  </main>
+
+<script>
+  const $ = s => document.querySelector(s);
+  const state = { schemaObj: null };
+
+  function sanitizeDump(text) {
+    const DROP_PATTERNS = [/^#/];
+    return text
+      .split(/\r?\n/)
+      .map(l => l.replace(/\u00A0/g, ' ').trim())
+      .filter(l => !!l && !DROP_PATTERNS.some(rx => rx.test(l)));
+  }
+
+  function isJsonLike(txt){ try{ JSON.parse(txt); return true; }catch{ return false; } }
+
+  function parseFlatColumns(text){
+    const lines = sanitizeDump(text);
+    const out = new Map();
+    for (const line of lines){
+      const [t,c,type] = line.split(/\s+/);
+      if (!t || !c) continue;
+      if (!out.has(t)) out.set(t,{ name:t, columns:[] });
+      out.get(t).columns.push({ name:c, type:type||'TEXT' });
+    }
+    return { tables:[...out.values()] };
+  }
+
+  function normalizeSchema(text){
+    if (isJsonLike(text)) return JSON.parse(text);
+    return parseFlatColumns(text);
+  }
+
+  $('#parseBtn').addEventListener('click', ()=>{
+    const raw = $('#schemaInput').value.trim();
+    if (!raw) return $('#parseState').textContent = 'Wklej schemat.';
+    try{
+      state.schemaObj = normalizeSchema(raw);
+      $('#schemaPreview').textContent = JSON.stringify(state.schemaObj,null,2);
+      $('#parseState').textContent = 'Schemat rozpoznany.';
+    }catch(e){
+      $('#parseState').textContent = 'Błąd odczytu: '+e.message;
+    }
+  });
+
+  $('#downloadBtn').addEventListener('click',()=>{
+    if (!state.schemaObj) return $('#parseState').textContent='Najpierw zamień schemat na JSON.';
+    const blob = new Blob([JSON.stringify(state.schemaObj,null,2)],{type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='schema.json'; a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  function cleanCode(str) {
+    return str
+      .replace(/```sql/gi, "")
+      .replace(/```/g, "")
+      .trim();
+  }
+
+  $('#optBtn').addEventListener('click', async ()=>{
+    if (!state.schemaObj) return $('#optState').textContent='Najpierw zamień schemat na JSON.';
+    const code = $('#codeInput').value.trim();
+    if (!code) return $('#optState').textContent='Wklej zapytanie.';
+
+    $('#optState').textContent='Optymalizuję…';
+    $('#optOut').textContent='...';
+    $('#optExplain').textContent='...';
+
+    try{
+     const res = await fetch('/api/optimize', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    schema: state.schemaObj,
+    code,
+    // 🔥 always explain in English
+    instructions: "Wyjaśnij wszystkie zmiany i powody wyłącznie po polsku."
+  })
+});
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error||'HTTP error');
+
+      $('#optOut').textContent = cleanCode(data.optimized || '');
+      $('#optExplain').textContent = data.explanation || '— brak wyjaśnienia —';
+      $('#optState').textContent='Gotowe';
+    }catch(e){
+      $('#optOut').textContent='—';
+      $('#optExplain').textContent='—';
+      $('#optState').textContent='❌ '+e.message;
+    }
+  });
+
+function copySql() {
+  const code = document.getElementById("optOut").textContent.trim();
+
+  if (!code || code === "— brak —") {
+    alert("Nie ma czego kopiować.");
+    return;
+  }
+
+  navigator.clipboard.writeText(code)
+    .then(() => {
+      alert("Skopiowano.");
+    })
+    .catch(() => {
+      alert("Nie udało się skopiować.");
+    });
+}
+
+function downloadSql() {
+  const code = document.getElementById("optOut").textContent.trim();
+
+  if (!code || code === "— brak —") {
+    alert("Nie ma czego pobrać.");
+    return;
+  }
+
+  const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "optimized.sql";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+</script>
+<div data-include="/partials/footer.html"></div>
+</body>
+</html>

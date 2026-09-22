@@ -1,48 +1,37 @@
 <header class="header">
   <div class="header-inner">
-    <a class="brand" href="/en/index.html" aria-label="AI-SQL-Chat - homepage">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M4 7c0-1.657 3.582-3 8-3s8 1.343 8 3-3.582 3-8 3-8-1.343-8-3Z" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M4 7v10c0 1.657 3.582 3 8 3s8-1.343 8-3V7" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M20 12c0 1.657-3.582 3-8 3s-8-1.343-8-3" stroke="currentColor" stroke-width="1.5"/>
-      </svg>
-      <span class="name">AI-SQL-Chat</span>
-      <img src="/img/owner.png" alt="Owner" class="avatar" />
-      <span class="byline">
-        created by
-        <a href="https://www.linkedin.com/in/grzegorz-parczewski-881a0251/"
-           target="_blank"
-           rel="author noopener noreferrer">
-          Grzegorz Parczewski
-        </a>
-      </span>
-    </a>
+    <div class="brand">
+      <a class="brand-home" href="/en/index.html" aria-label="AI-SQL-Chat - homepage">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7c0-1.657 3.582-3 8-3s8 1.343 8 3-3.582 3-8 3-8-1.343-8-3Z" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M4 7v10c0 1.657 3.582 3 8 3s8-1.343 8-3V7" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M20 12c0 1.657-3.582 3-8 3s-8-1.343-8-3" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <span class="name">AI-SQL-Chat</span>
+      </a>
+      <a class="byline" href="https://www.linkedin.com/in/grzegorz-parczewski-881a0251/" target="_blank" rel="author noopener noreferrer">
+        <img src="/img/owner.png" alt="" class="avatar" />
+        <span class="byline-prefix">created by</span>
+        <span class="byline-name">Grzegorz Parczewski</span>
+      </a>
+    </div>
 
-    <!-- Hamburger (mobile) -->
     <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-controls="mainmenu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
 
     <nav id="mainmenu" class="nav" role="navigation">
-
-      <!-- Auth links -->
-      <span id="authLinks">
+      <a class="link" href="/en/sql-query.html">Generator</a>
+      <a class="link" href="/en/optimize-feature.html">Optimizer</a>
+      <a class="link" href="/en/index.html#how">How it works</a>
+      <a class="link" href="/en/docs.html">Docs</a>
+      <span id="authLinks" class="nav-auth">
         <a class="link" href="/en/login.html" id="loginLink">Login</a>
-        <a class="link" href="/en/register.html" id="registerLink">Register</a>
+        <a class="link nav-quiet" href="/en/register.html" id="registerLink">Register</a>
       </span>
-
-      <!-- Visible only when logged in -->
       <a class="link" href="#" id="logoutLink" style="display:none;">Logout</a>
-
-      <!-- Buttons -->
-      <a class="btn btn-secondary" href="/en/schema-paste.html" id="pasteSchemaBtn">Paste Schema</a>
-      <a class="btn btn-secondary" href="/en/optimize-feature.html" id="optimizeBtn">Optimize</a>
-
-      <a class="btn btn-secondary" href="/en/schema-query.html"
-         id="loadSchemaBtn" style="display:none;">Load Schema</a>
-
-      <a class="btn btn-primary" href="/en/sql-query.html" id="tryDemoBtn">Try the demo</a>
-
+      <a class="link" href="/en/schema-query.html" id="loadSchemaBtn" style="display:none;">Schema</a>
+      <a class="btn btn-primary" href="/en/sql-query.html">Try the demo</a>
     </nav>
   </div>
 

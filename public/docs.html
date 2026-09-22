@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dokumentacja — schemat bazy i bezpieczny SELECT | AI-SQL-Chat</title>
+  <meta name="description" content="Jak przygotować schemat JSON dla AI-SQL-Chat: zapytania dla MySQL, PostgreSQL, SQL Server, Oracle i SQLite oraz zasady tylko-SELECT." />
+  <link rel="canonical" href="https://aisql.pl/docs.html" />
+  <link rel="alternate" hreflang="pl" href="https://aisql.pl/docs.html">
+  <link rel="alternate" hreflang="en" href="https://aisql.pl/en/docs.html">
+  <meta name="robots" content="index,follow" />
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"/>
+</head>
+<body class="page-docs">
+  <div class="bg-grid"></div>
+  <div data-include="/partials/header.html"></div>
+  <main class="container">
+    <header class="docs-hero">
+      <p class="kicker">Dokumentacja</p>
+      <h1>Schemat, pytania, bezpieczny SELECT</h1>
+      <p class="lead">Tu jest materiał, który wcześniej zajmował stronę główną: jak wyjąć strukturę bazy i czego narzędzie nie zrobi z danymi.</p>
+      <div class="doc-links">
+        <a class="btn btn-primary" href="/sql-query.html">Wypróbuj demo</a>
+        <a class="btn btn-secondary" href="/schema-paste.html">Wklej schemat</a>
+        <a class="btn btn-ghost" href="/schema-to-json.html">Instrukcja: schema → JSON</a>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>Jak zacząć</h2>
+      <ol>
+        <li>Wyjmij nazwy tabel i kolumn zapytaniem dla swojego silnika (niżej) albo skorzystaj z <a href="/schema-copy.html">instrukcji wklejania schematu</a>.</li>
+        <li>Na stronie <a href="/schema-paste.html">Wklej schemat</a> wygenerujesz SQL bez konta.</li>
+        <li>Żeby wracać do tego samego schematu, zaloguj się i wgraj JSON na stronie <a href="/schema-query.html">Załaduj schemat</a>.</li>
+      </ol>
+    </section>
+
+    <section class="card" id="faq">
+      <h2>FAQ</h2>
+      <details class="mt-12" open>
+        <summary>Czy modyfikujecie dane w bazie?</summary>
+        <p class="sub">Nie. System przepuszcza wyłącznie jedno zapytanie SELECT, z wymuszonym LIMIT i filtrami instrukcji modyfikujących.</p>
+      </details>
+      <details class="mt-12">
+        <summary>Gdzie trafiają wyniki zapytań?</summary>
+        <p class="sub">Do przeglądarki. Nie zapisujemy ich na stałe.</p>
+      </details>
+      <details class="mt-12">
+        <summary>Czy mogę uruchomić to u siebie?</summary>
+        <p class="sub">Tak, w modelu konsultacji on-prem / VPC. Szczegóły ochrony są na stronie <a href="/security.html">Bezpieczeństwo</a>.</p>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>Jak wygenerować schemat (tabele i kolumny)</h2>
+      <p class="sub">Wklej odpowiednie zapytanie w swojej bazie i wyeksportuj wynik. Podmień nazwę bazy albo schemy.</p>
+
+      <h3>MySQL / MariaDB</h3>
+<pre class="code">SELECT
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  IS_NULLABLE,
+  COLUMN_KEY
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'twoja_baza'
+ORDER BY TABLE_NAME, ORDINAL_POSITION;</pre>
+
+      <h3>PostgreSQL</h3>
+<pre class="code">SELECT
+  table_name,
+  column_name,
+  data_type,
+  is_nullable
+FROM information_schema.columns
+WHERE table_schema = 'public'
+ORDER BY table_name, ordinal_position;</pre>
+
+      <h3>SQL Server</h3>
+<pre class="code">SELECT
+  TABLE_SCHEMA,
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS
+ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION;</pre>
+
+      <h3>SQLite</h3>
+<pre class="code">SELECT name AS table_name
+FROM sqlite_master
+WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
+ORDER BY name;
+
+PRAGMA table_info('twoja_tabela');</pre>
+
+      <h3>Oracle — Twoje tabele</h3>
+<pre class="code">SELECT
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  DATA_LENGTH,
+  DATA_PRECISION,
+  DATA_SCALE,
+  NULLABLE
+FROM USER_TAB_COLUMNS
+ORDER BY TABLE_NAME, COLUMN_ID;</pre>
+
+      <h3>Oracle — konkretny OWNER</h3>
+      <p class="sub">OWNER to nazwa schemy, zwykle wielkimi literami, np. <code>HR</code>. Sprawdzisz ją przez <code>SELECT USER FROM dual;</code></p>
+<pre class="code">SELECT
+  OWNER,
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  NULLABLE
+FROM ALL_TAB_COLUMNS
+WHERE OWNER = 'HR'
+ORDER BY TABLE_NAME, COLUMN_ID;</pre>
+    </section>
+  </main>
+  <div data-include="/partials/footer.html"></div>
+  <script src="/js/include.js"></script>
+  <script src="/js/header.js"></script>
+  <script defer src="/js/cookie-consent.js"></script>
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('a[href="/schema-query.html"]').forEach((link) => {
+      link.addEventListener("click", async (e) => {
+        e.preventDefault();
+        try {
+          const res = await fetch("/api/auth/me", { credentials: "include" });
+          window.location.href = res.ok ? "/schema-query.html" : "/login.html";
+        } catch (err) {
+          window.location.href = "/login.html";
+        }
+      });
+    });
+  });
+  </script>
+</body>
+</html>

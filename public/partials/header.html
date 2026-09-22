@@ -1,73 +1,35 @@
 <header class="header">
   <div class="header-inner">
-    <a class="brand" href="/index.html" aria-label="AI-SQL-Chat - strona główna">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M4 7c0-1.657 3.582-3 8-3s8 1.343 8 3-3.582 3-8 3-8-1.343-8-3Z" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M4 7v10c0 1.657 3.582 3 8 3s8-1.343 8-3V7" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M20 12c0 1.657-3.582 3-8 3s-8-1.343-8-3" stroke="currentColor" stroke-width="1.5"/>
-      </svg>
-      <span class="name">AI-SQL-Chat</span>
-      <img src="/img/owner.png" alt="Owner" class="avatar" />
-      <span class="byline">
-        created by
-        <a href="https://www.linkedin.com/in/grzegorz-parczewski-881a0251/" 
-        target="_blank" 
-        rel="author noopener noreferrer">
-        Grzegorz Parczewski
-        </a>
-      </span>
-    </a>
-    <script type="application/ld+json">
-function updateHeaderLanguage() {
-  const userLang = navigator.language || navigator.userLanguage;
-
-  const isPL = userLang.startsWith("pl");
-
-  // Polskie teksty
-  if (isPL) {
-    document.getElementById("loginLink").textContent = "Zaloguj";
-    document.getElementById("registerLink").textContent = "Zarejestruj";
-    document.getElementById("logoutLink").textContent = "Wyloguj";
-
-    document.getElementById("pasteSchemaBtn").textContent = "Wklej schemat";
-    document.getElementById("optimizeBtn").textContent = "Optymalizuj";
-    document.getElementById("loadSchemaBtn").textContent = "Załaduj schemat";
-    document.getElementById("tryDemoBtn").textContent = "Wypróbuj demo";
-  } 
-  
-  // Angielskie teksty
-  else {
-    document.getElementById("loginLink").textContent = "Login";
-    document.getElementById("registerLink").textContent = "Register";
-    document.getElementById("logoutLink").textContent = "Logout";
-
-    document.getElementById("pasteSchemaBtn").textContent = "Paste Schema";
-    document.getElementById("optimizeBtn").textContent = "Optimize";
-    document.getElementById("loadSchemaBtn").textContent = "Load Schema";
-    document.getElementById("tryDemoBtn").textContent = "Try the demo";
-  }
-}
-
-document.addEventListener("DOMContentLoaded", updateHeaderLanguage);
-</script>
-    <!-- Hamburger (mobile) -->
+    <div class="brand">
+      <a class="brand-home" href="/index.html" aria-label="AI-SQL-Chat - strona główna">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7c0-1.657 3.582-3 8-3s8 1.343 8 3-3.582 3-8 3-8-1.343-8-3Z" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M4 7v10c0 1.657 3.582 3 8 3s8-1.343 8-3V7" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M20 12c0 1.657-3.582 3-8 3s-8-1.343-8-3" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <span class="name">AI-SQL-Chat</span>
+      </a>
+      <a class="byline" href="https://www.linkedin.com/in/grzegorz-parczewski-881a0251/" target="_blank" rel="author noopener noreferrer">
+        <img src="/img/owner.png" alt="" class="avatar" />
+        <span class="byline-prefix">created by</span>
+        <span class="byline-name">Grzegorz Parczewski</span>
+      </a>
+    </div>
     <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-controls="mainmenu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
 
     <nav id="mainmenu" class="nav" role="navigation">
-      <!-- Przyciski logowania/rejestracji -->
-      <span id="authLinks">
+      <a class="link" href="/sql-query.html">Generator</a>
+      <a class="link" href="/optimize-feature.html">Optimizer</a>
+      <a class="link" href="/index.html#jak-dziala">Jak działa</a>
+      <a class="link" href="/docs.html">Docs</a>
+      <span id="authLinks" class="nav-auth">
         <a class="link" href="/login.html" id="loginLink">Zaloguj</a>
-        <a class="link" href="/register.html" id="registerLink">Zarejestruj</a>
+        <a class="link nav-quiet" href="/register.html" id="registerLink">Zarejestruj</a>
       </span>
-
-      <!-- Zmieniane dynamicznie po zalogowaniu -->
       <a class="link" href="#" id="logoutLink" style="display:none;">Wyloguj</a>
-
-      <a class="btn btn-secondary" href="/schema-paste.html">Wklej schemat</a>
-       <a class="btn btn-secondary" href="/optimize-feature.html">Optymalizuj</a>
-      <a class="btn btn-secondary" href="/schema-query.html" id="loadSchemaBtn" style="display:none;">Załaduj schemat</a>
+      <a class="link" href="/schema-query.html" id="loadSchemaBtn" style="display:none;">Schemat</a>
       <a class="btn btn-primary" href="/sql-query.html">Wypróbuj demo</a>
     </nav>
   </div>

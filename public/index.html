@@ -1,596 +1,436 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-36ZC4QTDE2"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-36ZC4QTDE2');
-</script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-36ZC4QTDE2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-36ZC4QTDE2');
+  </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-  <link rel="canonical" href="https://aisql.pl/index.html">
+  <link rel="canonical" href="https://aisql.pl/" />
   <link rel="alternate" hreflang="pl" href="https://aisql.pl/index.html">
   <link rel="alternate" hreflang="en" href="https://aisql.pl/en/index.html">
   <link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/index.html">
 
-
-  <!-- SEO podstawowe -->
   <title>AI-SQL-Chat — generator SQL z języka naturalnego (tylko SELECT, bezpiecznie)</title>
   <meta name="description" content="AI-SQL-Chat to bezpieczny generator SQL z języka naturalnego. Wgraj schemat JSON i zadawaj pytania po polsku — otrzymasz jedno poprawne zapytanie SELECT z walidacją, filtrowaniem anty-SQLi i limitem. Obsługa MySQL, PostgreSQL, SQL Server, Oracle." />
-  <link rel="canonical" href="https://aisql.pl/" />
   <meta name="robots" content="index,follow,max-image-preview:large" />
   <meta name="keywords" content="SQL AI, generator SQL, SQL z języka naturalnego, natural language to SQL, SELECT generator, narzędzie SQL, SQL online, baza danych, schema JSON SQL">
 
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AI-SQL-Chat">
+  <meta property="og:locale" content="pl_PL">
+  <meta property="og:url" content="https://aisql.pl/">
+  <meta property="og:title" content="AI-SQL-Chat — generator SQL z języka naturalnego (tylko SELECT)">
+  <meta property="og:description" content="Pytaj swoją bazę językiem naturalnym. AI-SQL-Chat zamienia pytanie w jedno bezpieczne zapytanie SELECT zgodne z Twoim schematem.">
+  <meta property="og:image" content="https://aisql.pl/img/og-cover.png">
+  <meta property="og:image:secure_url" content="https://aisql.pl/img/og-cover.png">
+  <meta property="og:image:alt" content="AI-SQL-Chat — generator SQL z języka naturalnego">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
 
- <!-- Open Graph (Facebook, LinkedIn, Discord, Slack, Telegram, WhatsApp) -->
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="AI-SQL-Chat">
-<meta property="og:locale" content="pl_PL">
-<meta property="og:url" content="https://aisql.pl/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI-SQL-Chat — generuj SQL z opisu (tylko SELECT)">
+  <meta name="twitter:description" content="Wgraj schemat JSON, opisz zapytanie — AI-SQL-Chat stworzy poprawny SELECT z walidacją. Działa tylko w przeglądarce, bez wysyłania danych.">
+  <meta name="twitter:image" content="https://aisql.pl/img/og-cover.png">
+  <meta name="twitter:creator" content="@aisql">
 
-<meta property="og:title" content="AI-SQL-Chat — generator SQL z języka naturalnego (tylko SELECT)">
-<meta property="og:description" content="Generuj zapytania SQL w 5 sekund. Wgraj schemat JSON i opisz zadanie po polsku — AI-SQL-Chat wygeneruje jedno bezpieczne zapytanie SELECT. Bez wysyłania danych na serwer.">
+  <meta name="theme-color" content="#5B5CE2">
+  <meta property="article:author" content="https://www.linkedin.com/in/grzegorz-parczewski-881a0251/">
+  <meta property="article:publisher" content="https://www.linkedin.com/in/grzegorz-parczewski-881a0251/">
 
-<meta property="og:image" content="https://aisql.pl/img/og-cover.png">
-<meta property="og:image:secure_url" content="https://aisql.pl/img/og-cover.png">
-<meta property="og:image:alt" content="AI-SQL-Chat — generator SQL z języka naturalnego">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-
-
-<!-- Twitter Cards -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="AI-SQL-Chat — generuj SQL z opisu (tylko SELECT)">
-<meta name="twitter:description" content="Wgraj schemat JSON, opisz zapytanie — AI-SQL-Chat stworzy poprawny SELECT z walidacją. Działa tylko w przeglądarce, bez wysyłania danych.">
-<meta name="twitter:image" content="https://aisql.pl/img/og-cover.png">
-<meta name="twitter:creator" content="@aisql">
-
-
-<!-- Additional social optimization -->
-<meta name="theme-color" content="#0d6efd">
-<meta property="article:author" content="https://www.linkedin.com/in/grzegorz-parczewski-881a0251/">
-<meta property="article:publisher" content="https://www.linkedin.com/in/grzegorz-parczewski-881a0251/">
-
-
-  <!-- Favicons / manifest -->
   <link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
   <link rel="alternate icon" href="/img/favicon.png" />
   <link rel="manifest" href="/site.webmanifest" />
 
-  <!-- Fonty / performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-
-  <!-- Wspólny styl -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css"/>
 
-  <!-- Drobne dodatki tylko dla strony głównej -->
-  <style>
-    body{
-      background:
-        radial-gradient(1000px 600px at 92% -12%, rgba(99,102,241,.10), transparent 60%),
-        radial-gradient(900px 500px at -10% 110%, rgba(59,130,246,.10), transparent 60%),
-        var(--bg);
+  <script>
+  (function() {
+    if (window.location.pathname.startsWith("/en")) return;
+    const lang = navigator.language || navigator.userLanguage;
+    if (!lang.startsWith("pl")) {
+      const newPath = "/en" + window.location.pathname;
+      window.location.replace(newPath);
     }
-    .badge-line{display:flex; align-items:center; gap:10px; margin:10px 0 24px}
-    .pill{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; background:#f1f5f9; border:1px solid var(--line); border-radius:999px; color:#0f172a}
-    .demo{padding:14px; border-radius:var(--radius); display:grid; gap:12px; background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow)}
-    .pane{border-radius:12px; border:1px solid var(--line); background:#f8fafc; overflow:hidden}
-    .pane-head{display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:#eef2f7; color:#334155; border-bottom:1px solid #e2e8f0; font-size:13px}
-    .pane-body{padding:12px; overflow:auto; max-height:280px}
-    .kbd{display:inline-flex; align-items:center; gap:6px; background:#fff; padding:6px 8px; border-radius:8px; border:1px solid var(--line); font-family:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono","Courier New", monospace; font-size:12.5px}
-    .blue{color:#1d4ed8}
-    /* SEO karta, by nie używać inline */
-    .seo-card h2{margin:0 0 8px}
-    .seo-card h3{margin:12px 0 6px}
-    .seo-card p, .seo-card li, .seo-card ol{line-height:1.8}
-  </style>
-
-    <script>
-(function() {
-  // jeśli już jest w /en — nic nie rób
-  if (window.location.pathname.startsWith("/en")) return;
-
-  const lang = navigator.language || navigator.userLanguage;
-
-  // jeśli przeglądarka NIE jest PL → przełącz na EN
-  if (!lang.startsWith("pl")) {
-    const newPath = "/en" + window.location.pathname;
-    window.location.replace(newPath);
-  }
-})();
-</script>
-
+  })();
+  </script>
 </head>
 
-<body>
+<body class="page-home">
   <script src="/js/logout.js"></script>
   <div class="bg-grid"></div>
-
-  <!-- HEADER (include) -->
   <div data-include="/partials/header.html"></div>
 
-  <main class="container">
-    <!-- HERO -->
-    <section class="hero grid-2">
-      <div>
-        <div class="badge-line">
-          <span class="pill">Generuj SQL z języka naturalnego</span>
-          <span class="pill">Bezpieczne wykonywanie zapytań</span>
-        </div>
-
-        <h1 class="h1">
-          Pisz po ludzku. <br>
-          Dostajesz <span class="grad">poprawny SQL</span>.
-        </h1>
-        <p class="lead">
-          Wgraj schemat bazy, zadaj pytanie i od razu zobacz wynik. <br/>
-          AI-SQL-Chat generuje jedno, bezpieczne zapytanie <strong>SELECT</strong> i wykonuje je na Twojej bazie.
-        </p>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap">
-          <a class="btn btn-primary" href="/sql-query.html">Wypróbuj wersję demo</a>
-          <a class="btn btn-ghost" href="/schema-paste.html" aria-label="Wklej swój schemat i wygeneruj zapytanie">Wklej schemat</a>
-          <a class="btn btn-secondary" href="/schema-query.html">Załaduj własny schemat</a>
-          <a class="btn btn-ghost" href="/schema-copy.html">Instrukcja: wklej schemat</a>
-          <a class="btn btn-ghost" href="/schema-to-json.html">Instrukcja: eksport do JSON</a>
-        </div>
-
-        <div class="note mt-12">Nie zapisujemy wyników. Ograniczenia DDoS, rate-limit, ochrona przed DML/DDL.</div>
-
-        <!-- ===== Blok SEO: Generator SQL z języka naturalnego ===== -->
-        <section class="card seo-card" style="margin-top:16px">
-  <h2>Generator SQL z języka naturalnego — dla kogo i jak działa?</h2>
-  <p class="sub" style="font-size:16px; color:#334155; margin:0 0 10px">
-    <strong>AI-SQL-Chat</strong> to lekki i bezpieczny <em>generator SQL z języka naturalnego</em>.  
-    Wpisujesz zapytanie po polsku, a narzędzie zwraca jedno, poprawne zapytanie
-    <strong>SELECT</strong> zgodne z Twoim schematem bazy danych.  
-    Teraz możesz również <strong>wkleić własny schemat</strong> bezpośrednio na stronie 
-    <a href="/schema-paste.html">Wklej schemat</a> i wygenerować zapytanie SQL jednorazowo — 
-    bez logowania i bez zapisywania danych.
-  </p>
-
-  <p class="sub" style="font-size:16px; color:#334155; margin:8px 0 12px">
-    Jeśli chcesz zachować swój schemat na stałe, wystarczy go wcześniej przygotować zgodnie z instrukcją na stronie 
-    <a href="/schema-copy.html">Instrukcja: wklej schemat</a> i zapisać w formacie <code>.json</code>.  
-    Po <strong>zalogowaniu</strong> możesz go wgrać na stronie 
-    <a href="/schema-query.html">Załaduj schemat</a>, 
-    aby w dowolnym momencie wracać do swojego schematu i generować nowe zapytania SQL bez ponownego wklejania danych.
-  </p>
-
-  <h3>Najważniejsze korzyści</h3>
-  <ul style="margin:0; padding:0 0 0 18px; color:#0f172a">
-    <li><strong>Tylko SELECT</strong> — zapytania tylko-do-odczytu z wymuszonym <code>LIMIT 1000</code>.</li>
-    <li><strong>Własny schemat</strong> — możesz wkleić go ręcznie lub wgrać plik JSON.</li>
-    <li><strong>Zgodność z danymi</strong> — generowany SQL odnosi się do tabel i kolumn Twojej bazy.</li>
-    <li><strong>Bez wysyłki danych</strong> — przetwarzanie odbywa się wyłącznie w przeglądarce.</li>
-    <li><strong>Bezpieczeństwo</strong> — filtry anty-SQLi, limity zapytań i ochrona przed DDoS, opisane w 
-      <a href="/security.html">Bezpieczeństwie</a>.
-    </li>
-  </ul>
-
-  <h3>Jak zacząć w 2–3 minuty</h3>
-  <ol style="margin:0; padding:0 0 0 18px; color:#0f172a">
-    <li>Wygeneruj schemat swojej bazy danych wg 
-      <a href="/schema-copy.html">instrukcji</a> i przygotuj wynik w formacie <strong>JSON</strong>.
-    </li>
-    <li>Użyj strony <a href="/schema-paste.html">Wklej schemat</a>, aby jednorazowo wkleić schemat i wygenerować zapytanie SQL.</li>
-    <li>Jeśli chcesz zachować swój schemat na później — zaloguj się i wgraj plik JSON na stronie 
-      <a href="/schema-query.html">Załaduj schemat</a>. Od tej chwili możesz wracać do niego w każdej sesji i generować zapytania SQL w dowolnym momencie.
-    </li>
-  </ol>
-
-  <div class="mt-12" style="display:flex; gap:10px; flex-wrap:wrap">
-    <a class="btn btn-primary" href="/sql-query.html" aria-label="Uruchom demo generatora SQL">Wypróbuj demo</a>
-    <a class="btn btn-secondary" href="/schema-copy.html" aria-label="Instrukcja generowania własnego schematu">Instrukcja: przygotuj schemat</a>
-    <a class="btn btn-ghost" href="/schema-paste.html" aria-label="Wklej swój schemat i wygeneruj zapytanie">Wklej schemat</a>
-  </div>
-</section>
-
-        <!-- ===== /Blok SEO ===== -->
-      </div>
-
-      <div class="demo">
-        <div class="pane">
-          <div class="pane-head">
-            <span>Prompt</span>
-            <span class="kbd">/ask <span class="note">…</span></span>
-          </div>
-          <div class="pane-body code">
-            <span class="blue">„podaj liczbę sprzedanych modułów w podziale na dom i mieszkanie, dodaj wartość wycen”</span>
-            <pre id="typing" class="code" style="margin:10px 0 0"></pre>
+  <main>
+    <div class="container">
+      <section class="home-hero">
+        <div class="home-copy">
+          <p class="eyebrow"><span class="dot" aria-hidden="true"></span> Generator SQL z języka naturalnego</p>
+          <h1 class="home-title">Pytaj swoją bazę<br><span class="grad">językiem naturalnym.</span></h1>
+          <p class="home-lead">Nie musisz znać SQL. Podajesz schemat, zadajesz pytanie i dostajesz jedno bezpieczne zapytanie SELECT, zgodne z tabelami Twojej bazy.</p>
+          <div class="home-actions">
+            <a class="btn btn-primary btn-lg" href="/sql-query.html">Wypróbuj demo</a>
+            <a class="btn btn-secondary btn-lg" href="/schema-paste.html">Wklej schemat</a>
           </div>
         </div>
 
-        <div class="pane">
-          <div class="pane-head">
-            <span>SQL</span>
-            <span class="note">AI-SQL-Chat</span>
+        <div class="stage" id="playground">
+          <div class="stage-label">
+            <span>Przykład na schemacie demo</span>
+            <span class="stage-live"><span class="pulse" aria-hidden="true"></span> podgląd</span>
           </div>
-          <div class="pane-body code">
-<pre>
-SELECT s_rodzajdomu.rodzajDomu,
-       SUM(wynik_wycenymoduly.liczbaModulow)         AS liczba_sprzedanych_modulow,
-       ROUND(SUM(wynik_wycenymoduly.cenaBrutto), 2)  AS wartosc_wyceny
-FROM wynik_wycenymoduly
-JOIN dane_domu    ON wynik_wycenymoduly.id_dane_klienta = dane_domu.id_dane_klienta
-JOIN s_rodzajdomu ON dane_domu.rodzaj_domu = s_rodzajdomu.id_rodzajDomu
-GROUP BY s_rodzajdomu.rodzajDomu
-LIMIT 1000;
-</pre>
+          <div class="prompt">
+            <p class="prompt-kicker">Pytanie</p>
+            <p class="prompt-q" id="demoQuestion"></p>
+            <div class="chips" role="tablist" aria-label="Przykładowe pytania">
+              <button type="button" class="chip is-on" role="tab" aria-selected="true" data-i="0">Moduły i wycena</button>
+              <button type="button" class="chip" role="tab" aria-selected="false" data-i="1">Lokalizacje</button>
+              <button type="button" class="chip" role="tab" aria-selected="false" data-i="2">Cennik modułów</button>
+            </div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Jak to działa -->
-    <section class="card section-how">
-      <div class="card-head">
-        <h2>Jak to działa</h2>
-        <span class="sub">Trzy proste kroki od pytania do wyniku</span>
-      </div>
-
-      <div class="grid-steps">
-        <div class="card">
-          <div class="step-num">1</div>
-          <h3>Wygeneruj i wgraj schemat</h3>
-          <p class="sub">Wygeneruj i wczytaj JSON ze strukturą tabel i kolumn. Możesz też użyć naszego przykładowego schematu.</p>
-        </div>
-
-        <div class="card">
-          <div class="step-num">2</div>
-          <h3>Zadaj pytanie</h3>
-          <p class="sub">Napisz zwykłym językiem. Silnik wygeneruje jedno <strong>SELECT</strong> z walidacją i limitami.</p>
-        </div>
-
-        <div class="card">
-          <div class="step-num">3</div>
-          <h3>Odbierz wynik</h3>
-          <p class="sub">Pokażemy SQL i tabelę wynikową. Liczby zaokrąglamy do 2 miejsc — gotowe do prezentacji.</p>
-        </div>
-      </div>
-    </section>
-    <!-- 🔽 NOWY AKAPIT Z INFORMACJĄ O LOGOWANIU 🔽 -->
-    <section class="card" aria-labelledby="schema-json-cta">
-      <h2 id="schema-json-cta" style="margin:0 0 8px">Wgrywanie własnego schematu </h2>
-      <p class="sub" style="font-size:16px; color:#334155">
-        Wgrywanie własnego schematu oraz generowanie zapytań SQL na podstawie promptów 
-          jest dostępne <strong>po zalogowaniu</strong>.  
-          Po zalogowaniu Twój schemat zostaje zapisany i dostępny w kolejnych sesjach.
-      </p>
-      <div class="mt-12" style="display:flex; gap:10px; flex-wrap:wrap">
-        <a href="/login.html" style="color:#1d4ed8; text-decoration:underline;">Zaloguj się</a> lub 
-          <a href="/register.html" style="color:#1d4ed8; text-decoration:underline;">utwórz konto</a>, aby korzystać z pełnej wersji.
-      </div>
-    </section>
-
-    <!-- Callout: „Wygeneruj schemat JSON” (pełna szerokość pod 'Jak to działa') -->
-    <section class="card" aria-labelledby="schema-json-cta">
-      <h2 id="schema-json-cta" style="margin:0 0 8px">Wygeneruj schemat JSON z własnej bazy danych</h2>
-      <p class="sub" style="font-size:16px; color:#334155">
-        Nie masz jeszcze pliku schematu? W 2–3 minuty przygotujesz go z MySQL, PostgreSQL, SQL Server lub Oracle.
-        Uruchom krótkie zapytanie, a wynik wyeksportuj do <code>.json</code>.
-      </p>
-      <div class="mt-12" style="display:flex; gap:10px; flex-wrap:wrap">
-        <a class="btn btn-secondary" href="/schema-to-json.html">Instrukcja: schema → JSON</a>
-        <a class="btn btn-ghost" href="/schema-query.html">Załaduj schemat</a>
-      </div>
-    </section>
-
-       <!-- Callout: Optymalizacja (pełna szerokość pod 'Jak to działa') -->
-    <section class="card" aria-labelledby="schema-json-cta">
-      <h2 id="schema-json-cta" style="margin:0 0 8px">Optymalizuj swoje zapytanie</h2>
-      <p class="sub" style="font-size:16px; color:#334155">
-        Nowa funkcja <strong>optymalizacji zapytań SQL</strong> pozwala przeanalizować dowolny SELECT
-        i otrzymać gotowe rekomendacje dotyczące indeksów, filtrów oraz planów wykonania.
-        Możesz uzyskać pełny raport optymalizacyjny na stronie 
-      </p>
-      <div class="mt-12" style="display:flex; gap:10px; flex-wrap:wrap">
-        <a class="btn btn-secondary" href="/schema-to-json.html">Instrukcja: schema → JSON</a>
-        <a class="btn btn-ghost" href="/optimize-feature.html">Analiza i optymalizacja SQL</a>
-      </div>
-    </section>
-
-    <!-- Dlaczego -->
-    <section id="features" class="card section-why">
-      <div class="card-head">
-        <h2>Dlaczego AI-SQL-Chat?</h2>
-        <span class="sub">Bezpieczeństwo, użyteczność i szybkość wdrożenia</span>
-      </div>
-
-      <div class="grid-features">
-        <div class="card">
-          <h3>Jedno bezpieczne SELECT</h3>
-          <p class="sub">Blokujemy DDL/DML, OUTFILE/INFILE, SLEEP/BENCHMARK. Wymuszamy LIMIT oraz pojedynczą instrukcję.</p>
-        </div>
-        <div class="card">
-          <h3>Ochrona &amp; Rate-limit</h3>
-          <p class="sub">Slowdown, limity per IP, shedder na pętli zdarzeń — ochrony przed nadużyciami i DDoS.</p>
-        </div>
-        <div class="card">
-          <h3>Łatwa integracja</h3>
-          <p class="sub">Własny schemat JSON, prosty deployment (Node + Nginx), działa lokalnie i w chmurze.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Bezpieczeństwo (skrót) -->
-    <section class="grid-2">
-      <div class="card section-why">
-        <h2>Bezpieczeństwo danych</h2>
-        <p class="sub">Projekt od początku zorientowany na bezpieczeństwo operacji SQL i odporność na nadużycia.</p>
-        <ul style="margin:14px 0 0; padding:0 0 0 16px; color:var(--muted)">
-          <li>Brak przechowywania wyników — wszystko w pamięci.</li>
-          <li>Twarde filtrowanie SQL (pojedynczy SELECT + zakazane wzorce).</li>
-          <li>Ograniczenia rozmiaru body, brak „index of” w statykach.</li>
-          <li>Helmet, HPP, CORS whitelist, nocache, kompresja.</li>
-        </ul>
-        <div class="mt-12">
-          <a class="btn btn-ghost" href="/security.html">Więcej o bezpieczeństwie</a>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="pane">
-          <div class="pane-head"><span>Wymuszenia</span><span class="note">middleware</span></div>
-          <div class="pane-body code">
-<pre>
-if (!/^\s*SELECT\b/i.test(sql)) throw new Error('Tylko SELECT');
-if (banned.test(sql)) throw new Error('Niedozwolone instrukcje');
-if (!/\bLIMIT\b/i.test(sql)) sql = sql.replace(/;$/, '') + ' LIMIT 1000;';
-</pre>
+          <div class="stage-body">
+            <div class="checks">
+                <p class="checks-title">AI czyta schemat</p>
+                <ul id="demoChecks" style="margin:0;padding:0;list-style:none"></ul>
+            </div>
+            <div class="ide">
+              <div class="ide-bar">
+                <span class="ide-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span>SQL</span>
+                <span class="ide-valid">SELECT only</span>
+              </div>
+              <pre id="demoSql" aria-live="polite"></pre>
+              <div class="ide-foot">
+                <span class="badge">LIMIT 1000</span>
+                <span class="badge">Walidacja</span>
+                <span class="spacer"></span>
+                <button type="button" class="ide-copy" id="copySql">Kopiuj SQL</button>
+                <a class="ide-open" href="/sql-query.html">Otwórz demo</a>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="mt-12"></div>
-        <div class="pane">
-          <div class="pane-head"><span>Ochrona</span><span class="note">toobusy / rate-limit / slowdown</span></div>
-          <div class="pane-body code">
-<pre>
-if (toobusy()) return res.status(503).json({ error: 'Serwer przeciążony' });
-</pre>
-          </div>
+
+        <div class="engines">
+          <ul>
+            <li>MySQL</li>
+            <li>PostgreSQL</li>
+            <li>SQL Server</li>
+            <li>Oracle</li>
+            <li>SQLite</li>
+          </ul>
+          <p>Pracujemy na schemacie, który podasz: JSON albo wklejona struktura. Nie podłączamy się do Twojej bazy.</p>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- FAQ -->
-    <section id="faq" class="card">
-      <h2>FAQ</h2>
+      <section class="home-block" id="jak-dziala">
+        <h2>Od pytania do SQL</h2>
+        <p class="home-sub">Trzy kroki. Najpierw zobacz demo, potem wklej własny schemat.</p>
+        <div class="steps">
+          <article class="step">
+            <div class="step-mark" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 8.5c0-1.2 3.1-2.5 7-2.5s7 1.3 7 2.5-3.1 2.5-7 2.5-7-1.3-7-2.5Z" stroke="currentColor" stroke-width="1.6"/><path d="M5 8.5v7c0 1.2 3.1 2.5 7 2.5s7-1.3 7-2.5v-7" stroke="currentColor" stroke-width="1.6"/><path d="M19 12c0 1.2-3.1 2.5-7 2.5S5 13.2 5 12" stroke="currentColor" stroke-width="1.6"/></svg>
+            </div>
+            <h3>Dodaj schemat</h3>
+            <p>Pokazujesz, jak wygląda Twoja baza. W demo możesz zacząć od gotowego przykładu.</p>
+            <p class="step-say">Twoje tabele i kolumny, bez podłączania bazy.</p>
+          </article>
+          <article class="step">
+            <div class="step-mark" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 16.5V7.8A2.8 2.8 0 0 1 8.8 5h6.4A2.8 2.8 0 0 1 18 7.8v5.2a2.8 2.8 0 0 1-2.8 2.8H9.2L6 18.5v-2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            </div>
+            <h3>Zadaj pytanie</h3>
+            <p>Piszesz zwykłym zdaniem, tak jak zapytałbyś kogoś z zespołu.</p>
+            <p class="step-say">„Pokaż sprzedaż według rodzaju domu.”</p>
+          </article>
+          <article class="step">
+            <div class="step-mark" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M7 4.5h7.2L19 9.2V19a1.5 1.5 0 0 1-1.5 1.5h-10A1.5 1.5 0 0 1 6 19V6A1.5 1.5 0 0 1 7.5 4.5H7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m9 13.2 2 2 4.2-4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3>Dostajesz zapytanie</h3>
+            <p>Wracasz z gotowym, bezpiecznym zapytaniem. Kopiujesz je albo od razu oglądasz wynik.</p>
+            <p class="step-say">Jedna odpowiedź, gotowa do użycia.</p>
+          </article>
+        </div>
+      </section>
 
-      <details class="mt-12">
-        <summary>Czy modyfikujecie dane w bazie?</summary>
-        <p class="sub">Nie. System generuje i wykonuje wyłącznie jedno zapytanie <strong>SELECT</strong>, z wymuszonym LIMIT i filtrami anty-SQLi.</p>
-      </details>
+      <section class="home-block">
+        <h2>Mniej szukania. Więcej odpowiedzi.</h2>
+        <p class="home-sub">To samo pytanie biznesowe, krótsza droga do zapytania.</p>
+        <div class="compare">
+          <article>
+            <h3>Bez AI-SQL-Chat</h3>
+            <ol class="path">
+              <li>Pytanie biznesowe</li>
+              <li>Szukanie tabel</li>
+              <li>Dokumentacja</li>
+              <li>Łączenie tabel</li>
+              <li>Pisanie SQL</li>
+              <li>Poprawianie błędu</li>
+            </ol>
+          </article>
+          <article class="after">
+            <h3>Z AI-SQL-Chat</h3>
+            <ol class="path">
+              <li>Pytanie</li>
+              <li>Twój schemat i AI</li>
+              <li>Gotowy SELECT</li>
+              <li>Wynik</li>
+            </ol>
+          </article>
+        </div>
+      </section>
 
-      <details class="mt-12">
-        <summary>Gdzie trafiają wyniki zapytań?</summary>
-        <p class="sub">Tylko do przeglądarki. Backend nie przechowuje wyników — są w pamięci procesu wyłącznie na czas wykonania.</p>
-      </details>
+      <section class="home-block" id="bezpieczenstwo">
+        <div class="trust">
+          <h2>Zaprojektowany do bezpiecznej analizy danych</h2>
+          <p class="home-sub">Dostęp do odczytu, bez możliwości zmiany danych w bazie.</p>
+          <div class="trust-grid">
+            <div class="trust-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.2 6.2 11.5 13 4.5" stroke="#6ee7b7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Tylko SELECT</div>
+            <div class="trust-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.2 6.2 11.5 13 4.5" stroke="#6ee7b7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Brak INSERT, UPDATE i DELETE</div>
+            <div class="trust-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.2 6.2 11.5 13 4.5" stroke="#6ee7b7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> LIMIT 1000</div>
+            <div class="trust-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.2 6.2 11.5 13 4.5" stroke="#6ee7b7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Walidacja zapytań</div>
+            <div class="trust-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.2 6.2 11.5 13 4.5" stroke="#6ee7b7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Rate limiting</div>
+            <div class="trust-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.2 6.2 11.5 13 4.5" stroke="#6ee7b7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Własny schemat</div>
+          </div>
+          <p class="trust-more"><a href="/security.html">Jak działa ochrona zapytań</a></p>
+        </div>
+      </section>
 
-      <details class="mt-12">
-        <summary>Czy mogę użyć własnego schematu?</summary>
-        <p class="sub">Tak, wgraj plik JSON ze strukturą tabel/kolumn na stronie „Załaduj schemat”.</p>
-      </details>
+      <section class="home-block" id="dla-kogo">
+        <h2>Dla kogo</h2>
+        <p class="home-sub">Jedno narzędzie, trzy powody, żeby z niego korzystać.</p>
+        <div class="cards-3">
+          <article class="persona">
+            <p class="role">Analityk</p>
+            <h3>Dane bez pisania SQL od zera</h3>
+            <p>Pytasz o sprzedaż, region albo okres i dostajesz zapytanie, które da się od razu sprawdzić.</p>
+          </article>
+          <article class="persona">
+            <p class="role">Dane i BI</p>
+            <h3>Szybszy szkic zapytania</h3>
+            <p>Znasz SQL, ale nie chcesz składać JOIN-ów z pamięci. Dostajesz punkt startowy zgodny ze schematem.</p>
+          </article>
+          <article class="persona">
+            <p class="role">Zespół</p>
+            <h3>Odczyt bez prawa do zmian</h3>
+            <p>Osoby nietechniczne pytają o dane, a system i tak przepuszcza wyłącznie pojedynczy SELECT.</p>
+          </article>
+        </div>
+      </section>
 
-      <details class="mt-12">
-        <summary>Czy mogę uruchomić on-premise?</summary>
-        <p class="sub">Tak — oferuję konsultacje on-prem / VPC. Skontaktuj się ze mną.</p>
-      </details>
+      <section class="home-block">
+        <h2>Co możesz z tym zrobić</h2>
+        <p class="home-sub">Trzy typowe zadania. W demo zobaczysz je na przykładowym schemacie.</p>
+        <div class="cards-3">
+          <article class="scene">
+            <h3>Eksploruj</h3>
+            <q>Pokaż sprzedaż modułów według rodzaju domu.</q>
+            <p>Pierwsze zapytanie do nieznanej tabeli, bez przeglądania dokumentacji.</p>
+          </article>
+          <article class="scene">
+            <h3>Analizuj</h3>
+            <q>Które lokalizacje mają największą powierzchnię?</q>
+            <p>Agregacja i sortowanie opisane zdaniem, nie klauzulą GROUP BY.</p>
+          </article>
+          <article class="scene">
+            <h3>Optymalizuj</h3>
+            <q>Gdzie ten SELECT może zwalniać?</q>
+            <p>Osobny tryb patrzy na zapytanie w kontekście tabel i podpowiada poprawki.</p>
+          </article>
+        </div>
+      </section>
 
-      <!-- Jak wygenerować schemat bazy danych (różne silniki) -->
-      <details class="mt-12">
-        <summary>Jak wygenerować schemat bazy danych (tabele i kolumny)?</summary>
+      <section class="home-block">
+        <h2>Generator i optimizer</h2>
+        <p class="home-sub">Najpierw powstaje zapytanie. Potem można je poprawić.</p>
+        <div class="modes">
+          <a class="mode" href="/sql-query.html">
+            <strong>Generuj SQL</strong>
+            <span>Pytanie po polsku i schemat bazy. Na wyjściu jedno SELECT z limitem.</span>
+            <em>Wypróbuj demo</em>
+          </a>
+          <a class="mode" href="/optimize-feature.html">
+            <strong>Optymalizuj SQL</strong>
+            <span>Wklejasz SELECT i schemat. Dostajesz uwagi do indeksów, filtrów i planu.</span>
+            <em>Otwórz optimizer</em>
+          </a>
+        </div>
+      </section>
 
-        <p class="sub">Poniżej proste zapytania pokazujące nazwy tabel i kolumn dla popularnych silników. Wklej odpowiedni fragment w swojej bazie, a wynik możesz wyeksportować do JSON i użyć w AI-SQL-Chat.</p>
+      <section class="home-block faq" id="faq">
+        <h2>Zanim wkleisz schemat</h2>
+        <p class="home-sub">Krótko o tym, czego narzędzie nie zrobi z danymi.</p>
+        <details open>
+          <summary>Czy da się zmienić dane w bazie?</summary>
+          <p>Nie. Przechodzi wyłącznie jedno zapytanie SELECT, z wymuszonym limitem i filtrem instrukcji modyfikujących.</p>
+        </details>
+        <details>
+          <summary>Gdzie trafiają wyniki?</summary>
+          <p>Do przeglądarki. Wyniki nie są zapisywane na stałe.</p>
+        </details>
+        <details>
+          <summary>Czy muszę mieć konto?</summary>
+          <p>Do demo i jednorazowego wklejenia schematu nie. Konto przydaje się, gdy chcesz wracać do tego samego schematu. Zapisany schemat wgrywasz na stronie <a href="/schema-query.html">Załaduj schemat</a>.</p>
+        </details>
+        <details>
+          <summary>Skąd wziąć plik schematu?</summary>
+          <p>Z krótkiego zapytania do MySQL, PostgreSQL, SQL Server, Oracle albo SQLite. Gotowe przykłady są w <a href="/docs.html">dokumentacji</a>.</p>
+        </details>
+        <div class="docs-tease">
+          <p>Instrukcje eksportu schematu i zapytania dla poszczególnych silników są poza stroną główną, żeby dało się najpierw zobaczyć produkt.</p>
+          <a href="/docs.html">Otwórz dokumentację</a>
+        </div>
+      </section>
 
-        <p class="sub"><strong>MySQL / MariaDB</strong></p>
-<pre class="code">
-SELECT
-  TABLE_NAME,
-  COLUMN_NAME,
-  DATA_TYPE,
-  IS_NULLABLE,
-  COLUMN_KEY
-FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_SCHEMA = 'twoja_baza'   -- &lt;-- podmień
-ORDER BY TABLE_NAME, ORDINAL_POSITION;
-</pre>
-
-        <p class="sub"><strong>PostgreSQL</strong> (przez <code>information_schema</code>)</p>
-<pre class="code">
-SELECT
-  table_name   AS table_name,
-  column_name  AS column_name,
-  data_type    AS data_type,
-  is_nullable
-FROM information_schema.columns
-WHERE table_schema = 'public'       -- &lt;-- podmień, np. public
-ORDER BY table_name, ordinal_position;
-</pre>
-
-        <p class="sub"><strong>SQL Server</strong> (Azure SQL / MS SQL)</p>
-<pre class="code">
-SELECT
-  TABLE_SCHEMA,
-  TABLE_NAME,
-  COLUMN_NAME,
-  DATA_TYPE,
-  IS_NULLABLE
-FROM INFORMATION_SCHEMA.COLUMNS
--- opcjonalnie zawęź:
--- WHERE TABLE_CATALOG = 'TwojaBaza' AND TABLE_SCHEMA = 'dbo'
-ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION;
-</pre>
-
-        <p class="sub"><strong>SQLite</strong> (lista tabel + kolumny dla każdej)</p>
-<pre class="code">
--- Tabele
-SELECT name AS table_name
-FROM sqlite_master
-WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
-ORDER BY name;
-
--- Kolumny dla jednej tabeli (podmień):
-PRAGMA table_info('twoja_tabela');
-</pre>
-
-        <p class="sub"><strong>Oracle</strong> (Twoje tabele)</p>
-<pre class="code">
-SELECT
-  TABLE_NAME,
-  COLUMN_NAME,
-  DATA_TYPE,
-  DATA_LENGTH,
-  DATA_PRECISION,
-  DATA_SCALE,
-  NULLABLE
-FROM USER_TAB_COLUMNS
-ORDER BY TABLE_NAME, COLUMN_ID;
-</pre>
-
-        <p class="sub"><strong>Oracle</strong> (konkretna schema/OWNER)</p>
-<pre class="code">
-SELECT
-  OWNER,
-  TABLE_NAME,
-  COLUMN_NAME,
-  DATA_TYPE,
-  DATA_LENGTH,
-  DATA_PRECISION,
-  DATA_SCALE,
-  NULLABLE
-FROM ALL_TAB_COLUMNS
-WHERE OWNER = 'HR'  -- &lt;-- podmień na nazwę swojej schemy (zwykle WIELKIMI literami)
-ORDER BY TABLE_NAME, COLUMN_ID;
-</pre>
-
-        <p class="sub">Nie pamiętasz nazwy schemy w Oracle? Sprawdź:</p>
-<pre class="code">
-SELECT USER FROM dual;           -- aktualnie zalogowany użytkownik
-SELECT username FROM all_users;  -- dostępne schemy
-</pre>
-      </details>
-
-      <!-- Oracle OWNER hint -->
-      <details class="mt-12">
-        <summary>Oracle: co wpisać w polu OWNER?</summary>
-        <p class="sub">
-          OWNER to nazwa schemy (zwykle równa nazwie użytkownika) w <strong>WIELKICH LITERACH</strong>, np. <code>HR</code>, <code>SCOTT</code>, <code>APPUSER</code>.
-          Jeśli nie jesteś pewny, uruchom:
-        </p>
-<pre class="code">
-SELECT USER FROM dual;           -- pokaże bieżącego użytkownika (często to właściwy OWNER)
-SELECT username FROM all_users;  -- lista wszystkich schem
-</pre>
-        <p class="sub">Użyj tej wartości w klauzuli <code>WHERE OWNER = 'TWOJ_OWNER'</code> w zapytaniu do <code>ALL_TAB_COLUMNS</code>.</p>
-      </details>
-    </section>
-
-<section class="card section-why">
-  <div class="card-head">
-    <h2>Dla kogo to narzędzie będzie szczególnie użyteczne?</h2>
-    <span class="sub">Różne role, jeden cel — szybki dostęp do danych</span>
-  </div>
-
-  <ul style="margin:16px 0 0; padding:0 0 0 18px; color:#0f172a; line-height:1.8">
-    <li>
-      <strong>Analitycy biznesowi</strong>, którzy nie znają SQL, ale potrzebują 
-      regularnie pobierać dane z bazy i przygotowywać zestawienia.
-    </li>
-    <li>
-      <strong>Programiści oraz inżynierowie danych</strong>, którzy chcą szybko 
-      prototypować zapytania, sprawdzać hipotezy lub eksplorować bazę.
-    </li>
-    <li>
-      <strong>Zespoły operacyjne i analityczne</strong>, które chcą dać dostęp do danych 
-      osobom nietechnicznym — bez ryzyka modyfikacji danych (tylko SELECT).
-    </li>
-    <li>
-      <strong>Osoby eksperymentujące z AI</strong> w obszarze baz danych, 
-      generowania zapytań i semantycznego wyszukiwania w danych.
-    </li>
-    <li>
-      <strong>Studenci, uczniowie oraz osoby początkujące</strong>, które chcą nauczyć się SQL
-      i zrozumieć, jak wykorzystywać zapytania w praktycznej pracy z bazami danych.
-    </li>
-  </ul>
-</section>
-<section class="card section-why">
-  <div class="card-head">
-    <h2>Co użytkownicy mówią o AI-SQL-Chat?</h2>
-    <span class="sub">Opinie o praktycznym wykorzystaniu narzędzia</span>
-  </div>
-
-  <div class="grid-features">
-    <div class="card">
-      <h3>Szybko ułatwia pracę z danymi</h3>
-      <p class="sub">
-        świetnie sprawdziło się, gdy potrzebowałem szybko otrzymać poprawne zapytanie SQL — bez wertowania dokumentacji. 
-        Zaoszczędziło mi sporo czasu i zdjęło z głowy techniczne bariery.
-      </p>
+      <section class="home-cta">
+        <h2>Zobacz to na przykładzie</h2>
+        <p>Demo startuje na gotowym schemacie. Własną strukturę wkleisz, kiedy pytanie będzie już Twoje.</p>
+        <div class="home-actions">
+          <a class="btn btn-primary btn-lg" href="/sql-query.html">Wypróbuj demo</a>
+          <a class="btn btn-secondary btn-lg" href="/schema-paste.html">Wklej schemat</a>
+        </div>
+      </section>
     </div>
-
-    <div class="card">
-      <h3>Pomaga nawet wtedy, gdy znasz SQL</h3>
-      <p class="sub">
-        nie zastępuje pisania zapytań w 100%, ale jest świetnym pomocnikiem — generuje szkice,
-        podpowiedzi i poprawne struktury SELECT, które mogłem od razu optymalizować.
-      </p>
-    </div>
-
-    <div class="card">
-      <h3>Bezpieczny sposób na dostęp analityczny</h3>
-      <p class="sub">
-        osoby nietechniczne mogą korzystać z danych bez ryzyka modyfikacji w bazie. Tylko jeden SELECT 
-        i ochrona przed nadużyciami czynią to narzędzie pewnym i bezpiecznym.
-      </p>
-    </div>
-  </div>
-</section>
-
-
-    <!-- CTA -->
-    <section class="card cta-block section-cta" style="text-align:center">
-      <h3>Gotów sprawdzić na swoich danych?</h3>
-      <a class="btn btn-primary" href="/sql-query.html">Uruchom AI-SQL-Chat</a>
-    </section>
   </main>
 
-  <!-- FOOTER (include) -->
   <div data-include="/partials/footer.html"></div>
 
-  <!-- Skrypty wspólne -->
   <script src="/js/include.js"></script>
   <script src="/js/header.js"></script>
   <script defer src="/js/cookie-consent.js"></script>
-
-  <!-- Proste „pisanie” promptu w hero -->
+  <script src="/js/auth-check.js"></script>
   <script>
-    const target = document.getElementById('typing');
-    const text = 'AI: Rozumiem. Przygotowuję zapytanie…';
-    let i = 0;
-    (function type(){
-      if(!target) return;
-      target.textContent = text.slice(0, i++);
-      if(i <= text.length){ setTimeout(type, 28); }
-    })();
-  </script>
+  (function () {
+    const examples = [
+      {
+        q: "„Pokaż liczbę sprzedanych modułów w podziale na rodzaj domu i wartość wycen”",
+        checks: [
+          "Znaleziono tabelę wynik_wycenymoduly",
+          "Znaleziono słownik s_rodzajdomu",
+          "Połączono przez dane_domu"
+        ],
+        sql: "SELECT\n  s_rodzajdomu.rodzajDomu,\n  SUM(wynik_wycenymoduly.liczbaModulow)\n    AS liczba_sprzedanych_modulow,\n  ROUND(SUM(wynik_wycenymoduly.cenaBrutto), 2)\n    AS wartosc_wyceny\nFROM wynik_wycenymoduly\nJOIN dane_domu\n  ON wynik_wycenymoduly.id_dane_klienta\n   = dane_domu.id_dane_klienta\nJOIN s_rodzajdomu\n  ON dane_domu.rodzaj_domu\n   = s_rodzajdomu.id_rodzajDomu\nGROUP BY s_rodzajdomu.rodzajDomu\nLIMIT 1000;"
+      },
+      {
+        q: "„Które lokalizacje mają największą średnią powierzchnię?”",
+        checks: [
+          "Znaleziono tabelę dane_domu",
+          "Użyto kolumn lokalizacja i powierzchnia",
+          "Agregacja bez dodatkowego JOIN"
+        ],
+        sql: "SELECT\n  dane_domu.lokalizacja,\n  ROUND(AVG(dane_domu.powierzchnia), 1)\n    AS srednia_powierzchnia,\n  COUNT(*) AS liczba_wycen\nFROM dane_domu\nGROUP BY dane_domu.lokalizacja\nORDER BY srednia_powierzchnia DESC\nLIMIT 1000;"
+      },
+      {
+        q: "„Porównaj wartość wycen modułów z pozycjami cennika”",
+        checks: [
+          "Znaleziono wynik_wycenymoduly",
+          "Znaleziono ceny_modulow",
+          "Połączono po id_cenyModulow"
+        ],
+        sql: "SELECT\n  ceny_modulow.modulyCzesci,\n  SUM(wynik_wycenymoduly.liczbaModulow)\n    AS liczba_modulow,\n  ROUND(SUM(wynik_wycenymoduly.cenaBrutto), 2)\n    AS wartosc_wycen\nFROM wynik_wycenymoduly\nJOIN ceny_modulow\n  ON wynik_wycenymoduly.id_cenyModulow\n   = ceny_modulow.id_cenaModuow\nGROUP BY ceny_modulow.modulyCzesci\nORDER BY wartosc_wycen DESC\nLIMIT 1000;"
+      }
+    ];
 
-  <!-- JSON-LD: Breadcrumbs + SoftwareApplication + FAQ -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"BreadcrumbList",
-    "itemListElement":[
-      {"@type":"ListItem","position":1,"name":"AI-SQL-Chat","item":"https://aisql.pl/"}
-    ]
-  }
+    const qEl = document.getElementById("demoQuestion");
+    const checksEl = document.getElementById("demoChecks");
+    const sqlEl = document.getElementById("demoSql");
+    const copyBtn = document.getElementById("copySql");
+    if (!qEl || !checksEl || !sqlEl) return;
+
+    let currentSql = examples[0].sql;
+
+    function highlight(sql) {
+      const esc = sql.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return esc.replace(
+        /\b(GROUP BY|ORDER BY|SELECT|FROM|WHERE|LIMIT|JOIN|ON|AND|AS|DESC|ASC|ROUND|SUM|COUNT|AVG)\b/g,
+        '<span class="tok-kw">$1</span>'
+      ).replace(/\b(\d+)\b/g, '<span class="tok-num">$1</span>');
+    }
+
+    function show(index) {
+      const ex = examples[index];
+      currentSql = ex.sql;
+      qEl.textContent = ex.q;
+      checksEl.replaceChildren();
+      ex.checks.forEach((text, n) => {
+        const li = document.createElement("li");
+        li.className = "check";
+        li.style.animationDelay = (n * 70) + "ms";
+        li.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.2 6.2 11.5 13 4.5" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        li.append(document.createTextNode(text));
+        checksEl.appendChild(li);
+      });
+      sqlEl.innerHTML = highlight(ex.sql);
+    }
+
+    document.querySelectorAll(".chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".chip").forEach((el) => {
+          el.classList.remove("is-on");
+          el.setAttribute("aria-selected", "false");
+        });
+        chip.classList.add("is-on");
+        chip.setAttribute("aria-selected", "true");
+        show(Number(chip.dataset.i));
+      });
+    });
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (err) {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.position = "fixed";
+        area.style.left = "-9999px";
+        document.body.appendChild(area);
+        area.select();
+        let ok = false;
+        try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+        area.remove();
+        return ok;
+      }
+    }
+
+    copyBtn.addEventListener("click", async () => {
+      const ok = await copyText(currentSql);
+      copyBtn.textContent = ok ? "Skopiowano" : "Nie skopiowano";
+      setTimeout(() => { copyBtn.textContent = "Kopiuj SQL"; }, 1600);
+    });
+
+    show(0);
+  })();
+  </script>
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const schemaLinks = document.querySelectorAll('a[href="/schema-query.html"]');
+    async function isLoggedIn() {
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        return res.ok;
+      } catch (err) {
+        return false;
+      }
+    }
+    schemaLinks.forEach((link) => {
+      link.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const loggedIn = await isLoggedIn();
+        window.location.href = loggedIn ? "/schema-query.html" : "/login.html";
+      });
+    });
+  });
   </script>
 
   <script type="application/ld+json">
@@ -602,12 +442,11 @@ SELECT username FROM all_users;  -- lista wszystkich schem
     "operatingSystem":"Web",
     "url":"https://aisql.pl/",
     "description":"Generator SQL z języka naturalnego. Jedno zapytanie SELECT zgodne ze schematem JSON, z filtrowaniem anty-SQLi i limitem.",
-    "softwareHelp":"https://aisql.pl/schema-to-json.html",
+    "softwareHelp":"https://aisql.pl/docs.html",
     "offers":{"@type":"Offer","price":"0","priceCurrency":"PLN"},
     "creator":{"@type":"Person","name":"Grzegorz Parczewski"}
   }
   </script>
-
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -615,88 +454,26 @@ SELECT username FROM all_users;  -- lista wszystkich schem
     "mainEntity":[
       {
         "@type":"Question",
-        "name":"Czy modyfikujecie dane w bazie?",
-        "acceptedAnswer":{"@type":"Answer","text":"Nie. System generuje i wykonuje wyłącznie jedno zapytanie SELECT, z wymuszonym LIMIT i filtrami anty-SQLi."}
+        "name":"Czy da się zmienić dane w bazie?",
+        "acceptedAnswer":{"@type":"Answer","text":"Nie. Przechodzi wyłącznie jedno zapytanie SELECT, z wymuszonym limitem i filtrem instrukcji modyfikujących."}
       },
       {
         "@type":"Question",
-        "name":"Gdzie trafiają wyniki zapytań?",
-        "acceptedAnswer":{"@type":"Answer","text":"Tylko do przeglądarki. Backend nie przechowuje wyników — są w pamięci procesu wyłącznie na czas wykonania."}
+        "name":"Gdzie trafiają wyniki?",
+        "acceptedAnswer":{"@type":"Answer","text":"Do przeglądarki. Wyniki nie są zapisywane na stałe."}
       },
       {
         "@type":"Question",
-        "name":"Czy mogę użyć własnego schematu?",
-        "acceptedAnswer":{"@type":"Answer","text":"Tak, wgraj plik JSON ze strukturą tabel/kolumn na stronie „Załaduj schemat”."}
+        "name":"Czy muszę mieć konto?",
+        "acceptedAnswer":{"@type":"Answer","text":"Do demo i jednorazowego wklejenia schematu nie. Konto przydaje się, gdy chcesz wracać do tego samego schematu."}
       },
       {
         "@type":"Question",
-        "name":"Czy mogę uruchomić on-premise?",
-        "acceptedAnswer":{"@type":"Answer","text":"Tak — oferuję konsultacje on-prem / VPC. Skontaktuj się ze mną."}
+        "name":"Skąd wziąć plik schematu?",
+        "acceptedAnswer":{"@type":"Answer","text":"Z krótkiego zapytania do MySQL, PostgreSQL, SQL Server, Oracle albo SQLite. Gotowe przykłady są w dokumentacji."}
       }
     ]
   }
   </script>
-  <script src="/js/auth-check.js"></script>
- 
-  
-
-  <!-- 🔽 Nowy skrypt – przekierowanie dla linków schema-query.html -->
-  <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const schemaLinks = document.querySelectorAll('a[href="/schema-query.html"]');
-
-    async function isLoggedIn() {
-      try {
-        const res = await fetch("/api/auth/me", { credentials: "include" });
-        return res.ok;
-      } catch {
-        return false;
-      }
-    }
-
-    schemaLinks.forEach(link => {
-      link.addEventListener("click", async (e) => {
-        e.preventDefault();
-        const loggedIn = await isLoggedIn();
-        if (loggedIn) {
-          window.location.href = "/schema-query.html"; // ✅ zalogowany
-        } else {
-          window.location.href = "/login.html"; // ❌ niezalogowany
-        }
-      });
-    });
-  });
-  </script>
-
-
-
 </body>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "AI-SQL-Chat",
-  "url": "https://aisql.pl/",
-  "description": "AI-SQL-Chat — generator SQL z języka naturalnego. Wgraj schemat JSON i otrzymaj jedno bezpieczne zapytanie SELECT zgodne ze strukturą Twojej bazy danych.",
-  "inLanguage": "pl-PL",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https://aisql.pl/?q={search_term_string}",
-    "query-input": "required name=search_term_string"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "AI-SQL",
-    "url": "https://aisql.pl/",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://aisql.pl/img/logo.png",
-      "width": 512,
-      "height": 512
-    }
-  }
-}
-</script>
-
 </html>
-
