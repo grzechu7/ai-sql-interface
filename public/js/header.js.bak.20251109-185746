@@ -1,0 +1,129 @@
+(function () {
+  const qs = (sel, root = document) => root.querySelector(sel);
+
+  // Funkcja sprawdzająca, czy sesja jest aktywna
+  async function hasSession() {
+    try {
+      const r = await fetch('/api/auth/me', { credentials: 'include' });
+
+      // Logowanie statusu odpowiedzi
+      console.log('Odpowiedź serwera (status):', r.status);
+
+      if (!r.ok) {
+        console.error('Błąd odpowiedzi z serwera:', r.status, r.statusText);
+        return false; // Jeśli odpowiedź nie jest OK, zwróć false
+      }
+
+      // Zalogowanie pełnej odpowiedzi, jeśli status jest OK
+      const responseBody = await r.json();
+      console.log('Odpowiedź serwera (body):', responseBody);
+
+      // Sprawdzenie, czy w odpowiedzi znajduje się status sesji
+      if (responseBody && responseBody.user) {
+        console.log('Sesja jest aktywna:', responseBody.user);
+        return true; // Sesja aktywna
+      } else {
+        console.log('Brak użytkownika w odpowiedzi, sesja nieaktywna');
+        return false; // Sesja nieaktywna
+      }
+    } catch (err) {
+      // Logowanie błędu, jeśli wystąpił
+      console.error('Błąd przy sprawdzaniu sesji:', err);
+      return false;
+    }
+  }
+
+  // Funkcja ustawiająca UI w zależności od statusu sesji
+  function setAuthUI(isAuthed) {
+    const login = qs('#loginLink');
+    const register = qs('#registerLink');
+    const logout = qs('#logoutLink');
+    const loadSchema = qs('#loadSchemaBtn');
+
+    console.log('Ustawianie UI autoryzacji: ', isAuthed);
+
+    if (isAuthed) {
+      if (login) login.style.display = 'none';
+      if (register) register.style.display = 'none';
+      if (logout) logout.style.display = 'inline-block';
+      if (loadSchema) loadSchema.style.display = 'inline-block';
+    } else {
+      if (login) login.style.display = 'inline-block';
+      if (register) register.style.display = 'inline-block';
+      if (logout) logout.style.display = 'none';
+      if (loadSchema) loadSchema.style.display = 'none';
+    }
+  }
+
+  // Funkcja odświeżająca UI w zależności od stanu sesji
+  async function refreshAuthUI() {
+    console.log('Sprawdzanie sesji...');
+    const authed = await hasSession();
+    console.log('Czy użytkownik jest autoryzowany?', authed);
+    setAuthUI(authed);
+  }
+
+  // Funkcja odpowiedzialna za wylogowanie
+  function bindLogout() {
+    const logout = qs('#logoutLink');
+    if (logout && !logout.dataset.bound) {
+      logout.dataset.bound = '1';
+      logout.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+          });
+        } finally {
+          location.href = '/index.html';
+        }
+      });
+    }
+  }
+
+  // --- Burger menu ---
+  function initBurger() {
+    const burger = document.getElementById('navToggle');
+    const menu = document.getElementById('mainmenu');
+    if (!burger || !menu) return false;
+
+    burger.addEventListener('click', () => {
+      burger.classList.toggle('open');
+      menu.classList.toggle('open');
+      const expanded = burger.getAttribute('aria-expanded') === 'true';
+      burger.setAttribute('aria-expanded', String(!expanded));
+    });
+
+    menu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        menu.classList.remove('open');
+        burger.classList.remove('open');
+        burger.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    console.log('✅ Burger menu initialized');
+    return true;
+  }
+
+  // Funkcja inicjująca wszystkie procesy
+  async function init() {
+    await refreshAuthUI();
+    bindLogout();
+    initBurger();
+  }
+
+  // Czekamy aż include.js wstawi header, potem inicjujemy
+  document.addEventListener('DOMContentLoaded', () => {
+    let ran = false;
+    const runOnce = () => {
+      if (ran) return;
+      ran = true;
+      init();
+    };
+
+    document.addEventListener('include:loaded', runOnce);
+    setTimeout(runOnce, 600); // fallback jeśli event nie przyszedł
+  });
+})();

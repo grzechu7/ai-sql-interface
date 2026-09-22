@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-36ZC4QTDE2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-36ZC4QTDE2');
+  </script>
+
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- SEO podstawowe -->
+  <title>Demo generatora SQL — generuj SELECT z opisu (PL) | AI-SQL-Chat</title>
+  <meta name="description" content="Wypróbuj demo: wpisz prośbę zwykłym językiem, a AI-SQL-Chat zbuduje poprawny SELECT z walidacją i limitem. Działa na Twoim schemacie JSON — bezpiecznie, tylko-odczyt."/>
+  <link rel="canonical" href="https://aisql.pl/sql-query.html"/>
+  <meta name="robots" content="index,follow,max-image-preview:large"/>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:locale" content="pl_PL"/>
+  <meta property="og:site_name" content="AI-SQL-Chat"/>
+  <meta property="og:title" content="Demo generatora SQL — generuj SELECT z opisu"/>
+  <meta property="og:description" content="Wpisz po polsku, odbierz poprawny SELECT z walidacją. Wgraj schema.json i zobacz wynik."/>
+  <meta property="og:url" content="https://aisql.pl/sql-query.html"/>
+  <meta property="og:image" content="https://aisql.pl/img/og-cover.png"/>
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Demo generatora SQL — generuj SELECT z opisu"/>
+  <meta name="twitter:description" content="Demo AI-SQL-Chat: jedno bezpieczne zapytanie SELECT z opisu po polsku."/>
+  <meta name="twitter:image" content="https://aisql.pl/img/og-cover.png"/>
+
+  <!-- Favicons / manifest -->
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml"/>
+  <link rel="alternate icon" href="/img/favicon.png"/>
+  <link rel="manifest" href="/site.webmanifest"/>
+
+  <!-- Fonty / CSS -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"/>
+
+<link rel="canonical" href="https://aisql.pl/index.html">
+<link rel="alternate" hreflang="pl" href="https://aisql.pl/index.html">
+<link rel="alternate" hreflang="en" href="https://aisql.pl/en/index.html">
+<link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/index.html">
+
+
+  <style>
+    .grid-2-balanced{display:grid; gap:16px; grid-template-columns:1fr}
+    @media(min-width:980px){ .grid-2-balanced{ grid-template-columns: 1fr 1fr; } }
+    nav.breadcrumbs{font-size:13px;color:#64748b;margin:8px 0 0}
+    nav.breadcrumbs a{color:inherit;text-decoration:none}
+    nav.breadcrumbs a:hover{text-decoration:underline}
+  </style>
+
+<script>
+(function() {
+  if (window.location.pathname.startsWith("/en")) return;
+
+  const lang = navigator.language || navigator.userLanguage;
+
+  if (!lang.startsWith("pl")) {
+    const newPath = "/en" + window.location.pathname;
+    window.location.replace(newPath);
+  }
+})();
+</script>
+
+
+</head>
+<body>
+  <script src="/js/logout.js"></script>
+  <div class="bg-grid"></div>
+
+  <!-- HEADER (include) -->
+  <div data-include="/partials/header.html"></div>
+
+  <main class="container">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumbs" aria-label="okruszki">
+      <a href="/">AI-SQL-Chat</a> › <span>Demo generatora SQL</span>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" style="padding-top:28px; padding-bottom:8px">
+      <h1 class="h1">Demo: generuj zapytania SQL z pliku <span class="grad">JSON Schema</span></h1>
+      <p class="lead">
+        Wpisz prośbę zwykłym językiem — AI-SQL-Chat zbuduje jedno, bezpieczne <strong>SELECT</strong> z walidacją i limitem. Możesz <strong>wkleić swój schemat bazy bezpośrednio</strong> na stronie <a href="/schema-paste.html">Wklej schemat</a>
+        lub użyć <strong>wcześniej wygenerowanego</strong> <a href="/schema-query.html">schema.json</a> (możesz <a href="/schema-to-json.html">wygenerować go w 3 krokach</a>).
+      </p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px">
+        <button class="btn btn-secondary" type="button" onclick="useSample()">Użyj przykładowego schematu</button>
+      </div>
+      <div class="pills-row" style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px">
+        <span class="pill">🔒 Brak wysyłki danych poza przeglądarkę</span>
+        <span class="pill">📜 Log audytu i wersjonowanie</span>
+        <span class="pill">🔎 Tryb tylko-odczyt</span>
+      </div>
+    </section>
+
+    <!-- Instrukcja -->
+    <section class="card section-how" style="margin-bottom:16px">
+      <div class="card-head">
+        <h2>Instrukcja</h2>
+      </div>
+      <div class="sub">
+        <p>Na tej stronie, w polu <strong>„Zadaj pytanie o dane”</strong>, wpisz prośbę zwykłym językiem — AI przetworzy ją na zapytanie SQL. Możesz wyświetlić samo zapytanie lub od razu zobaczyć jego wynik w postaci tabeli.</p>
+        <p>Baza demonstracyjna dotyczy sprzedaży modułów do inteligentnego domu i zawiera m.in.: typ obiektu (dom/mieszkanie), powierzchnię, listę modułów (np. sterownik rolet, oświetlenia, RGB) oraz miejscowości.</p>
+        <div style="margin-top:10px">
+          <strong>Przykładowe zapytania:</strong>
+          <ul style="margin:8px 0 0 18px">
+            <li><code>podaj 5 najlepiej sprzedających się modułów w warszawie wraz z cenami</code></li>
+            <li><code>podaj liczbę sprzedanych modułów w podziale na dom i mieszkanie dodaj wartości wyceny</code></li>
+            <li><code>podaj wartość wyceny modułów w podziale na powierzchnie domu</code></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dwie kolumny: zapytanie | demonstracja -->
+    <section class="grid-2-balanced">
+      <!-- LEWA -->
+      <div class="card">
+        <div class="card-head">
+          <h2>Zadaj pytanie o dane</h2>
+          <span class="sub">Napisz po ludzku — my zrobimy z tego jedno bezpieczne SELECT.</span>
+        </div>
+
+        <div class="prompt-row">
+          <textarea id="qPrompt" class="input" rows="4"
+            placeholder="np. podaj 5 najlepiej sprzedających się modułów w Warszawie wraz z cenami"></textarea>
+          <div class="actions" style="display:flex; gap:8px; margin-top:8px">
+            <button class="btn btn-primary" type="button" onclick="onGenerateClick()">⚡ Wygeneruj SQL</button>
+            <button class="btn btn-ghost" type="button" onclick="clearPrompt()">Wyczyść</button>
+          </div>
+        </div>
+        <div id="loading2" class="loading note"></div>
+      </div>
+
+      <!-- PRAWA -->
+      <div class="card">
+        <div class="card-head">
+          <h2>Krótka demonstracja</h2>
+          <span class="note">Wypełnij pola i kliknij „Wygeneruj SQL”.</span>
+        </div>
+
+        <div class="mt-12">
+          <label class="sub">Opis zapytania</label>
+          <textarea id="q" class="input" rows="3"
+            placeholder="np. Pokaż 100 ostatnich zamówień wraz z emailem klienta"></textarea>
+        </div>
+
+        <div class="mt-12">
+          <label class="sub">Schemat JSON</label>
+          <textarea id="schemaBox" class="input" rows="12"></textarea>
+          <div class="note mt-8">*Możesz to skonfigurować — domyślnie cała logika działa lokalnie.</div>
+        </div>
+
+        <div class="mt-12" style="display:flex; gap:10px; align-items:center">
+          <button class="btn btn-primary" type="button" onclick="onGenerateClick()">⚡ Wygeneruj SQL</button>
+          <div id="loading" class="note"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- SQL + podgląd schematu -->
+    <section class="grid-2-balanced" style="margin-top:16px">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2>Wygenerowane zapytanie</h2>
+            <div class="sub">Bezpieczna propozycja na bazie schematu</div>
+          </div>
+          <div style="display:flex; gap:8px">
+            <button class="btn btn-secondary" type="button" onclick="copySql()">📋 Kopiuj</button>
+            <button class="btn btn-secondary" type="button" onclick="downloadSql()">⬇️ Pobierz</button>
+          </div>
+        </div>
+        <pre id="sql" class="code">-- Tu pojawi się wygenerowane zapytanie SQL
+</pre>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2>Podgląd schematu</h2>
+            <div class="sub">Wykryte tabele i kolumny</div>
+          </div>
+        </div>
+        <div id="schemaPreview" class="note">Brak schematu.</div>
+      </div>
+    </section>
+
+    <!-- Tabela wyników -->
+    <section id="resultSection" class="card" style="display:none; margin-top:16px">
+      <div class="card-head">
+        <h2>Wyniki</h2>
+        <span id="rowCount" class="note"></span>
+      </div>
+      <div id="result" class="table-scroll"></div>
+    </section>
+
+    
+    
+    <!-- SEO copy (NOWE) -->
+    <section id="seo-copy" class="card" style="margin-top:16px">
+      <h2>Generator SQL z języka naturalnego — konwerter opisu na SELECT</h2>
+      <p class="sub" style="font-size:16px">
+        AI-SQL-Chat pełni rolę <strong>generatora SQL z języka naturalnego</strong>: wpisujesz zwykłe zdanie po polsku,
+        a narzędzie tworzy <strong>jedno bezpieczne zapytanie SELECT</strong> zgodne z Twoim schematem <code>schema.json</code>.
+        Dzięki walidacji typów i nazw kolumn dostajesz składnię gotową do uruchomienia.
+      </p>
+      <p class="sub" style="font-size:16px">
+        Nasz <em>konwerter opisu na SELECT</em> działa w trybie tylko-odczyt (bez DDL/DML), wymusza <code>LIMIT</code> i blokuje
+        ryzykowne konstrukcje. Możesz <strong>wkleić swój schemat bezpośrednio</strong> na stronie 
+  <a href="/schema-paste.html">Wklej schemat</a> — wystarczy, że skopiujesz strukturę tabel i kolumn
+  według krótkiej instrukcji z <a href="/schema-copy.html">Instrukcja: wklej schemat</a>. Jeśli potrzebujesz przygotować schemat, skorzystaj z instrukcji
+        <a href="/schema-to-json.html">„Jak zrobić schema.json”</a>, a gotowy plik wgraj na
+        <a href="/schema-query.html">„Załaduj schemat”</a>.
+      </p>
+      <p class="sub" style="font-size:16px">
+        Rozwiązanie przyspiesza analizy ad-hoc i ułatwia współpracę między biznesem a IT — od zapytań o sprzedaż,
+        po szybkie raporty i testy hipotez. Zobacz, jak Twój opis staje się działającym SQL-em.
+      </p>
+    </section>
+    
+  </main>
+
+  <!-- FOOTER (include) -->
+  <div data-include="/partials/footer.html"></div>
+
+  <!-- Helpery API (prefiks /api z automatycznym fallbackiem) -->
+  <script>
+  async function apiFetch(path, options = {}) {
+    const urlWithApi = path.startsWith('/api/') ? path : '/api' + path;
+    try {
+      const r1 = await fetch(urlWithApi, options);
+      if (r1.status !== 404) return r1;
+    } catch(e) { /* CORS/Network – spróbuj bez prefiksu */ }
+    return fetch(path, options);
+  }
+  async function readError(res) {
+    const ct = res.headers.get('content-type') || '';
+    try {
+      if (ct.includes('application/json')) {
+        const j = await res.json();
+        return JSON.stringify(j);
+      }
+      return await res.text();
+    } catch { return '(brak treści błędu)'; }
+  }
+  </script>
+
+  <!-- Logika strony -->
+  <script>
+    const DEFAULT_SCHEMA = `{
+  "tables": [
+    { "name": "customers", "columns": [
+      { "name": "id", "type": "INTEGER", "pk": true },
+      { "name": "email", "type": "TEXT" },
+      { "name": "created_at", "type": "TIMESTAMP" }
+    ]},
+    { "name": "orders", "columns": [
+      { "name": "id", "type": "INTEGER", "pk": true },
+      { "name": "customer_id", "type": "INTEGER", "fk": "customers.id" },
+      { "name": "amount", "type": "DECIMAL" },
+      { "name": "status", "type": "TEXT" },
+      { "name": "created_at", "type": "TIMESTAMP" }
+    ]}
+  ]
+}`;
+
+    const schemaBox = document.getElementById('schemaBox');
+    schemaBox.value = DEFAULT_SCHEMA;
+    renderSchemaPreview();
+
+    function useSample(){
+      schemaBox.value = DEFAULT_SCHEMA;
+      renderSchemaPreview();
+    }
+    function renderSchemaPreview(){
+      try{
+        const obj = JSON.parse(schemaBox.value);
+        const out = [];
+        (obj.tables||[]).forEach(t=>{
+          out.push(`<div class="card" style="padding:10px; margin:10px 0">
+            <div style="font-weight:600; margin-bottom:6px">📦 ${t.name}</div>
+            <ul style="margin:0; padding-left:18px; line-height:1.6">
+              ${(t.columns||[]).map(c=>`<li>${c.name}${c.pk?' (PK)':''}${c.fk?` → ${c.fk}`:''} : ${c.type}</li>`).join('')}
+            </ul>
+          </div>`);
+        });
+        document.getElementById('schemaPreview').innerHTML = out.join('') || 'Brak tabel.';
+      }catch{
+        document.getElementById('schemaPreview').innerHTML = '<span style="color:#ef4444">Niepoprawny JSON.</span>';
+      }
+    }
+    schemaBox.addEventListener('input', renderSchemaPreview);
+
+    function clearPrompt(){
+      const qp = document.getElementById('qPrompt');
+      if (qp) qp.value = '';
+      const q = document.getElementById('q');
+      if (q) q.value = '';
+      document.getElementById('resultSection').style.display = 'none';
+      document.getElementById('sql').textContent = '-- Tu pojawi się wygenerowane zapytanie SQL\n';
+    }
+
+    async function onGenerateClick(){
+      const qVal =
+        (document.getElementById('qPrompt')?.value || '').trim() ||
+        (document.getElementById('q')?.value || '').trim();
+
+      const l1 = document.getElementById('loading');
+      const l2 = document.getElementById('loading2');
+      if(!qVal){ return alert('Wpisz opis zapytania.'); }
+
+      if (l1) l1.textContent = '⏳ Generuję i wykonuję...';
+      if (l2) l2.textContent = '⏳ Generuję i wykonuję...';
+
+      try {
+       let resp = await apiFetch('/api/ask', {
+  method:'POST',
+  headers:{
+    'Content-Type':'application/json',
+    'x-fixed-schema': 'true'   // 🔹 Wymusza lokalny schema.json na serwerze
+  },
+  body: JSON.stringify({ question: qVal })
+});
+
+
+
+        if (!resp.ok) {
+          const errText = await readError(resp);
+          alert(`Błąd serwera (${resp.status}): ${errText}`);
+          return;
+        }
+
+        const data = await resp.json().catch(()=> ({}));
+
+        if (data.sqlFileId) {
+          const sqlResp = await apiFetch('/sql/' + encodeURIComponent(data.sqlFileId));
+          const sqlText = await sqlResp.text();
+          document.getElementById('sql').textContent = sqlText || '-- (brak danych)\n';
+        } else if (data.sql) {
+          document.getElementById('sql').textContent = data.sql || '-- (brak danych)\n';
+        } else {
+          document.getElementById('sql').textContent = '-- (brak danych)\n';
+        }
+
+        const rows = data.rows || [];
+        document.getElementById('rowCount').textContent = rows.length ? rows.length+' wierszy' : 'Brak danych';
+        document.getElementById('result').innerHTML = renderTable(rows);
+        document.getElementById('resultSection').style.display = 'block';
+        document.getElementById('resultSection').scrollIntoView({behavior:'smooth', block:'start'});
+      } catch (e) {
+        alert('Błąd połączenia z serwerem: ' + (e?.message || e));
+      } finally {
+        if (l1) l1.textContent = '';
+        if (l2) l2.textContent = '';
+      }
+    }
+
+    function renderTable(rows){
+      if(!rows.length) return '<div class="empty">Brak wyników.</div>';
+      const cols = Object.keys(rows[0]);
+      const thead = '<thead><tr>'+cols.map(c=>`<th>${esc(c)}</th>`).join('')+'</tr></thead>';
+      const tbody = '<tbody>'+rows.map(r=>'<tr>'+cols.map(c=>`<td>${esc(r[c])}</td>`).join('')+'</tr>').join('')+'</tbody>';
+      return `<div class="table-scroll"><table>${thead}${tbody}</table></div>`;
+    }
+    const esc = s=> s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+    function copySql(){
+      const code = document.getElementById('sql').textContent || '';
+      if(code) navigator.clipboard.writeText(code);
+    }
+    function downloadSql(){
+      const code = document.getElementById('sql').textContent || '';
+      if(!code) return;
+      const blob = new Blob([code],{type:'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'query.sql'; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    (function fillYear(){
+      const nodes = document.querySelectorAll('.js-year');
+      if (nodes.length) {
+        const y = new Date().getFullYear();
+        nodes.forEach(n => n.textContent = y);
+      } else {
+        setTimeout(fillYear, 120);
+      }
+    })();
+  </script>
+
+  <!-- Wspólne skrypty -->
+  <script src="/js/include.js"></script>
+  <script src="/js/header.js"></script>
+  <script defer src="/js/cookie-consent.js"></script>
+
+  <!-- JSON-LD: Breadcrumbs + WebPage + FAQ (demo) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"BreadcrumbList",
+    "itemListElement":[
+      {"@type":"ListItem","position":1,"name":"AI-SQL-Chat","item":"https://aisql.pl/"},
+      {"@type":"ListItem","position":2,"name":"Demo generatora SQL","item":"https://aisql.pl/sql-query.html"}
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebPage",
+    "name":"Demo generatora SQL — AI-SQL-Chat",
+    "url":"https://aisql.pl/sql-query.html",
+    "description":"Wpisz po polsku, odbierz poprawny SELECT z walidacją. Działa na Twoim schema.json; bezpiecznie, tylko-odczyt."
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Czy demo modyfikuje dane w bazie?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Nie. Demo generuje i wykonuje wyłącznie jedno zapytanie SELECT z wymuszonym LIMIT i filtrami anty-SQLi."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Czy muszę mieć plik schema.json?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tak, to on mapuje nazwy tabel i kolumn. Możesz go wygenerować w 3 krokach: https://aisql.pl/schema-to-json.html i wgrać na https://aisql.pl/schema-query.html."
+        }
+      }
+    ]
+  }
+  </script>
+    <script src="/js/auth-check.js"></script>
+
+  <!-- 🔽 Nowy skrypt – przekierowanie dla linków schema-query.html -->
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const schemaLinks = document.querySelectorAll('a[href="/schema-query.html"]');
+
+    async function isLoggedIn() {
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        return res.ok;
+      } catch {
+        return false;
+      }
+    }
+
+    schemaLinks.forEach(link => {
+      link.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const loggedIn = await isLoggedIn();
+        if (loggedIn) {
+          window.location.href = "/schema-query.html"; // ✅ zalogowany
+        } else {
+          window.location.href = "/login.html"; // ❌ niezalogowany
+        }
+      });
+    });
+  });
+  </script>
+</body>
+</html>
+
+</body>
+</html>

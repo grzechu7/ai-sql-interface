@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+>
+
+  <!-- INDEX -->
+  <url>
+    <loc>https://aisql.pl/</loc>
+    <lastmod>2025-10-05</lastmod>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://aisql.pl/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisql.pl/en/index.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/index.html"/>
+  </url>
+
+  <!-- SQL QUERY -->
+  <url>
+    <loc>https://aisql.pl/sql-query.html</loc>
+    <lastmod>2025-10-05</lastmod>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://aisql.pl/sql-query.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisql.pl/en/sql-query.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/sql-query.html"/>
+  </url>
+
+  <!-- SCHEMA QUERY -->
+  <url>
+    <loc>https://aisql.pl/schema-query.html</loc>
+    <lastmod>2025-10-05</lastmod>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://aisql.pl/schema-query.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisql.pl/en/schema-query.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/schema-query.html"/>
+  </url>
+
+  <!-- SCHEMA TO JSON -->
+  <url>
+    <loc>https://aisql.pl/schema-to-json.html</loc>
+    <lastmod>2025-10-05</lastmod>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://aisql.pl/schema-to-json.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisql.pl/en/schema-to-json.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/schema-to-json.html"/>
+  </url>
+
+  <!-- SCHEMA PASTE -->
+  <url>
+    <loc>https://aisql.pl/schema-paste.html</loc>
+    <lastmod>2025-10-07</lastmod>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://aisql.pl/schema-paste.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisql.pl/en/schema-paste.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/schema-paste.html"/>
+  </url>
+
+  <!-- SCHEMA COPY -->
+  <url>
+    <loc>https://aisql.pl/schema-copy.html</loc>
+    <lastmod>2025-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://aisql.pl/schema-copy.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisql.pl/en/schema-copy.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/schema-copy.html"/>
+  </url>
+
+  <!-- SECURITY -->
+  <url>
+    <loc>https://aisql.pl/security.html</loc>
+    <lastmod>2025-10-05</lastmod>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://aisql.pl/security.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisql.pl/en/security.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/security.html"/>
+  </url>
+
+  <!-- PRIVACY -->
+  <url>
+    <loc>https://aisql.pl/privacy.html</loc>
+    <lastmod>2025-10-05</lastmod>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://aisql.pl/privacy.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisql.pl/en/privacy.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/privacy.html"/>
+  </url>
+
+  <!-- TERMS -->
+  <url>
+    <loc>https://aisql.pl/terms.html</loc>
+    <lastmod>2025-10-05</lastmod>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://aisql.pl/terms.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisql.pl/en/terms.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/terms.html"/>
+  </url>
+
+  <!-- OPTIMIZE FEATURE -->
+  <url>
+    <loc>https://aisql.pl/optimize-feature.html</loc>
+    <lastmod>2025-11-25</lastmod>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://aisql.pl/optimize-feature.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisql.pl/en/optimize-feature.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/optimize-feature.html"/>
+  </url>
+
+  <!-- LOGIN -->
+  <url>
+    <loc>https://aisql.pl/login.html</loc>
+    <lastmod>2025-11-25</lastmod>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://aisql.pl/login.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisql.pl/en/login.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/login.html"/>
+  </url>
+
+  <!-- REGISTER -->
+  <url>
+    <loc>https://aisql.pl/register.html</loc>
+    <lastmod>2025-10-05</lastmod>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://aisql.pl/register.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aisql.pl/en/register.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/register.html"/>
+  </url>
+
+</urlset>

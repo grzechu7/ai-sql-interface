@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rejestracja | AI-SQL-Chat</title>
+  <link rel="stylesheet" href="style.css" />
+
+<link rel="canonical" href="https://aisql.pl/index.html">
+<link rel="alternate" hreflang="pl" href="https://aisql.pl/index.html">
+<link rel="alternate" hreflang="en" href="https://aisql.pl/en/index.html">
+<link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/index.html">
+
+<script>
+(function() {
+  if (window.location.pathname.startsWith("/en")) return;
+
+  const lang = navigator.language || navigator.userLanguage;
+
+  if (!lang.startsWith("pl")) {
+    const newPath = "/en" + window.location.pathname;
+    window.location.replace(newPath);
+  }
+})();
+</script>
+
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header-inner">
+      <a class="brand" href="/index.html" aria-label="AI-SQL-Chat - strona główna">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7c0-1.657 3.582-3 8-3s8 1.343 8 3-3.582 3-8 3-8-1.343-8-3Z" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M4 7v10c0 1.657 3.582 3 8 3s8-1.343 8-3V7" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M20 12c0 1.657-3.582 3-8 3s-8-1.343-8-3" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <span class="name">AI-SQL-Chat</span>
+        <img src="/img/owner.png" alt="Owner" class="avatar" />
+        <span class="byline">
+          created by
+          <a href="mailto:podkowa71@gmail.com" rel="author">Grzegorz Parczewski</a>
+        </span>
+      </a>
+
+      <!-- Nawigacja -->
+      <nav id="mainmenu" class="nav" role="navigation">
+        <a class="link" href="/index.html">Strona główna</a>
+        <a class="link" href="/login.html">Logowanie</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== FORMULARZ REJESTRACJI ===== -->
+  <main class="container" style="max-width:420px;">
+    <div class="card">
+      <div class="card-head">
+        <h2>Utwórz konto</h2>
+      </div>
+
+      <form id="registerForm">
+        <input class="input mt-12" type="text" id="full_name" placeholder="Imię lub nick (opcjonalnie)" />
+        <input class="input mt-12" type="email" id="email" placeholder="E-mail" required />
+        <input class="input mt-12" type="password" id="password" placeholder="Hasło" required />
+
+        <button id="registerBtn" type="submit" class="btn btn-primary mt-16" style="width:100%;">
+          Zarejestruj się
+        </button>
+      </form>
+
+      <p class="sub mt-16" style="text-align:center;">
+        Masz już konto?
+        <a href="login.html" class="link" style="color:var(--accent);">Zaloguj się</a>
+      </p>
+
+      <div class="mt-20" style="text-align:center;">
+        <p class="sub" style="margin-bottom:8px;">lub użyj konta Google</p>
+        <a href="/api/auth/google" class="btn btn-secondary" style="width:100%;">
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="" width="18" class="btn-ico" />
+          Google
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== SKRYPT REJESTRACJI ===== -->
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("registerForm");
+    const registerBtn = document.getElementById("registerBtn");
+
+    if (!form) return;
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const full_name = document.getElementById("full_name").value.trim() || null;
+
+      registerBtn.disabled = true;
+      registerBtn.textContent = "Rejestrowanie...";
+
+      try {
+        // ✅ KROK 1 — rejestracja
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, full_name }),
+          credentials: "include"
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert("❌ " + (data.error || "Nie udało się utworzyć konta."));
+          registerBtn.disabled = false;
+          registerBtn.textContent = "Zarejestruj się";
+          return;
+        }
+
+        console.log("✅ Rejestracja zakończona:", data);
+
+        // ✅ KROK 2 — automatyczne logowanie (passport session)
+        const loginRes = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+          credentials: "include"
+        });
+
+        const loginData = await loginRes.json();
+
+        if (loginRes.ok && loginData.ok) {
+          console.log("✅ Zalogowano automatycznie:", loginData);
+          window.location.href = "/schema-query.html"; // 🔹 automatyczne przekierowanie
+        } else {
+          alert("✅ Konto utworzone, zaloguj się ręcznie.");
+          window.location.href = "/login.html";
+        }
+      } catch (err) {
+        console.error("❌ Błąd rejestracji:", err);
+        alert("❌ Błąd połączenia z serwerem.");
+      } finally {
+        registerBtn.disabled = false;
+        registerBtn.textContent = "Zarejestruj się";
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

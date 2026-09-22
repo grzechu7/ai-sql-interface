@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Security — AI-SQL-Chat</title>
+  <meta name="description" content="Security measures: single SELECT, SQL filters, rate-limit, HTTP headers, CORS, retention, encryption, and vulnerability disclosure.">
+  <link rel="canonical" href="https://aisql.pl/en/security.html">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"/>
+
+<link rel="alternate" hreflang="pl" href="https://aisql.pl/security.html">
+<link rel="alternate" hreflang="en" href="https://aisql.pl/en/security.html">
+<link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/security.html">
+
+
+
+</head>
+<body>
+  <script src="/js/logout.js"></script>
+  <div class="bg-grid"></div>
+
+  <!-- HEADER -->
+  <div data-include="/en/partials/header.html"></div>
+
+  <main class="container">
+    <section class="card">
+      <div class="card-head">
+        <h1 style="font-size:28px; margin:0">Security in AI-SQL-Chat</h1>
+        <span class="note">Last updated: <time datetime="2025-01-01">January 1, 2025</time></span>
+      </div>
+
+      <div class="sub" style="font-size:16px; line-height:1.8">
+        <p>
+          This document describes the technical and organizational security measures implemented in <strong>AI-SQL-Chat</strong>.
+          We focus on minimal data usage, secure-by-design SQL guardrails, and multi-layer protection (defense-in-depth).
+        </p>
+
+        <!-- 1 -->
+        <h2>1) Data and Privacy</h2>
+        <ul>
+          <li>By default, query results are not stored permanently; data is processed in memory only for the duration of execution.</li>
+          <li>Technical logs are minimal (statuses, metrics, error signatures) — without user data whenever possible.</li>
+          <li>See the <a href="/en/privacy.html">Privacy Policy</a> for GDPR-related information.</li>
+        </ul>
+
+        <!-- 2 -->
+        <h2>2) Encryption and Secrets</h2>
+        <ul>
+          <li>Full HTTPS/TLS on the entire path (including Oracle Cloud load balancer).</li>
+          <li>Secrets (API keys, passwords) are stored in environment variables or a secrets manager — never in the repository.</li>
+        </ul>
+
+        <!-- 3 -->
+        <h2>3) Threat Model (Summary)</h2>
+        <ul>
+          <li>SQL injections and payloads attempting to bypass validation.</li>
+          <li>Excessive load (DoS/DDoS, brute-forcing endpoints).</li>
+          <li>Unauthorized access to static files or uploaded schema files.</li>
+          <li>Browser-level attacks (XSS/CSRF), header manipulation.</li>
+          <li>Data leakage through logs, misconfigured CORS, or overly broad permissions.</li>
+        </ul>
+
+        <!-- 4 -->
+        <h2>4) Design Principles</h2>
+        <ul>
+          <li><strong>Single-SELECT only.</strong> Only one <code>SELECT</code> statement is generated and allowed.</li>
+          <li><strong>Data minimization.</strong> No permanent result storage; temporary data lives only in process memory.</li>
+          <li><strong>Secure defaults.</strong> Hard limits, blacklist patterns, payload size limits.</li>
+        </ul>
+
+        <!-- 5 -->
+        <h2>5) SQL Protection (Middleware)</h2>
+        <p>The model output and the user's input are validated by syntactic and semantic filters:</p>
+<pre class="code">
+// pseudocode (Node/Express)
+const banned = /\b(INSERT|UPDATE|DELETE|DROP|TRUNCATE|ALTER|CREATE|RENAME|MERGE|CALL|EXEC|OUTFILE|INFILE|SLEEP|BENCHMARK)\b/i;
+
+function enforceSQL(req, res, next){
+  let sql = String(req.body.sql || req.body.question || '');
+  if(!/^\\s*SELECT\\b/i.test(sql)) return res.status(400).json({error:'SELECT only'});
+  if(banned.test(sql))            return res.status(400).json({error:'Forbidden clause'});
+  if(!/\\bLIMIT\\b/i.test(sql))   sql = sql.replace(/;?\\s*$/, ' LIMIT 1000;');
+
+  // optional schema-based whitelist using uploaded JSON
+  req.sql = sql;
+  next();
+}
+</pre>
+
+        <!-- 6 -->
+        <h2>6) Limits and Protections</h2>
+        <ul>
+          <li><strong>Rate-limit & slowdown:</strong> per-IP limits and soft delays under abuse patterns.</li>
+          <li><strong>toobusy-like:</strong> instant 503 when event loop lag is high.</li>
+          <li><strong>Body-size limit:</strong> strict payload limits; rejection of unusual MIME types.</li>
+        </ul>
+
+        <!-- 7 -->
+        <h2>7) Security HTTP Headers</h2>
+        <p>The reverse proxy (e.g., Nginx) sets strong headers:</p>
+<pre class="code">
+add_header X-Frame-Options "SAMEORIGIN" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+
+# Basic CSP (adjust for your domains/CDNs):
+add_header Content-Security-Policy "
+  default-src 'self';
+  img-src 'self' data:;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com 'self';
+  script-src 'self';
+  connect-src 'self';
+" always;
+</pre>
+
+        <!-- 8 -->
+        <h2>8) CORS and Static Files</h2>
+        <ul>
+          <li><strong>CORS:</strong> strict origin whitelist, no <code>*</code> for authenticated requests.</li>
+          <li><strong>Static files:</strong> directory listing disabled; sensitive files (<code>.env</code>, <code>.key</code>, hidden files) blocked.</li>
+        </ul>
+
+        <!-- 9 -->
+        <h2>9) Availability and Backups</h2>
+        <ul>
+          <li>Automatic process restarts (PM2/systemd), health checks.</li>
+          <li>Backups of configuration and deployment artefacts; user schemas kept according to retention policy.</li>
+        </ul>
+
+        <!-- 10 -->
+        <h2>10) Vulnerability Disclosure (Responsible Disclosure)</h2>
+        <p>
+          If you find a vulnerability, please email <a href="mailto:podkowa71@gmail.com">podkowa71@gmail.com</a> with the subject
+          <em>[SECURITY]</em>. Include reproduction steps, scope, and impact.  
+          We respond promptly, usually within 7 days.  
+          Please avoid public PoCs until a fix is deployed.
+        </p>
+
+        <!-- 11 -->
+        <h2>11) Incident Response</h2>
+        <ol>
+          <li>Detection and triage (logs, metrics, alerts).</li>
+          <li>Containment (rate-limit spikes, block offending origins, disable affected features).</li>
+          <li>Root cause analysis, patching, verification.</li>
+          <li>User notification if the incident may have impacted them.</li>
+        </ol>
+
+        <!-- 12 -->
+        <h2>12) On-Prem / VPC Deployment</h2>
+        <p>
+          For business clients we offer on-prem/VPC deployment consulting (network segmentation, key rotation,
+          centralized logging, extra CSP rules, SCA/DAST scanning).  
+          Contact: <a href="mailto:podkowa71@gmail.com">podkowa71@gmail.com</a>.
+        </p>
+
+        <!-- 13 -->
+        <h2>13) Example Nginx Configuration (Static Files)</h2>
+<pre class="code">
+location / {
+  try_files $uri $uri/ =404;
+}
+
+location ~* \\.(env|key|pem|log|bak)$ {
+  deny all;
+}
+
+autoindex off;
+client_max_body_size 512k;
+</pre>
+
+        <!-- 14 -->
+        <h2>14) Document Changes</h2>
+        <p>This document may be updated as the service evolves. A change log is available upon request.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <div data-include="/en/partials/footer.html"></div>
+
+  <!-- Shared scripts -->
+  <script src="/js/include.js"></script>
+  <script src="/js/header.js"></script>
+  <script defer src="/js/cookie-consent.js"></script>
+</body>
+</html>

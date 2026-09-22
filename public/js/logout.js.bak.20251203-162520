@@ -1,0 +1,8 @@
+// logout.js — globalna obsługa wylogowania
+document.addEventListener('click', (e) => {
+  if (e.target && e.target.id === 'logoutBtn') {
+    e.preventDefault();
+    localStorage.removeItem('token');
+    window.location.href = '/login.html';
+  }
+});

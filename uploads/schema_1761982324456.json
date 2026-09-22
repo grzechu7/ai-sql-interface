@@ -1,0 +1,491 @@
+{
+  "tables": [
+    {
+      "name": "BONUSES",
+      "columns": [
+        {
+          "name": "EMPLOYEE_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "DEPARTMENT_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "BONUS",
+          "type": "TEXT"
+        },
+        {
+          "name": "SALARY",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "COUNTRIES",
+      "columns": [
+        {
+          "name": "COUNTRY_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "COUNTRY_NAME",
+          "type": "TEXT"
+        },
+        {
+          "name": "REGION_ID",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "DEPARTMENTS",
+      "columns": [
+        {
+          "name": "DEPARTMENT_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "DEPARTMENT_NAME",
+          "type": "TEXT"
+        },
+        {
+          "name": "MANAGER_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "LOCATION_ID",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "EMP",
+      "columns": [
+        {
+          "name": "FIRST_NAME",
+          "type": "TEXT"
+        },
+        {
+          "name": "LAST_NAME",
+          "type": "TEXT"
+        },
+        {
+          "name": "SALARY",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "EMP_DETAILS_VIEW",
+      "columns": [
+        {
+          "name": "EMPLOYEE_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "JOB_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "MANAGER_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "DEPARTMENT_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "LOCATION_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "COUNTRY_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "FIRST_NAME",
+          "type": "TEXT"
+        },
+        {
+          "name": "LAST_NAME",
+          "type": "TEXT"
+        },
+        {
+          "name": "SALARY",
+          "type": "TEXT"
+        },
+        {
+          "name": "COMMISSION_PCT",
+          "type": "TEXT"
+        },
+        {
+          "name": "DEPARTMENT_NAME",
+          "type": "TEXT"
+        },
+        {
+          "name": "JOB_TITLE",
+          "type": "TEXT"
+        },
+        {
+          "name": "CITY",
+          "type": "TEXT"
+        },
+        {
+          "name": "STATE_PROVINCE",
+          "type": "TEXT"
+        },
+        {
+          "name": "COUNTRY_NAME",
+          "type": "TEXT"
+        },
+        {
+          "name": "REGION_NAME",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "EMP_LOG",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "CZAS_INSERTU",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "EMPLOYEES",
+      "columns": [
+        {
+          "name": "EMPLOYEE_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "FIRST_NAME",
+          "type": "TEXT"
+        },
+        {
+          "name": "LAST_NAME",
+          "type": "TEXT"
+        },
+        {
+          "name": "EMAIL",
+          "type": "TEXT"
+        },
+        {
+          "name": "PHONE_NUMBER",
+          "type": "TEXT"
+        },
+        {
+          "name": "HIRE_DATE",
+          "type": "TEXT"
+        },
+        {
+          "name": "JOB_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "SALARY",
+          "type": "TEXT"
+        },
+        {
+          "name": "COMMISSION_PCT",
+          "type": "TEXT"
+        },
+        {
+          "name": "MANAGER_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "DEPARTMENT_ID",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "EMP_TEMP",
+      "columns": [
+        {
+          "name": "EMPLOYEE_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "FIRST_NAME",
+          "type": "TEXT"
+        },
+        {
+          "name": "DEPARTMENT_ID",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "JOB_HISTORY",
+      "columns": [
+        {
+          "name": "EMPLOYEE_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "START_DATE",
+          "type": "TEXT"
+        },
+        {
+          "name": "END_DATE",
+          "type": "TEXT"
+        },
+        {
+          "name": "JOB_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "DEPARTMENT_ID",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "JOBS",
+      "columns": [
+        {
+          "name": "JOB_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "JOB_TITLE",
+          "type": "TEXT"
+        },
+        {
+          "name": "MIN_SALARY",
+          "type": "TEXT"
+        },
+        {
+          "name": "MAX_SALARY",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "LANGUAGES",
+      "columns": [
+        {
+          "name": "LANG_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "LANG_NAME",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "LOCATIONS",
+      "columns": [
+        {
+          "name": "LOCATION_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "STREET_ADDRESS",
+          "type": "TEXT"
+        },
+        {
+          "name": "POSTAL_CODE",
+          "type": "TEXT"
+        },
+        {
+          "name": "CITY",
+          "type": "TEXT"
+        },
+        {
+          "name": "STATE_PROVINCE",
+          "type": "TEXT"
+        },
+        {
+          "name": "COUNTRY_ID",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "POLICZ",
+      "columns": [
+        {
+          "name": "A",
+          "type": "TEXT"
+        },
+        {
+          "name": "B",
+          "type": "TEXT"
+        },
+        {
+          "name": "WYNIK",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "PRACOWNICY_TEST",
+      "columns": [
+        {
+          "name": "EMPLOYEE_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "FIRST_NAME",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "REGIONS",
+      "columns": [
+        {
+          "name": "REGION_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "REGION_NAME",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "TABELA_AUTOMATIC",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "NAZWA",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "TABELA_AUTOMATIC3",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "NAZWA",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "TABELA_CHECK",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "NAZWA",
+          "type": "TEXT"
+        },
+        {
+          "name": "LICZBA",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "TABELA_KURSOW",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "NAZWA",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "TAJNE_DANE",
+      "columns": [
+        {
+          "name": "LOGIN",
+          "type": "TEXT"
+        },
+        {
+          "name": "TYP_USLUGI",
+          "type": "TEXT"
+        },
+        {
+          "name": "CENA",
+          "type": "TEXT"
+        },
+        {
+          "name": "DATA",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "TEST_SHEDULER",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "CZAS",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "V_PIVOT",
+      "columns": [
+        {
+          "name": "DEPARTMENT_ID",
+          "type": "TEXT"
+        },
+        {
+          "name": "FI_ACCOUNT",
+          "type": "TEXT"
+        },
+        {
+          "name": "PU_CLERK",
+          "type": "TEXT"
+        },
+        {
+          "name": "IT_PROG",
+          "type": "TEXT"
+        },
+        {
+          "name": "MK_MAN",
+          "type": "TEXT"
+        },
+        {
+          "name": "MK_REP",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "X",
+      "columns": [
+        {
+          "name": "CZAS",
+          "type": "TEXT"
+        },
+        {
+          "name": "DZIALANIE",
+          "type": "TEXT"
+        }
+      ]
+    }
+  ]
+}

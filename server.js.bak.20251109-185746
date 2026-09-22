@@ -1,0 +1,492 @@
+// === SERVER.JS — Oracle Cloud / Lokalnie (rozdzielone endpointy, sesje HTTP) ===
+
+import express from "express";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+import fs from "fs/promises";
+import { existsSync, mkdirSync } from "fs";
+import multer from "multer";
+import session from "express-session";
+import MySQLStoreFactory from "express-mysql-session";
+import { OpenAI } from "openai";
+
+import passport, { dbAuth } from "./passport.js";
+import { dbData } from "./db.js";
+
+import { parseUploadedSchema } from "./parse-schema.js";
+import authRoutes from "./auth/auth.routes.js";
+import { requireAuth } from "./middleware/requireAuth.js";
+
+dotenv.config();
+
+console.log("🔥 To jest aktywny server.js z /var/www/");
+console.log("🧭 AKTYWNY SERVER:", import.meta.url);
+console.log("📂 BIEŻĄCY KATALOG:", process.cwd());
+console.log("✅ Passport załadowany:", typeof passport.authenticate);
+
+
+process.on("uncaughtException", (err) => {
+  console.error("💥 [uncaughtException]", err);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("💥 [unhandledRejection]", reason);
+});
+
+
+const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Jeśli działa za Nginx/Proxy (np. Oracle Cloud)
+app.set("trust proxy", 1);
+
+app.get("/ping-test", (req, res) => {
+  res.send("Ping-test działa ✅");
+});
+
+
+// === SESJA ===
+const MySQLStore = MySQLStoreFactory(session);
+const sessionStore = new MySQLStore(
+  {
+    createDatabaseTable: true,
+    schema: {
+      tableName: "sessions",
+      columnNames: {
+        session_id: "session_id",
+        expires: "expires",
+        data: "data",
+      },
+    },
+  },
+  dbAuth   // ✅ bez .promise, bo używamy createConnection z mysql2/promise
+);
+
+
+// === CORS ===
+// CORS — musi być przed sesją
+app.use(
+  cors({
+    origin: [
+  "https://aisql.pl",
+  "https://www.aisql.pl",
+  "https://130.162.227.150",
+  "http://localhost:8080",
+],
+    credentials: true,
+  })
+);
+
+// Middleware JSON
+app.use(express.json({ limit: "4mb" }));
+app.use(express.urlencoded({ extended: true }));
+
+// Sesja — po CORS
+// === KONFIGURACJA SESJI ===
+// Musi być po CORS, aby działały ciasteczka z credentials:true.
+// Automatycznie dopasowuje cookie do środowiska:
+//  - lokalnie działa bez HTTPS,
+//  - w produkcji (Nginx + HTTPS) ustawia secure + sameSite=none.
+
+console.log("➡️ 1. Przed session middleware");
+
+app.use(
+  session({
+    name: process.env.SESSION_NAME || "aisql.sid",
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore,
+    proxy: true,
+cookie: {
+      name: "aisql.sid",
+      path: "/",
+      domain: process.env.SESSION_DOMAIN || undefined, // ✅ SUPER — teraz działa na aisql.pl + www.aisql.pl
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",  // ✅ HTTPS
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 dni
+    },
+  })
+);
+
+
+console.log("➡️ 2. Po session middleware");
+
+app.use(passport.initialize());
+console.log("➡️ 3. Po passport.initialize()");
+
+app.use(passport.session());
+console.log("➡️ 4. Po passport.session()");
+
+
+/* localhost */
+/*
+    cookie: {
+  httpOnly: true,
+  secure: false,                // ⬅️ ważne: lokalnie NIE HTTPS
+  sameSite: "lax",              // ⬅️ Chrome akceptuje z localhosta
+  maxAge: 1000 * 60 * 60 * 8,   // 8h
+},
+*/
+/* produkcja*/
+/*
+ cookie: {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",  // ✅ działa z HTTPS
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  maxAge: 1000 * 60 * 60 * 8,
+},
+
+cookie: {
+      name: "aisql.sid",
+      path: "/",
+      domain: process.env.SESSION_DOMAIN || undefined, // ✅ SUPER — teraz działa na aisql.pl + www.aisql.pl
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",  // ✅ HTTPS
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 dni
+    },
+*/
+
+
+// ✅ Testowy endpoint dla Nginx
+app.get("/api/ping", (req, res) => {
+  console.log("✅ /api/ping działa — połączenie z backendem OK");
+  res.json({ ok: true, msg: "Połączenie z backendem działa poprawnie przez Nginx" });
+});
+
+// === AUTH ===
+
+
+app.use("/api/auth", authRoutes);
+
+// ✅ Ochrona: zwraca JSON 404 dla nieistniejących endpointów API
+app.all(/^\/api\/(.*)/, (req, res) => {
+  res.status(404).json({ error: "Endpoint API nie istnieje" });
+});
+
+
+
+// === FOLDERY UPLOAD ===
+const uploadsDir = path.join(__dirname, "uploads");
+if (!existsSync(uploadsDir)) mkdirSync(uploadsDir);
+const upload = multer({ dest: path.join(__dirname, "tmp_uploads") });
+if (!existsSync("tmp_uploads")) mkdirSync("tmp_uploads");
+
+// === OpenAI ===
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// === Helper: AI generacja SQL ===
+async function generateSql(prompt, schema) {
+  const schemaText = JSON.stringify(schema, null, 2);
+  const knownColumns = Array.isArray(schema.tables)
+    ? schema.tables.flatMap((t) => t.columns.map((c) => `${t.name}.${c.name}`))
+    : Object.entries(schema).flatMap(([t, cols]) => cols.map((c) => `${t}.${c}`));
+
+  const rules = `
+Masz dostęp tylko do poniższej struktury bazy danych:
+${schemaText}
+
+Kolumny: ${knownColumns.join(", ")}
+
+Zasady:
+- Czytaj dokładnie schemat bazy danyc, nie wymyslaj innych tabel ani kolumn.
+- Zwróć jedno zapytanie SQL (SELECT ...;).
+- Używaj wyłącznie nazw tabel i kolumn z powyższej struktury.
+- Nie twórz nowych tabel ani kolumn.
+- Nie dodawaj komentarzy ani wyjaśnień — zwróć wyłącznie jedno poprawne zapytanie SQL zakończone średnikiem.
+- Unikaj błędów ambiguous column — zawsze kwalifikuj kolumny pełną nazwą tabeli.
+- Nie wymyślaj nieistniejących połączeń między tabelami.
+
+`;
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-3.5-turbo",
+    temperature: 0.2,
+    messages: [
+      { role: "system", content: rules },
+      { role: "user", content: `Wygeneruj SQL dla pytania: "${prompt}"` },
+    ],
+  });
+
+  return response.choices[0].message.content.trim();
+}
+
+function extractSql(text) {
+  const match = text.match(/SELECT[\s\S]*?;/i);
+  return match ? match[0].trim() : text.trim();
+}
+
+function normalizeSelect(sql) {
+  const s = sql.trim().replace(/;+\s*$/g, "");
+  if (!/^select\b/i.test(s)) throw new Error("Dozwolone są wyłącznie zapytania SELECT.");
+  const hasLimit =
+    /\blimit\s+\d+/i.test(s) ||
+    /\bfetch\s+first\s+\d+\s+rows\s+only/i.test(s) ||
+    /\boffset\s+\d+\s+rows?\b/i.test(s);
+  return hasLimit ? s : `${s} LIMIT 100`;
+}
+
+function toRowObjects(dbResult) {
+  if (Array.isArray(dbResult?.rows) && dbResult.rows.length && !Array.isArray(dbResult.rows[0])) {
+    return dbResult.rows;
+  }
+  if (Array.isArray(dbResult?.recordset)) return dbResult.recordset;
+
+  if (Array.isArray(dbResult?.rows) && dbResult.rows.length && Array.isArray(dbResult.rows[0])) {
+    const names =
+      (dbResult.fields && dbResult.fields.map((f) => f.name)) ||
+      (dbResult.metaData && dbResult.metaData.map((m) => m.name)) ||
+      null;
+    return dbResult.rows.map((arr) => {
+      const obj = {};
+      arr.forEach((v, i) => (obj[names?.[i] || `col${i + 1}`] = v));
+      return obj;
+    });
+  }
+
+  if (Array.isArray(dbResult) && dbResult.length === 2) {
+    const rows = dbResult[0];
+    const fields = dbResult[1];
+    if (Array.isArray(rows) && rows.length) {
+      if (!Array.isArray(rows[0])) return rows;
+      const names = Array.isArray(fields)
+        ? fields.map((f) => f.name || f.orgName || f.columnName || f.orgColumnName)
+        : null;
+      return rows.map((arr) => {
+        const obj = {};
+        arr.forEach((v, i) => (obj[names?.[i] || `col${i + 1}`] = v));
+        return obj;
+      });
+    }
+  }
+
+  if (Array.isArray(dbResult) && dbResult.length && Array.isArray(dbResult[0])) {
+    return dbResult.map((arr) => {
+      const obj = {};
+      arr.forEach((v, i) => (obj[`col${i + 1}`] = v));
+      return obj;
+    });
+  }
+
+  return [];
+}
+
+// === /api/ask — generowanie SQL i wykonanie na bazie dbData ===
+app.post("/api/ask", async (req, res) => {
+  try {
+    const { question } = req.body;
+    if (!question || !question.trim()) {
+      return res.status(400).json({ error: "Brak pytania w treści żądania." });
+    }
+
+    let schema;
+
+// 🔹 1️⃣ Jeśli frontend przesłał schemat w body (np. schema-paste.html)
+if (req.body.schema) {
+  schema = req.body.schema;
+  console.log("📄 Używam schematu przesłanego z frontendu (schema-paste.html)");
+} else {
+  // 🔹 2️⃣ W przeciwnym razie: domyślnie lub z konta użytkownika
+  let schemaPath = path.join(__dirname, "schema.json");
+
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    const userId = req.user?.id;
+    if (userId) {
+      const [rows] = await dbAuth.query(
+        "SELECT path FROM aisql.user_schemas WHERE user_id = ? ORDER BY uploaded_at DESC LIMIT 1",
+        [userId]
+      );
+      if (rows.length && rows[0].path && existsSync(rows[0].path)) {
+        schemaPath = rows[0].path;
+        console.log(`📂 Używam schematu użytkownika: ${schemaPath}`);
+      } else {
+        console.log("⚠️ Brak schematu użytkownika — używam domyślnego.");
+      }
+    }
+  }
+
+  schema = JSON.parse(await fs.readFile(schemaPath, "utf-8"));
+}
+
+
+    const raw = await generateSql(question, schema);
+    const sqlOnly = extractSql(raw);
+    const safeSql = normalizeSelect(sqlOnly);
+
+// 🔹 Jeśli front przesłał flagę dryRun — nie łączymy się z bazą
+if (req.body.dryRun) {
+  console.log("🧠 Tryb DEMO — generuję tylko SQL, bez połączenia z bazą");
+  return res.json({ ok: true, sql: safeSql, dryRun: true });
+}
+
+// 🔹 Normalny tryb — wykonaj zapytanie w bazie
+let rows = [];
+try {
+  const result = await dbData.query(safeSql);
+  rows = toRowObjects(result);
+} catch (e) {
+  console.error("⚠️ Błąd podczas wykonywania SQL:", e);
+  return res.status(200).json({ sql: safeSql, rows: [], dbError: e?.message || String(e) });
+}
+
+return res.json({ ok: true, sql: safeSql, rowCount: rows.length, rows });
+
+  } catch (err) {
+    console.error("❌ /api/ask — krytyczny błąd:", err);
+    res.status(500).json({ error: err?.message || "Błąd serwera." });
+  }
+});
+
+
+// ✅ Alias dla starszego frontu (POST /ask -> /api/ask)
+app.post("/ask", (req, res, next) => {
+  console.log("➡️ Odebrano POST /ask — przekierowuję do /api/ask");
+  req.url = "/api/ask";
+  app._router.handle(req, res, next);
+});
+
+// === 3️⃣ schema-query.html — user-specific files in aisql.user_schemas ===
+app.post("/api/schema/upload", requireAuth, upload.single("schemaFile"), async (req, res) => {
+  try {
+    const simplified = await parseUploadedSchema(req.file.path);
+    const fileName = `schema_${Date.now()}.json`;
+    const savePath = path.join(uploadsDir, fileName);
+    await fs.writeFile(savePath, JSON.stringify(simplified, null, 2));
+
+    const userId = req.user?.id;
+    if (userId) {
+      await dbAuth.query(
+        "INSERT INTO aisql.user_schemas (user_id, filename, path, uploaded_at) VALUES (?, ?, ?, NOW())",
+        [userId, fileName, savePath]
+      );
+    }
+
+    res.send(`✅ Schemat zapisany jako: ${fileName}`);
+  } catch (err) {
+    console.error("❌ /api/schema/upload:", err);
+    res.status(400).send("Błąd przetwarzania schematu");
+  } finally {
+    if (req.file?.path && existsSync(req.file.path)) await fs.unlink(req.file.path);
+  }
+});
+
+// Lista schematów użytkownika
+app.get("/api/schema/list", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const [rows] = await dbAuth.query(
+      "SELECT filename FROM aisql.user_schemas WHERE user_id = ? ORDER BY uploaded_at DESC",
+      [userId]
+    );
+    res.json(rows.map((r) => r.filename));
+  } catch (err) {
+    console.error("❌ /api/schema/list:", err);
+    res.status(500).json({ error: err.message || String(err) });
+  }
+});
+
+// Usuwanie schematu użytkownika
+app.delete("/api/schema/delete/:name", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const [rows] = await dbAuth.query(
+      "SELECT path FROM aisql.user_schemas WHERE user_id = ? AND filename = ?",
+      [userId, req.params.name]
+    );
+    if (!rows.length) return res.status(404).send("Nie znaleziono pliku lub brak dostępu");
+
+    const file = rows[0].path;
+    if (existsSync(file)) await fs.unlink(file);
+    await dbAuth.query(
+      "DELETE FROM aisql.user_schemas WHERE user_id = ? AND filename = ?",
+      [userId, req.params.name]
+    );
+    res.send(`✅ Usunięto ${req.params.name}`);
+  } catch (err) {
+    console.error("❌ /api/schema/delete:", err);
+    res.status(500).json({ error: err.message || String(err) });
+  }
+});
+
+// === Diagnostyka DB ===
+app.get("/ping-db", async (req, res) => {
+  try {
+    await dbAuth.query("SELECT 1");
+    await dbData.query("SELECT 1");
+    res.send("✅ Obie bazy działają");
+  } catch (err) {
+    res.status(500).send("❌ Błąd DB: " + err.message);
+  }
+});
+
+
+
+// === 🔍 TEST POŁĄCZENIA Z BAZAMI: AUTH + DATA ===
+app.get("/api/debug/db", async (req, res) => {
+  try {
+    if (!dbAuth) {
+      return res.status(500).json({ ok: false, error: "Brak połączenia z bazą autoryzacyjną" });
+    }
+
+    // test połączenia z bazą AISQL (auth)
+    const [authTest] = await dbAuth.query("SELECT 1 AS ok_auth");
+
+    // test połączenia z bazą danych główną (jeśli masz np. dbData)
+    let dataOk = null;
+    if (global.dbData) {
+      const [dataTest] = await global.dbData.query("SELECT 1 AS ok_data");
+      dataOk = dataTest[0];
+    }
+
+    res.json({
+      ok: true,
+      message: "Połączenia z bazami działają ✅",
+      auth: authTest[0],
+      data: dataOk,
+    });
+  } catch (err) {
+    console.error("💥 [DEBUG /api/debug/db ERROR]:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// === Serwowanie plików statycznych ===
+app.use(express.static(path.join(__dirname, "public")));
+
+// ✅ SPA fallback — ale NIE dla API!
+app.get(/^\/(?!api)(.*)/, (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// === Keep-alive DB ===
+setInterval(async () => {
+  try {
+    await dbAuth.query("SELECT 1");
+    await dbData.query("SELECT 1");
+    console.log("✅ Keep-alive: połączenia z bazą aktywne");
+  } catch (err) {
+    console.error("⚠️ Keep-alive error:", err.message);
+  }
+}, 300000);
+
+// 🔍 TEST SESJI I LOGINU
+app.get("/api/debug/session", (req, res) => {
+  res.json({
+    sessionID: req.sessionID,
+    isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false,
+    user: req.user || null,
+  });
+});
+
+// === Start serwera ===
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, "0.0.0.0", () =>
+  console.log(
+    `🚀 Serwer działa na http://localhost:${PORT} [${process.env.NODE_ENV || "dev"}]`
+  )
+);

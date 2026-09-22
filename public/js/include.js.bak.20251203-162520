@@ -1,0 +1,47 @@
+// === include.js ===
+// Loader partiali: <div data-include="/partials/header.html"></div>
+
+(function () {
+  const nodes = Array.from(document.querySelectorAll('[data-include]'));
+  if (!nodes.length) return;
+
+  nodes.forEach(async (el) => {
+    const url = el.getAttribute('data-include');
+    if (!url) return;
+
+    try {
+      const res = await fetch(url, { credentials: 'same-origin' });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      const html = await res.text();
+
+      // Wstaw zawartość partiala do DOM
+      el.outerHTML = html;
+
+      // 🔥 Emitujemy event dla innych skryptów
+      document.dispatchEvent(new CustomEvent("include:loaded", { detail: url }));
+
+      // ✅ Jeśli załadowano header.html, uruchom logikę sesji
+      if (url.includes("header.html")) {
+        setTimeout(() => {
+          if (typeof checkLoginStatus === "function") checkLoginStatus();
+          if (typeof attachLogoutHandler === "function") attachLogoutHandler();
+        }, 500);
+      }
+
+    } catch (e) {
+      console.error("include.js: nie udało się wczytać", url, e);
+    }
+  });
+
+  // === Wstawienie roku do stopki (jeśli dotyczy) ===
+  const fillYear = () => {
+    const yearNodes = document.querySelectorAll(".js-year");
+    if (yearNodes.length) {
+      const y = new Date().getFullYear();
+      yearNodes.forEach((n) => (n.textContent = y));
+    } else {
+      setTimeout(fillYear, 120);
+    }
+  };
+  fillYear();
+})();

@@ -1,0 +1,143 @@
+<header class="header">
+  <div class="header-inner">
+    <a class="brand" href="/en/index.html" aria-label="AI-SQL-Chat - homepage">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 7c0-1.657 3.582-3 8-3s8 1.343 8 3-3.582 3-8 3-8-1.343-8-3Z" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M4 7v10c0 1.657 3.582 3 8 3s8-1.343 8-3V7" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M20 12c0 1.657-3.582 3-8 3s-8-1.343-8-3" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <span class="name">AI-SQL-Chat</span>
+      <img src="/img/owner.png" alt="Owner" class="avatar" />
+      <span class="byline">
+        created by
+        <a href="https://www.linkedin.com/in/grzegorz-parczewski-881a0251/"
+           target="_blank"
+           rel="author noopener noreferrer">
+          Grzegorz Parczewski
+        </a>
+      </span>
+    </a>
+
+    <!-- Hamburger (mobile) -->
+    <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-controls="mainmenu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav id="mainmenu" class="nav" role="navigation">
+
+      <!-- Auth links -->
+      <span id="authLinks">
+        <a class="link" href="/en/login.html" id="loginLink">Login</a>
+        <a class="link" href="/en/register.html" id="registerLink">Register</a>
+      </span>
+
+      <!-- Visible only when logged in -->
+      <a class="link" href="#" id="logoutLink" style="display:none;">Logout</a>
+
+      <!-- Buttons -->
+      <a class="btn btn-secondary" href="/en/schema-paste.html" id="pasteSchemaBtn">Paste Schema</a>
+      <a class="btn btn-secondary" href="/en/optimize-feature.html" id="optimizeBtn">Optimize</a>
+
+      <a class="btn btn-secondary" href="/en/schema-query.html"
+         id="loadSchemaBtn" style="display:none;">Load Schema</a>
+
+      <a class="btn btn-primary" href="/en/sql-query.html" id="tryDemoBtn">Try the demo</a>
+
+    </nav>
+  </div>
+
+  <!-- SEO (English version) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "url": "https://aisql.pl/en",
+        "name": "AI-SQL-Chat",
+        "inLanguage": "en",
+        "description": "AI-SQL-Chat — AI tool for generating SQL queries from natural language.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://aisql.pl/en/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "WebApplication",
+        "name": "AI-SQL-Chat",
+        "url": "https://aisql.pl/en",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "description": "AI-SQL-Chat generates SQL queries based on natural language and uploaded JSON schema.",
+        "image": "https://aisql.pl/img/logo.png",
+        "author": {
+          "@type": "Person",
+          "name": "Grzegorz Parczewski",
+          "url": "https://www.linkedin.com/in/grzegorz-parczewski-881a0251/"
+        }
+      }
+    ]
+  }
+  </script>
+</header>
+
+<!-- ================== SESSION LOGIC ================== -->
+<script>
+async function apiFetch(path, options = {}) {
+  const url = path.startsWith("http") ? path : (path.startsWith("/api") ? path : "/api" + path);
+  return fetch(url, {
+    ...options,
+    credentials: "include"
+  });
+}
+
+async function checkSessionAndToggleButtons() {
+  const login = document.getElementById("loginLink");
+  const register = document.getElementById("registerLink");
+  const logout = document.getElementById("logoutLink");
+  const loadSchema = document.getElementById("loadSchemaBtn");
+
+  try {
+    const res = await apiFetch("/api/auth/me");
+
+    if (res.ok) {
+      if (login) login.style.display = "none";
+      if (register) register.style.display = "none";
+      if (logout) logout.style.display = "inline-block";
+      if (loadSchema) loadSchema.style.display = "inline-block";
+    } else {
+      if (login) login.style.display = "inline-block";
+      if (register) register.style.display = "inline-block";
+      if (logout) logout.style.display = "none";
+      if (loadSchema) loadSchema.style.display = "none";
+    }
+  } catch (err) {
+    console.warn("Session check error:", err);
+    if (loadSchema) loadSchema.style.display = "none";
+  }
+}
+
+function attachLogoutHandler() {
+  const logout = document.getElementById("logoutLink");
+  if (logout && !logout.dataset.bound) {
+    logout.dataset.bound = "true";
+    logout.addEventListener("click", async (e) => {
+      e.preventDefault();
+      try {
+        await apiFetch("/api/auth/logout", { method: "POST" });
+        location.reload();
+      } catch (err) {
+        alert("Logout error");
+      }
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    checkSessionAndToggleButtons();
+    attachLogoutHandler();
+  }, 300);
+});
+</script>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-36ZC4QTDE2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-36ZC4QTDE2');
+  </script>
+
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- SEO -->
+  <title>Załaduj schemat JSON — generator SQL z języka naturalnego | AI-SQL-Chat</title>
+  <meta name="description" content="Wgraj plik schema.json i generuj jedno, bezpieczne zapytanie SELECT z opisu w języku naturalnym. Obsługa MySQL, PostgreSQL, SQL Server, Oracle." />
+  <link rel="canonical" href="https://aisql.pl/schema-query.html" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pl_PL" />
+  <meta property="og:site_name" content="AI-SQL-Chat" />
+  <meta property="og:title" content="Załaduj schemat JSON — generator SQL z opisu" />
+  <meta property="og:description" content="Wgraj schema.json i generuj jedno bezpieczne zapytanie SELECT z języka naturalnego. Tylko odczyt, wymuszone LIMIT, pełna walidacja." />
+  <meta property="og:url" content="https://aisql.pl/schema-query.html" />
+  <meta property="og:image" content="https://aisql.pl/img/og-cover.png" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Załaduj schemat JSON — generator SQL z opisu" />
+  <meta name="twitter:description" content="Wgraj schema.json i generuj jedno bezpieczne zapytanie SELECT z języka naturalnego." />
+  <meta name="twitter:image" content="https://aisql.pl/img/og-cover.png" />
+
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="/img/favicon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"/>
+</head>
+
+<body>
+
+<!-- ✅ OCHRONA: jeśli brak tokenu → redirect do login -->
+<script>
+
+
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = "/login.html";
+  } else {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (!payload.iss || !payload.aud) {
+        localStorage.removeItem("token");
+        window.location.href = "/login.html";
+      }
+    } catch (e) {
+      localStorage.removeItem("token");
+      window.location.href = "/login.html";
+    }
+  }
+
+
+</script>
+
+<script src="/js/logout.js"></script>
+<div class="bg-grid"></div>
+<div data-include="/partials/header.html"></div>
+
+<main class="container">
+  <nav class="breadcrumbs" aria-label="okruszki">
+    <a href="/">AI-SQL-Chat</a> › <span>Załaduj schemat</span>
+  </nav>
+
+  <!-- Upload -->
+  <section class="card" id="upload">
+    <div class="card-head">
+      <h2>Wgraj schemat JSON</h2>
+      <span class="note">Akceptowane: *.json (≤ 512 KB)</span>
+    </div>
+
+    <form id="uploadForm" enctype="multipart/form-data" class="grid-2">
+      <input type="file" name="schemaFile" accept=".json,application/json" required class="file"/>
+      <div style="display:flex; gap:10px; align-items:center">
+        <button class="btn btn-primary" type="submit">📂 Wgraj</button>
+        <div id="uploadResult" class="note"></div>
+      </div>
+    </form>
+  </section>
+
+  <!-- Generowanie SQL -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Wygeneruj SQL z najnowszego schematu</h2>
+      <span class="note">Zwraca tylko SELECT</span>
+    </div>
+    <textarea id="prompt" class="input" rows="4"></textarea>
+
+    <div class="mt-12" style="display:flex; gap:10px; align-items:center">
+      <button class="btn btn-primary" id="genBtn">🧠 Generuj SQL</button>
+      <div id="genState" class="note"></div>
+    </div>
+    <pre id="sqlOutput" class="code mt-12">-- Tu pojawi się wygenerowane zapytanie SQL</pre>
+  </section>
+
+  <!-- Lista -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Przesłane schematy</h2>
+      <button class="btn btn-secondary" id="refreshBtn" type="button">Odśwież</button>
+    </div>
+    <div id="schemasList" class="note">⏳ Ładowanie…</div>
+  </section>
+</main>
+
+<div data-include="/partials/footer.html"></div>
+
+<!-- ✅ Poprawiony helper API -->
+<script>
+  async function apiFetch(path, options = {}) {
+  let url = path.startsWith("/api/") ? path : "/api" + path;
+  url = url.replace(/\/api\/api\//, "/api/");
+
+  const token = localStorage.getItem("token");
+
+  const headers = new Headers(options.headers || {});
+  if (token) headers.set("Authorization", "Bearer " + token);
+  options.headers = headers;
+
+  const res = await fetch(url, options).catch(e => {
+    console.warn("Błąd API:", e);
+    throw e;
+  });
+
+  return res;
+}
+
+
+  async function readError(res) {
+    const ct = res.headers.get('content-type') || '';
+    if (ct.includes('application/json')) {
+      const j = await res.json();
+      return j.error || JSON.stringify(j);
+    }
+    return await res.text();
+  }
+</script>
+
+<!-- 🔧 Logika strony -->
+<script>
+  document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const info = document.getElementById('uploadResult');
+    info.textContent = '⏳ Przesyłanie...';
+
+    try {
+      const fd = new FormData(e.target);
+      const res = await apiFetch('/schema/upload', { method: 'POST', body: fd });
+      const txt = await res.text();
+      info.textContent = res.ok ? txt : ('❌ ' + txt + ' (' + res.status + ')');
+      if (res.ok) loadSchemas();
+    } catch {
+      info.textContent = '❌ Błąd połączenia';
+    }
+  });
+
+  document.getElementById('genBtn').addEventListener('click', generateSQL);
+  async function generateSQL() {
+    const p = document.getElementById('prompt').value.trim();
+    const out = document.getElementById('sqlOutput');
+    const state = document.getElementById('genState');
+    if (!p) {
+      state.textContent = 'Wpisz treść zapytania.';
+      return;
+    }
+    state.textContent = '⏳ Generuję...';
+    out.textContent = '';
+
+    const res = await apiFetch('/generate-sql', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: p })
+    });
+
+    if (!res.ok) {
+      state.textContent = '❌ ' + (await readError(res));
+      return;
+    }
+
+    const data = await res.json().catch(() => ({}));
+    out.textContent = data.sql || '-- brak danych';
+    state.textContent = '✅ Gotowe';
+  }
+
+  document.getElementById('refreshBtn').addEventListener('click', loadSchemas);
+  async function loadSchemas() {
+    const box = document.getElementById('schemasList');
+    box.textContent = '⏳ Ładowanie…';
+
+    const res = await apiFetch('/schemas');
+    if (!res.ok) {
+      box.textContent = '❌ ' + (await readError(res)) + ' (' + res.status + ')';
+      return;
+    }
+
+    const files = await res.json();
+    if (!files.length) {
+      box.textContent = 'Brak plików.';
+      return;
+    }
+
+    const ul = document.createElement('ul');
+    ul.style.listStyle = 'none';
+    ul.innerHTML = files.map(f => `
+      <li style="padding:6px 0; display:flex; justify-content:space-between">
+        <span>${f}</span>
+        <button class="btn btn-secondary" data-del="${f}">Usuń</button>
+      </li>`).join('');
+
+    box.innerHTML = '';
+    box.appendChild(ul);
+
+    ul.querySelectorAll("button[data-del]").forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm("Usunąć ten plik?")) return;
+        const res = await apiFetch('/schemas/' + btn.dataset.del, { method: 'DELETE' });
+        if (!res.ok) alert('Błąd: ' + (await readError(res)));
+        loadSchemas();
+      });
+    });
+  }
+
+  loadSchemas();
+</script>
+
+<script src="/js/include.js"></script>
+<script src="/js/header.js"></script>
+<script defer src="/js/cookie-consent.js"></script>
+
+</body>
+</html>

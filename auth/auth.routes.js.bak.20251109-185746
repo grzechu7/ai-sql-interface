@@ -1,0 +1,111 @@
+import express from "express";
+import passport from "passport";
+import * as authController from "./auth.controller.js";
+
+const router = express.Router();
+
+// ✅ Rejestracja użytkownika
+router.post("/register", authController.register);
+
+// ✅ Logowanie sesyjne (Passport Local)
+// Logowanie sesyjne (Passport Local)
+router.post("/login", (req, res, next) => {
+  console.log("🚀 [AUTH] POST /api/auth/login wywołane, body:", req.body);
+  console.log("[AUTH] Status sesji przed logowaniem:", req.session);
+
+  // Sprawdzamy, czy sesja jest już aktywna
+  if (req.isAuthenticated()) {
+    console.log("[AUTH] Użytkownik już zalogowany, sesja aktywna.");
+    return res.status(200).json({
+      ok: true,
+      user: req.user,
+      message: "Sesja już aktywna.",
+    });
+  }
+
+  try {
+    passport.authenticate("local", async (err, user, info) => {
+      if (err) {
+        console.error("💥 [AUTH ERROR] Passport Local:", err);
+        return res
+          .status(500)
+          .json({ error: "Błąd Passporta", details: err.message });
+      }
+
+      if (!user) {
+        console.warn("🚫 [AUTH FAIL] Nieprawidłowe dane logowania:", info);
+        return res
+          .status(401)
+          .json({ error: info?.message || "Nieprawidłowe dane logowania" });
+      }
+
+      console.log("[AUTH] Status sesji po próbie logowania:", req.session);
+
+      req.login(user, (err) => {
+        if (err) {
+          console.error("❌ [AUTH ERROR] req.login():", err);
+          return res.status(500).json({ error: "Błąd sesji logowania" });
+        }
+
+        console.log(
+          `✅ [AUTH SUCCESS] Zalogowano: ${user.email} (id=${user.id})`
+        );
+        res.status(200).json({
+          ok: true,
+          user: { id: user.id, email: user.email },
+          message: "Zalogowano pomyślnie",
+        });
+      });
+    })(req, res, next);
+  } catch (outerErr) {
+    console.error("🔥 [AUTH FATAL] Wyjątek w login:", outerErr);
+    res
+      .status(500)
+      .json({ error: "Błąd serwera", details: outerErr.message });
+  }
+});
+
+
+
+// ✅ Wylogowanie — niszczy sesję i cookie aisql.sid
+router.post("/logout", (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      console.error("❌ [AUTH ERROR] logout():", err);
+      return res.status(500).json({ error: "Błąd wylogowania" });
+    }
+
+    req.session.destroy(() => {
+      res.clearCookie("aisql.sid", {
+        path: "/", // 👈 bardzo ważne
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      });
+
+      console.log("👋 [AUTH] Wylogowano użytkownika");
+      res.json({ ok: true, message: "Wylogowano pomyślnie" });
+    });
+  });
+});
+
+// ✅ Dane aktualnego użytkownika (dla /api/auth/me)
+router.get("/me", (req, res) => {
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    console.log("👤 [AUTH] /me → użytkownik:", req.user);
+    res.json({ user: req.user });
+  } else {
+    console.warn("🚫 [AUTH] /me → brak autoryzacji");
+    res.status(401).json({ error: "Nieautoryzowany" });
+  }
+});
+
+// ✅ Globalny handler błędów w tym routerze
+router.use((err, req, res, next) => {
+  console.error("🔥 [AUTH ROUTER ERROR]", err.stack || err);
+  res
+    .status(500)
+    .json({ error: err.message || "Błąd serwera" });
+});
+
+export default router;

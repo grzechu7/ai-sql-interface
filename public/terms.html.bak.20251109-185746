@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-36ZC4QTDE2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-36ZC4QTDE2');
+</script>
+
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Regulamin — AI-SQL-Chat</title>
+ <meta name="description" content="Regulamin świadczenia usług AI-SQL-Chat oraz informacje o korzystaniu z systemu AI zgodnie z wymogami UE.Warunki korzystania z serwisu, licencje, odpowiedzialność, AI usage i ograniczenia.">
+<link rel="canonical" href="https://aisql.pl/terms.html">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"/>
+ 
+</head>
+<body>
+  <script src="/js/logout.js"></script>
+  <div class="bg-grid"></div>
+
+  <!-- HEADER (include) -->
+  <div data-include="/partials/header.html"></div>
+
+  <main class="container">
+    <section class="card">
+      <div class="card-head">
+        <h1 style="font-size:28px; margin:0">Regulamin AI-SQL-Chat</h1>
+        <span class="note">Wersja 1.0 — obowiązuje od: <time datetime="2025-01-01">1 stycznia 2025 r.</time></span>
+      </div>
+
+      <div class="sub" style="font-size:16px; line-height:1.8">
+        <p>Niniejszy Regulamin określa zasady korzystania z serwisu <strong>AI-SQL-Chat</strong> dostępnego pod adresem <code>https://aisql.pl</code> (dalej: „Serwis”), w tym z funkcji generowania zapytań SQL z użyciem systemu sztucznej inteligencji („System AI”). Usługodawcą jest <strong>Grzegorz Parczewski</strong>  — e-mail kontaktowy: <a href="mailto:podkowa71@gmail.com">podkowa71@gmail.com</a> (dalej: „Usługodawca”).</p>
+
+        <h2>1) Definicje</h2>
+        <ul>
+          <li><strong>Użytkownik</strong> — osoba korzystająca z Serwisu.</li>
+          <li><strong>System AI</strong> — komponent oprogramowania wykorzystujący modele sztucznej inteligencji do przetwarzania zapytań tekstowych na zapytania SQL.</li>
+          <li><strong>Treści Użytkownika</strong> — dane wpisywane do Serwisu (np. zapytania, wgrane schematy JSON).</li>
+          <li><strong>Usługa</strong> — funkcjonalności Serwisu, w tym generowanie SQL, podgląd wyników, upload schematu.</li>
+        </ul>
+
+        <h2>2) Charakter i przejrzystość działania AI</h2>
+        <ul>
+          <li>Serwis wykorzystuje System AI do automatycznego generowania propozycji zapytań SQL na podstawie opisu Użytkownika i schematu bazy danych.</li>
+          <li>Wyjście Systemu AI ma charakter <strong>propozycji</strong>. Użytkownik pozostaje odpowiedzialny za weryfikację poprawności, bezpieczeństwa i adekwatności zapytania SQL oraz wyników.</li>
+          <li>Serwis jest przeznaczony do zastosowań biznesowych i deweloperskich <strong>o niskim i średnim ryzyku</strong>; nie jest przeznaczony do zastosowań wysokiego ryzyka w rozumieniu przepisów UE (w tym AI Act). Użytkownik nie może wykorzystywać Serwisu w obszarach zaklasyfikowanych jako wysokiego ryzyka lub zakazanych.</li>
+          <li>Serwis może stosować techniczne ograniczenia bezpieczeństwa (np. wymuszanie <code>SELECT</code>, wzorce zabronione, limit zapytania).</li>
+        </ul>
+
+        <h2>3) Warunki korzystania</h2>
+        <ul>
+          <li>Warunkiem korzystania z Serwisu jest akceptacja Regulaminu i Polityki prywatności (<a href="/privacy.html">/privacy.html</a>).</li>
+          <li>Użytkownik zobowiązuje się nie wprowadzać Treści niezgodnych z prawem, naruszających prawa osób trzecich lub poufność danych.</li>
+          <li>Użytkownik zapewnia, że posiada podstawę prawną do przetwarzania danych, które wprowadza (np. schematów, nazw pól, przykładowych wartości danych).</li>
+        </ul>
+
+        <h2>4) Ograniczenia techniczne i zakazy</h2>
+        <ul>
+          <li>Serwis domyślnie blokuje instrukcje DDL/DML, komendy zagrażające bezpieczeństwu (np. <code>OUTFILE/INFILE</code>, <code>SLEEP/BENCHMARK</code>) oraz wymusza <code>LIMIT</code>.</li>
+          <li>Zakazane jest obchodzenie tych zabezpieczeń, testy penetracyjne bez zgody, inżynieria wsteczna, nadmierne obciążanie (DDoS), używanie botów i skryptów do masowego generowania zapytań.</li>
+          <li>Użytkownik nie może wykorzystywać Serwisu do generowania treści nielegalnych, wprowadzających w błąd lub naruszających prawa innych.</li>
+        </ul>
+
+        <h2>5) Treści Użytkownika i licencja</h2>
+        <ul>
+          <li>Wprowadzając Treści Użytkownika, udzielasz Usługodawcy niewyłącznej, nieodpłatnej licencji na ich techniczne przechowywanie i przetwarzanie w zakresie niezbędnym do świadczenia Usługi (np. walidacja względem schematu).</li>
+          <li>Usługodawca nie rości sobie praw do wyników SQL poza zakresem niezbędnym do wykonania Usługi.</li>
+        </ul>
+
+        <h2>6) Odpowiedzialność</h2>
+        <ul>
+          <li>Usługodawca dokłada starań, aby System AI działał poprawnie, jednak nie gwarantuje bezbłędności ani przydatności wyników do każdego celu.</li>
+          <li>Użytkownik ponosi pełną odpowiedzialność za użycie wygenerowanych zapytań, ich wykonanie na własnych środowiskach oraz wynikające z tego skutki (np. obciążenie bazy, nieprawidłowe wyniki biznesowe).</li>
+          <li>W najszerszym dopuszczalnym zakresie prawnym odpowiedzialność Usługodawcy jest ograniczona do rzeczywiście poniesionej szkody bezpośredniej oraz nie obejmuje utraconych korzyści.</li>
+        </ul>
+
+        <h2>7) Dostępność i zmiany Usługi</h2>
+        <ul>
+          <li>Serwis może być czasowo niedostępny z przyczyn technicznych lub bezpieczeństwa. Usługodawca może wprowadzać aktualizacje, które zmieniają sposób działania Systemu AI.</li>
+          <li>Regulamin może być zmieniany z ważnych powodów (np. zmiany prawa, funkcjonalności). O istotnych zmianach poinformujemy na stronie; dalsze korzystanie po dacie wejścia zmian oznacza akceptację nowej wersji.</li>
+        </ul>
+
+        <h2>8) Ochrona danych i prywatność (RODO)</h2>
+        <ul>
+          <li>Informacje o przetwarzaniu danych osobowych znajdują się w <a href="/privacy.html">Polityce prywatności</a>. Serwis ogranicza przetwarzanie danych do niezbędnego minimum i zachęca do niewprowadzania danych osobowych do Treści Użytkownika.</li>
+          <li>Podstawą prawną przetwarzania są m.in. prawnie uzasadnione interesy Usługodawcy (zapewnienie działania Serwisu, bezpieczeństwo, logowanie zdarzeń) oraz wykonanie umowy (świadczenie Usługi).</li>
+        </ul>
+
+        <h2>9) Zasady zgodności z prawem UE dot. AI</h2>
+        <ul>
+          <li><strong>Przejrzystość:</strong> Użytkownik jest informowany, że korzysta z Systemu AI; propozycje SQL mogą zawierać błędy i wymagają weryfikacji przez człowieka.</li>
+          <li><strong>Zarządzanie ryzykiem:</strong> Serwis stosuje ograniczenia bezpieczeństwa (single-SELECT, zakazane wzorce, limity) i loguje zdarzenia techniczne w celu detekcji nadużyć.</li>
+          <li><strong>Zakaz zastosowań wysokiego ryzyka:</strong> Zabronione jest użycie w obszarach kwalifikowanych jako wysokie ryzyko/zakazane w przepisach UE (np. ocena zdolności kredytowej bez nadzoru, krytyczna infrastruktura, biometryczna kategoryzacja); Użytkownik ponosi odpowiedzialność za ocenę zgodności swojego przypadku użycia.</li>
+          <li><strong>Nadzór ludzki:</strong> Serwis zakłada nadzór i akceptację wyników przez człowieka — dajemy narzędzia do podglądu SQL, kopiowania i pobrania, ale decyzję operacyjną podejmuje Użytkownik.</li>
+        </ul>
+
+        <h2>10) Płatności</h2>
+        <p>Jeśli wprowadzimy plany płatne, warunki (ceny, okres rozliczeniowy, faktury, odstąpienie) zostaną opisane w dedykowanej sekcji cennika. Obecnie Serwis może oferować wersję bezpłatną/demo z limitami.</p>
+
+        <h2>11) Reklamacje i kontakt</h2>
+        <ul>
+          <li>Reklamacje można składać e-mailem: <a href="mailto:podkowa71@gmail.com">podkowa71@gmail.com</a>. Opisz problem, datę, adres URL, zrzut ekranu/log i oczekiwanie.</li>
+          <li>Rozpatrujemy reklamacje bez zbędnej zwłoki, zwykle do 14 dni.</li>
+          <li>Jako konsument (jeśli Serwis będzie sprzedawał płatne plany konsumenckie) masz prawo skorzystać z pozasądowych metod rozwiązywania sporów i z platformy ODR: <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="nofollow noopener">ec.europa.eu/consumers/odr</a>.</li>
+        </ul>
+
+        <h2>12) Prawa własności intelektualnej</h2>
+        <ul>
+          <li>Wszelkie prawa do Serwisu (znaki, UI, kod) należą do Usługodawcy lub licencjodawców. Użytkownik uzyskuje niewyłączne prawo do korzystania z Serwisu zgodnie z Regulaminem.</li>
+          <li>Zakazane jest kopiowanie lub odtwarzanie istotnych części Serwisu bez zgody, z wyjątkiem przypadków dozwolonych prawem.</li>
+        </ul>
+
+        <h2>13) Siła wyższa</h2>
+        <p>Usługodawca nie odpowiada za niewykonanie lub nienależyte wykonanie Usługi spowodowane siłą wyższą (np. awarie dostawców chmury, przerwy w Internecie, ataki).</p>
+
+        <h2>14) Prawo właściwe i sąd</h2>
+        <p>Do Regulaminu stosuje się prawo polskie z poszanowaniem przepisów ochrony konsumenta obowiązujących w UE. Spory rozstrzygają właściwe polskie sądy powszechne, chyba że bezwzględnie obowiązujące przepisy stanowią inaczej.</p>
+
+        <h2>15) Postanowienia końcowe</h2>
+        <ul>
+          <li>Jeśli jakiekolwiek postanowienie Regulaminu okaże się nieważne, pozostałe pozostają w mocy.</li>
+          <li>Aktualna wersja Regulaminu jest dostępna pod adresem <code>/terms.html</code>. Historia zmian może być publikowana w repozytorium lub na stronie.</li>
+        </ul>
+
+        <hr style="margin:18px 0">
+        <p class="note">To nie jest porada prawna. Dokument przygotowano z myślą o zgodności z zasadami przejrzystości UE dot. AI (m.in. informacja o użyciu AI, nadzór ludzki, ograniczenia ryzyka), RODO (odwołanie do Polityki prywatności), prawami konsumenta oraz ODR. Zalecamy weryfikację pod Twoje realne modele biznesowe i jurysdykcję.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER (include) -->
+  <div data-include="/partials/footer.html"></div>
+
+  <!-- Skrypty współdzielone -->
+  <script src="/js/include.js"></script>
+  <script src="/js/header.js"></script>
+  <script defer src="/js/cookie-consent.js"></script>
+</body>
+</html>

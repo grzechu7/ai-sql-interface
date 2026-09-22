@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-36ZC4QTDE2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-36ZC4QTDE2');
+</script>
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<title>AI-SQL-Chat — Privacy Policy</title>
+<meta name="description" content="Privacy and cookie policy of AI-SQL-Chat (aisql.pl). Information about data processing, uploaded schema files, cookies, and security." />
+
+<link rel="canonical" href="https://aisql.pl/en/privacy.html">
+<link rel="alternate" hreflang="pl" href="https://aisql.pl/privacy.html">
+<link rel="alternate" hreflang="en" href="https://aisql.pl/en/privacy.html">
+<link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/privacy.html">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/style.css"/>
+
+<style>
+  .toc { margin: 12px 0 0; padding-left: 18px; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .section { margin-top: 16px; }
+</style>
+
+</head>
+
+<body>
+<div class="bg-grid"></div>
+
+<!-- HEADER -->
+<div data-include="/en/partials/header.html"></div>
+
+<main class="container">
+
+<!-- HERO -->
+<section class="card" style="padding:20px">
+  <h1 class="h1" style="margin:0 0 8px">Privacy Policy</h1>
+  <p class="lead" style="margin:0">
+    This document explains how we process data on <strong>AI-SQL-Chat</strong> (aisql.pl),
+    including the use of cookies, uploaded <code>JSON Schema</code> files, SQL generation,
+    and security practices. The document is prepared in accordance with GDPR.
+  </p>
+
+  <ul class="toc">
+    <li><a href="#admin">Data controller & contact</a></li>
+    <li><a href="#scope">Scope & sources of data</a></li>
+    <li><a href="#purpose">Purposes & legal basis</a></li>
+    <li><a href="#cookies">Cookies & similar technologies</a></li>
+    <li><a href="#upload">Uploading JSON schemas</a></li>
+    <li><a href="#api">Using AI-SQL-Chat</a></li>
+    <li><a href="#logs">Server logs & security</a></li>
+    <li><a href="#sharing">Data sharing</a></li>
+    <li><a href="#retention">Data retention</a></li>
+    <li><a href="#rights">User rights</a></li>
+    <li><a href="#changes">Policy changes</a></li>
+  </ul>
+
+  <div class="note mt-12">Last updated: <time datetime="2025-01-01">1 January 2025</time></div>
+</section>
+
+<!-- ADMIN -->
+<section id="admin" class="card section">
+  <div class="card-head"><h2>Data controller & contact</h2></div>
+  <p class="sub">
+    The data controller is <strong>AI-SQL-Chat</strong>.  
+    For matters related to data protection, please contact:  
+    <a href="mailto:podkowa71@gmail.com">podkowa71@gmail.com</a>.
+  </p>
+</section>
+
+<!-- SCOPE -->
+<section id="scope" class="card section">
+  <div class="card-head"><h2>Scope & sources of data</h2></div>
+  <ul class="sub" style="margin:0 0 0 18px">
+    <li>Operational data: IP address, timestamp, browser headers (stored in server logs).</li>
+    <li>Voluntary data: content entered in the interface (e.g., natural-language prompts), uploaded <code>JSON</code> schema files.</li>
+    <li>No user accounts — the service works without registration.</li>
+    <li>We do not build user profiles and do not store generated SQL results beyond what is necessary for processing a request.</li>
+  </ul>
+</section>
+
+<!-- PURPOSE -->
+<section id="purpose" class="card section">
+  <div class="card-head"><h2>Purposes & legal basis</h2></div>
+  <ul class="sub" style="margin:0 0 0 18px">
+    <li><strong>Service delivery</strong> (generating SQL based on prompts and uploaded schema) — GDPR Art. 6(1)(b).</li>
+    <li><strong>Security & maintenance</strong> (logs, rate limiting, abuse protection) — GDPR Art. 6(1)(f).</li>
+    <li><strong>Essential cookies</strong> — GDPR Art. 6(1)(f).</li>
+    <li><strong>Optional cookies</strong> (if introduced) — GDPR Art. 6(1)(a).  
+        By default we do not use third-party analytics cookies.</li>
+  </ul>
+</section>
+
+<!-- COOKIES -->
+<section id="cookies" class="card section">
+  <div class="card-head"><h2>Cookies & similar technologies</h2></div>
+  <p class="sub">
+    The service uses only <strong>essential</strong> cookies required for the interface to function,
+    including remembering your cookie-banner choice (<code>cookie-consent</code>).  
+    We do not use external trackers or advertising cookies. If additional categories (e.g., analytics) are introduced, we will request consent.
+  </p>
+
+  <ul class="sub" style="margin:8px 0 0 18px">
+    <li><strong>cookie-consent</strong> — stores your choice from the cookie banner (duration: up to 12 months).</li>
+    <li><strong>technical cookies</strong> — may be used for session handling/anti-abuse mechanisms; not used for profiling.</li>
+  </ul>
+
+  <p class="note mt-8">
+    Cookie management: you may delete/modify your settings at any time in your browser.  
+    If the banner is hidden, delete the <code>cookie-consent</code> cookie to show it again.
+  </p>
+</section>
+
+<!-- UPLOAD -->
+<section id="upload" class="card section">
+  <div class="card-head"><h2>Uploading JSON schemas</h2></div>
+  <p class="sub">
+    The “Upload JSON schema” function stores the uploaded file in the <code>uploads/</code> directory
+    so it can be used to generate SQL queries.  
+    The latest uploaded file is used by the AI-SQL-Chat module.  
+    Files can be deleted from the schema list in the app.  
+    Upload only schemas that do not contain personal or confidential business data.
+  </p>
+</section>
+
+<!-- API USAGE -->
+<section id="api" class="card section">
+  <div class="card-head"><h2>Using AI-SQL-Chat</h2></div>
+  <ul class="sub" style="margin:0 0 0 18px">
+    <li><strong>Prompt → SQL:</strong> Based on a natural-language prompt and a provided schema, we generate a <em>single</em> <code>SELECT</code> query with enforced <code>LIMIT</code> and anti-SQLi filtering.</li>
+    <li><strong>Results:</strong> Query results are displayed in the browser and are not permanently stored on the server.</li>
+    <li><strong>Security:</strong> We block DDL/DML instructions, <code>INFILE/OUTFILE</code>, artificial delays, and multi-statement sequences.</li>
+  </ul>
+</section>
+
+<!-- LOGS -->
+<section id="logs" class="card section">
+  <div class="card-head"><h2>Server logs & security</h2></div>
+  <p class="sub">
+    The server (Oracle Cloud) may automatically store standard access logs:  
+    IP address, date/time, requested resource, browser information.  
+    These are used for diagnostics, security, and service statistics.  
+    We employ protective mechanisms (rate limit, slowdown, content filters).
+  </p>
+</section>
+
+<!-- SHARING -->
+<section id="sharing" class="card section">
+  <div class="card-head"><h2>Data sharing</h2></div>
+  <p class="sub">
+    We do not sell data nor share it with third parties for marketing purposes.  
+    Data may be processed by hosting/maintenance providers only as necessary  
+    and based on a data-processing agreement.
+  </p>
+</section>
+
+<!-- RETENTION -->
+<section id="retention" class="card section">
+  <div class="card-head"><h2>Data retention</h2></div>
+  <ul class="sub" style="margin:0 0 0 18px">
+    <li>Server logs — according to hosting provider retention policies and security needs.</li>
+    <li>Files in <code>uploads/</code> — until deleted by the user or administratively (e.g., cleanup/disk limits).</li>
+    <li>Cookie consent — up to 12 months.</li>
+    <li>Query results — only in memory for the duration of request handling (no persistent storage).</li>
+  </ul>
+</section>
+
+<!-- RIGHTS -->
+<section id="rights" class="card section">
+  <div class="card-head"><h2>User rights</h2></div>
+  <p class="sub">
+    You have the following rights: access, rectification, erasure, restriction,  
+    objection, data portability, and filing a complaint to your supervisory authority.  
+    Send your request to: <a href="mailto:podkowa71@gmail.com">podkowa71@gmail.com</a>.
+  </p>
+</section>
+
+<!-- CHANGES -->
+<section id="changes" class="card section">
+  <div class="card-head"><h2>Changes to this policy</h2></div>
+  <p class="sub">
+    This policy may be updated as the service evolves.  
+    A new version will be published on this page and the date above will be updated.  
+    Continued use of the service constitutes acceptance of the changes.
+  </p>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<div data-include="/en/partials/footer.html"></div>
+
+<script src="/js/include.js"></script>
+<script src="/js/header.js"></script>
+<script defer src="/js/cookie-consent.js"></script>
+
+</body>
+</html>

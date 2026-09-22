@@ -1,0 +1,16 @@
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <span class="note">© <span class="js-year"></span> AI-SQL-Chat</span>
+      <span class="sep">•</span>
+      <a class="link" href="/privacy.html">Prywatność</a>
+      <span class="sep">•</span>
+      <a class="link" href="/terms.html">Regulamin</a>
+      <span class="sep">•</span>
+      <a class="link" href="/security.html">Bezpieczeństwo</a>
+    </div>
+    <div class="footer-right">
+      <span class="note warn">⚠️ SQL generowany automatycznie — weryfikuj w krytycznych miejscach.</span>
+    </div>
+  </div>
+</footer>

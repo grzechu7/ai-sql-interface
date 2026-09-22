@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Wklej schemat i generuj SQL — AI-SQL-Chat</title>
+
+  <link rel="canonical" href="https://aisql.pl/schema-paste.html"/>
+  <meta name="robots" content="index,follow"/>
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml"/>
+  <link rel="alternate icon" href="/img/favicon.png"/>
+  <link rel="manifest" href="/site.webmanifest"/>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"/>
+
+  <link rel="canonical" href="https://aisql.pl/index.html">
+<link rel="alternate" hreflang="pl" href="https://aisql.pl/index.html">
+<link rel="alternate" hreflang="en" href="https://aisql.pl/en/index.html">
+<link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/index.html">
+
+
+  <style>
+    .grid-2 { display:grid; gap:16px; grid-template-columns:1fr; }
+    @media(min-width:980px){ .grid-2{ grid-template-columns:1.2fr .8fr; } }
+    .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  </style>
+
+<script>
+(function() {
+  if (window.location.pathname.startsWith("/en")) return;
+
+  const lang = navigator.language || navigator.userLanguage;
+
+  if (!lang.startsWith("pl")) {
+    const newPath = "/en" + window.location.pathname;
+    window.location.replace(newPath);
+  }
+})();
+</script>
+
+
+</head>
+<body>
+  <script src="/js/logout.js"></script>
+  <div class="bg-grid"></div>
+  <div data-include="/partials/header.html"></div>
+
+  <main class="container">
+   <section class="hero" style="padding-top:28px; padding-bottom:8px">
+      <h1 class="h1">Wklej schemat i <span class="grad">generuj SQL</span></h1>
+      <p class="lead">
+        Wklej wynik zapytania do kolumny (np. z phpMyAdmin) lub gotowy JSON.
+        Następnie wpisz pytanie po polsku — wygenerujemy jedno <strong>SELECT</strong>.
+      </p>
+      <p class="sub" style="margin-top:8px; font-size:15px;">
+        🔍 Nie wiesz, jak pobrać strukturę bazy?
+        Zobacz prostą instrukcję krok po kroku:
+        <a href="/schema-copy.html" class="btn btn-ghost" style="margin-left:6px;">📘 Jak skopiować schemat</a>
+      </p>
+    </section>
+
+    <section class="grid-2">
+      <!-- LEWA -->
+      <div class="card">
+        <div class="card-head">
+          <h2>1) Wklej schemat</h2>
+          <span class="note">Obsługa: płaska lista (TSV/CSV/spacje) lub JSON</span>
+        </div>
+
+        <textarea id="schemaInput" class="input mono" rows="12" placeholder="Wklej wynik:
+TABLE_NAME  COLUMN_NAME  DATA_TYPE
+ceny_modulow  cenaBrutto  decimal
+..."></textarea>
+
+        <div class="mt-12" style="display:flex; gap:10px; flex-wrap:wrap">
+          <button class="btn btn-secondary" id="parseBtn" type="button">Parsuj do JSON</button>
+          <button class="btn btn-ghost" id="downloadBtn" type="button">Pobierz schema.json</button>
+          <span id="parseState" class="note"></span>
+        </div>
+
+        <!-- 2) PYTANIE + WYNIK -->
+        <div class="mt-16 card">
+          <div class="card-head">
+            <h3>2) Napisz pytanie po ludzku</h3>
+            <span class="note">Np. „podaj 5 najlepiej sprzedających się modułów w Warszawie wraz z cenami”</span>
+          </div>
+          <textarea id="prompt" class="input" rows="4" placeholder="np. moduły i ich ceny"></textarea>
+          <div class="mt-12" style="display:flex; gap:10px; align-items:center">
+            <button class="btn btn-primary" id="genBtn" type="button">🧠 Generuj SQL</button>
+            <span id="genState" class="note"></span>
+          </div>
+
+          <!-- Wynik SQL -->
+          <div class="mt-12">
+    
+                 <div style="display:flex; gap:8px">
+            <h3>3) Wygenerowane zapytanie SQL</h3>
+            <button class="btn btn-secondary" type="button" onclick="copySql()">📋 Kopiuj</button>
+            <button class="btn btn-secondary" type="button" onclick="downloadSql()">⬇️ Pobierz</button>
+          </div>
+            <pre id="sqlOut" class="code mono" style="min-height:140px;white-space:pre-wrap">— brak —</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRAWA -->
+      <div class="card">
+        <div class="card-head">
+          <h2>Podgląd schematu</h2>
+          <span class="note">Znormalizowany JSON</span>
+        </div>
+        <label class="sub">Znormalizowany schemat (JSON)</label>
+        <pre id="schemaPreview" class="code mono" style="min-height:180px;white-space:pre-wrap">— brak —</pre>
+      </div>
+    </section>
+
+    <section class="card mt-16">
+      <h2>Generator SQL z języka naturalnego</h2>
+      <p class="sub">
+        Ten konwerter działa w trybie tylko-odczyt — nie łączy się z bazą i nie wykonuje zapytań.
+        Zwraca jedynie propozycję <strong>SELECT</strong> na podstawie podanego schematu.
+      </p>
+    </section>
+  </main>
+
+  <div data-include="/partials/footer.html"></div>
+
+  <script src="/js/include.js"></script>
+  <script src="/js/header.js"></script>
+  <script defer src="/js/cookie-consent.js"></script>
+
+  <script>
+    const $ = sel => document.querySelector(sel);
+    const state = { schemaObj: null };
+
+    function sanitizeDump(text) {
+      const DROP_PATTERNS = [
+        /pokazano wiersze/i, /wykonanie zapytania/i, /phpmyadmin/i,
+        /information_schema\.columns/i, /^SELECT\b/i, /^FROM\b/i, /^WHERE\b/i,
+        /^#/, /^--/, /^TABLE_NAME/i, /^COLUMN_NAME/i
+      ];
+      return text
+        .split(/\r?\n/)
+        .map(l => l.replace(/\u00A0/g, ' ').trim())
+        .filter(l => !!l)
+        .filter(l => !DROP_PATTERNS.some(rx => rx.test(l)));
+    }
+
+    function isJsonLike(txt){ try{ JSON.parse(txt); return true; }catch{ return false; } }
+
+    function parseFlatColumns(text){
+      const lines = sanitizeDump(text);
+      const out = new Map();
+      for (const line of lines){
+        let parts = line.split('\t');
+        if (parts.length < 2) parts = line.split(',').map(s => s.trim());
+        if (parts.length < 2) parts = line.split(/\s+/);
+        const [t, c, type] = parts;
+        if (!t || !c) continue;
+        if (!out.has(t)) out.set(t, { name:t, columns:[] });
+        out.get(t).columns.push({ name:c, type:(type||'TEXT') });
+      }
+      return { tables: Array.from(out.values()) };
+    }
+
+    function normalizeSchema(text){
+      if (isJsonLike(text)){
+        const obj = JSON.parse(text);
+        if (!obj.tables && typeof obj === 'object'){
+          const tables = Object.entries(obj).map(([name, cols]) => ({
+            name,
+            columns:(cols||[]).map(x => (typeof x==='string'?{name:x,type:'TEXT'}:x))
+          }));
+          return { tables };
+        }
+        return obj;
+      }
+      return parseFlatColumns(text);
+    }
+
+    const pretty = obj => JSON.stringify(obj,null,2);
+
+    // --- Parsowanie schematu ---
+    $('#parseBtn').addEventListener('click', ()=>{
+      const raw = $('#schemaInput').value.trim();
+      if (!raw){ $('#parseState').textContent='Wklej najpierw schemat.'; return; }
+      try{
+        state.schemaObj = normalizeSchema(raw);
+        $('#schemaPreview').textContent = pretty(state.schemaObj);
+        $('#parseState').textContent = '✅ OK — rozpoznano schemat.';
+      }catch(e){
+        $('#parseState').textContent='❌ Nie udało się sparsować schematu: '+e.message;
+      }
+    });
+
+    $('#downloadBtn').addEventListener('click', ()=>{
+      if (!state.schemaObj){ $('#parseState').textContent='Najpierw parsuj schemat.'; return; }
+      const blob = new Blob([JSON.stringify(state.schemaObj,null,2)],{type:'application/json;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='schema.json'; a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // --- Generowanie SQL ---
+    $('#genBtn').addEventListener('click', async ()=>{
+      const question = $('#prompt').value.trim();
+      if (!question){ $('#genState').textContent='Wpisz pytanie.'; return; }
+
+      $('#genState').textContent = '⏳ Generuję...';
+      $('#sqlOut').textContent = '...';
+
+      try {
+      const res = await fetch("/api/ask", {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    question,
+    schema: state.schemaObj, // 👈 dodajemy lokalny schemat JSON
+    dryRun: true              // 👈 tryb bez łączenia z bazą
+  })
+});
+
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+
+        $('#sqlOut').textContent = data.sql || '— (brak danych)';
+        $('#genState').textContent = '✅ Gotowe';
+      } catch(e) {
+        $('#genState').textContent = '❌ ' + (e?.message || 'Błąd generowania.');
+        $('#sqlOut').textContent = '—';
+      }
+    });
+    
+    // ⭐ FUNKCJA — kopiowanie wygenerowanego SQL
+function copySql() {
+  const code = document.getElementById("sqlOut").textContent.trim();
+
+  if (!code || code === "— brak —" || code === "—") {
+    alert("Brak kodu do skopiowania.");
+    return;
+  }
+
+  navigator.clipboard.writeText(code)
+    .then(() => alert("Skopiowano do schowka!"))
+    .catch(() => alert("❌ Błąd kopiowania"));
+}
+
+// ⭐ FUNKCJA — pobieranie wygenerowanego SQL jako pliku .sql
+function downloadSql() {
+  const code = document.getElementById("sqlOut").textContent.trim();
+
+  if (!code || code === "— brak —" || code === "—") {
+    alert("Brak kodu do pobrania.");
+    return;
+  }
+
+  const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "generated.sql";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+
+  </script>
+</body>
+</html>

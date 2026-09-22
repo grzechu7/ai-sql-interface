@@ -1,0 +1,255 @@
+<header class="header">
+  <div class="header-inner">
+    <a class="brand" href="/index.html" aria-label="AI-SQL-Chat - strona główna">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 7c0-1.657 3.582-3 8-3s8 1.343 8 3-3.582 3-8 3-8-1.343-8-3Z" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M4 7v10c0 1.657 3.582 3 8 3s8-1.343 8-3V7" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M20 12c0 1.657-3.582 3-8 3s-8-1.343-8-3" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <span class="name">AI-SQL-Chat</span>
+      <img src="/img/owner.png" alt="Owner" class="avatar" />
+      <span class="byline">
+        created by
+        <a href="https://www.linkedin.com/in/grzegorz-parczewski-881a0251/" 
+        target="_blank" 
+        rel="author noopener noreferrer">
+        Grzegorz Parczewski
+        </a>
+      </span>
+    </a>
+    <script type="application/ld+json">
+function updateHeaderLanguage() {
+  const userLang = navigator.language || navigator.userLanguage;
+
+  const isPL = userLang.startsWith("pl");
+
+  // Polskie teksty
+  if (isPL) {
+    document.getElementById("loginLink").textContent = "Zaloguj";
+    document.getElementById("registerLink").textContent = "Zarejestruj";
+    document.getElementById("logoutLink").textContent = "Wyloguj";
+
+    document.getElementById("pasteSchemaBtn").textContent = "Wklej schemat";
+    document.getElementById("optimizeBtn").textContent = "Optymalizuj";
+    document.getElementById("loadSchemaBtn").textContent = "Załaduj schemat";
+    document.getElementById("tryDemoBtn").textContent = "Wypróbuj demo";
+  } 
+  
+  // Angielskie teksty
+  else {
+    document.getElementById("loginLink").textContent = "Login";
+    document.getElementById("registerLink").textContent = "Register";
+    document.getElementById("logoutLink").textContent = "Logout";
+
+    document.getElementById("pasteSchemaBtn").textContent = "Paste Schema";
+    document.getElementById("optimizeBtn").textContent = "Optimize";
+    document.getElementById("loadSchemaBtn").textContent = "Load Schema";
+    document.getElementById("tryDemoBtn").textContent = "Try the demo";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", updateHeaderLanguage);
+</script>
+    <!-- Hamburger (mobile) -->
+    <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-controls="mainmenu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav id="mainmenu" class="nav" role="navigation">
+      <!-- Przyciski logowania/rejestracji -->
+      <span id="authLinks">
+        <a class="link" href="/login.html" id="loginLink">Zaloguj</a>
+        <a class="link" href="/register.html" id="registerLink">Zarejestruj</a>
+      </span>
+
+      <!-- Zmieniane dynamicznie po zalogowaniu -->
+      <a class="link" href="#" id="logoutLink" style="display:none;">Wyloguj</a>
+
+      <a class="btn btn-secondary" href="/schema-paste.html">Wklej schemat</a>
+       <a class="btn btn-secondary" href="/optimize-feature.html">Optymalizuj</a>
+      <a class="btn btn-secondary" href="/schema-query.html" id="loadSchemaBtn" style="display:none;">Załaduj schemat</a>
+      <a class="btn btn-primary" href="/sql-query.html">Wypróbuj demo</a>
+    </nav>
+  </div>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "url": "https://aisql.pl",
+      "name": "AI-SQL-Chat",
+      "inLanguage": "pl",
+      "description": "AI-SQL-Chat — narzędzie AI do generowania zapytań SQL z języka naturalnego.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://aisql.pl/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+
+    {
+      "@type": "WebApplication",
+      "name": "AI-SQL-Chat",
+      "url": "https://aisql.pl",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Any",
+      "description": "AI-SQL-Chat generuje zapytania SQL na podstawie opisu w języku naturalnym i wgranego schematu bazy danych.",
+      "image": "https://aisql.pl/img/logo.png",
+      "author": {
+        "@type": "Person",
+        "name": "Grzegorz Parczewski",
+        "url": "https://www.linkedin.com/in/grzegorz-parczewski-881a0251/"
+      }
+    },
+
+    {
+      "@type": "SoftwareApplication",
+      "name": "AI-SQL-Chat",
+      "operatingSystem": "Any",
+      "applicationCategory": "UtilitiesApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "PLN"
+      },
+      "description": "Narzędzie AI generujące komendy SQL w przeglądarce. W pełni prywatne, bez wysyłania danych na serwer."
+    },
+
+    {
+      "@type": "Product",
+      "name": "AI-SQL-Chat",
+      "brand": "AI-SQL",
+      "description": "Generator zapytań SQL oparty na AI, działający lokalnie w przeglądarce.",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "37"
+      },
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "PLN",
+        "price": "0"
+      }
+    },
+
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Czy AI-SQL-Chat wysyła moje dane na serwer?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Nie. Całość przetwarzania odbywa się w przeglądarce. Schematy baz danych nie opuszczają Twojego urządzenia."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Jakie bazy danych obsługuje?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AI-SQL-Chat obsługuje MySQL, PostgreSQL, MariaDB, Oracle, SQLite oraz dowolne schematy tabel w formacie JSON lub CREATE TABLE."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Czy mogę modyfikować dane SQL?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Nie. System generuje wyłącznie zapytania SELECT dla pełnego bezpieczeństwa."
+          }
+        }
+      ]
+    },
+
+    {
+      "@type": "HowTo",
+      "name": "Jak wygenerować zapytanie SQL za pomocą AI-SQL-Chat?",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "text": "Wgraj schemat bazy danych w formacie JSON lub wklej strukturę tabel."
+        },
+        {
+          "@type": "HowToStep",
+          "text": "Wpisz polecenie w języku naturalnym, np. „pokaż 10 ostatnich zamówień klientów”."
+        },
+        {
+          "@type": "HowToStep",
+          "text": "Kliknij Generuj SQL — narzędzie stworzy poprawne zapytanie SELECT."
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+
+</header>
+
+<script>
+// === PROSTA KONTROLA SESJI W HEADERZE ===
+
+async function apiFetch(path, options = {}) {
+  const url = path.startsWith("http") ? path : (path.startsWith("/api") ? path : "/api" + path);
+  return fetch(url, {
+    ...options,
+    credentials: "include", // 🔑 ważne! — wysyła i odbiera ciasteczka sesji
+  });
+}
+
+async function checkSessionAndToggleButtons() {
+  const login = document.getElementById("loginLink");
+  const register = document.getElementById("registerLink");
+  const logout = document.getElementById("logoutLink");
+  const loadSchema = document.getElementById("loadSchemaBtn");
+
+  try {
+    const res = await apiFetch("/api/auth/me");
+
+    if (res.ok) {
+      // ✅ zalogowany — pokaż "Załaduj schemat", ukryj login/rejestrację
+      if (login) login.style.display = "none";
+      if (register) register.style.display = "none";
+      if (logout) logout.style.display = "inline-block";
+      if (loadSchema) loadSchema.style.display = "inline-block";
+    } else {
+      // ❌ niezalogowany — ukryj "Załaduj schemat"
+      if (login) login.style.display = "inline-block";
+      if (register) register.style.display = "inline-block";
+      if (logout) logout.style.display = "none";
+      if (loadSchema) loadSchema.style.display = "none";
+    }
+  } catch (err) {
+    console.warn("⚠️ Błąd przy sprawdzaniu sesji:", err);
+    if (loadSchema) loadSchema.style.display = "none";
+  }
+}
+
+function attachLogoutHandler() {
+  const logout = document.getElementById("logoutLink");
+  if (logout && !logout.dataset.bound) {
+    logout.dataset.bound = "true";
+    logout.addEventListener("click", async (e) => {
+      e.preventDefault();
+      try {
+        await apiFetch("/api/auth/logout", { method: "POST" });
+        location.reload(); // 🔁 po wylogowaniu — odśwież stronę
+      } catch (err) {
+        alert("❌ Błąd wylogowania");
+      }
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // 🔄 Poczekaj aż include.js wstawi header, potem sprawdź sesję
+  setTimeout(() => {
+    checkSessionAndToggleButtons();
+    attachLogoutHandler();
+  }, 400);
+});
+</script>
+
+

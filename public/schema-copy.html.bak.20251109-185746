@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-36ZC4QTDE2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-36ZC4QTDE2');
+  </script>
+
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <title>Jak skopiować schemat i wkleić do AI-SQL-Chat — schema-paste.html</title>
+  <meta name="description" content="Instrukcja krok po kroku jak skopiować strukturę bazy (MySQL, Oracle, PostgreSQL, SQL Server) i wkleić ją bezpośrednio w AI-SQL-Chat na stronie schema-paste.html, aby generować SQL." />
+  <link rel="canonical" href="https://aisql.pl/schema-copy.html" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pl_PL" />
+  <meta property="og:site_name" content="AI-SQL-Chat" />
+  <meta property="og:title" content="Jak skopiować schemat i wkleić do AI-SQL-Chat" />
+  <meta property="og:description" content="Prosty sposób: uruchom zapytanie SQL, skopiuj wynik i wklej w AI-SQL-Chat (schema-paste.html)." />
+  <meta property="og:url" content="https://aisql.pl/schema-copy.html" />
+  <meta property="og:image" content="https://aisql.pl/img/og-cover.png" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Jak skopiować schemat i wkleić do AI-SQL-Chat" />
+  <meta name="twitter:description" content="Uruchom zapytanie, skopiuj wynik i wklej do schema-paste.html — gotowe." />
+  <meta name="twitter:image" content="https://aisql.pl/img/og-cover.png" />
+
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="/img/favicon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"/>
+
+  <style>
+    .grid-2{display:grid;gap:16px}
+    @media(min-width:900px){.grid-2{grid-template-columns:repeat(2,1fr)}}
+    .copy-btn{margin-left:8px}
+    .step-title{font-weight:700;margin-bottom:6px}
+    details summary{cursor:pointer;font-weight:600}
+    nav.breadcrumbs{font-size:13px;color:#64748b;margin:8px 0 0}
+    nav.breadcrumbs a{color:inherit;text-decoration:none}
+    nav.breadcrumbs a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <script src="/js/logout.js"></script>
+  <div class="bg-grid"></div>
+  <div data-include="/partials/header.html"></div>
+
+  <main class="container">
+    <nav class="breadcrumbs">
+      <a href="/">AI-SQL-Chat</a> › <span>Skopiuj i wklej schemat</span>
+    </nav>
+
+    <section class="card" style="padding-top:22px">
+      <div class="card-head">
+        <h1 style="font-size:26px; margin:0">Jak <span class="grad">skopiować schemat</span> i wkleić do AI-SQL-Chat</h1>
+        <span class="note">Działa z MySQL, Oracle i innymi bazami — bez eksportu pliku</span>
+      </div>
+      <p class="sub" style="font-size:16px">
+        Uruchom zapytanie w swojej bazie, <strong>skopiuj wynik</strong> (listę tabel i kolumn) i <strong>wklej go na stronie</strong>
+        <a href="/schema-paste.html">schema-paste.html</a> w polu <em>„Wklej schemat”</em>.  
+        Od tej chwili generator SQL w AI-SQL-Chat dopasuje zapytania do Twojej struktury.
+      </p>
+    </section>
+
+    <!-- MySQL -->
+    <section class="card" id="mysql">
+      <div class="card-head">
+        <h2>MySQL / MariaDB (phpMyAdmin)</h2>
+        <span class="sub muted">Szybkie kopiowanie struktury tabel</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="step-title">1. Uruchom zapytanie w phpMyAdmin</div>
+          <p class="sub">Wejdź w zakładkę <strong>SQL</strong> i wklej to zapytanie. Podmień <code>twoja_baza</code> na nazwę swojej bazy:</p>
+
+          <div class="mt-12">
+            <button class="btn btn-secondary copy-btn" data-copy="#q-mysql">Kopiuj</button>
+            <span class="note">kopiuj SQL</span>
+          </div>
+
+<pre id="q-mysql" class="code mt-12">
+SELECT
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  IS_NULLABLE,
+  COLUMN_KEY
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'twoja_baza'  -- &lt;-- PODMIEŃ
+ORDER BY TABLE_NAME, ORDINAL_POSITION;
+</pre>
+        </div>
+
+        <div class="card">
+          <div class="step-title">2. Skopiuj wynik i wklej w AI-SQL-Chat</div>
+          <ul class="sub" style="margin:8px 0 0 18px">
+            <li>Po uruchomieniu zapytania zobaczysz tabelę z kolumnami.</li>
+            <li>Zaznacz cały wynik (CTRL+A → CTRL+C).</li>
+            <li>Przejdź na stronę <a href="/schema-paste.html">schema-paste.html</a> i wklej w pole „Wklej schemat”.</li>
+          </ul>
+          <p class="note mt-8">Nie musisz nic eksportować – wystarczy skopiować tekst.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Oracle -->
+    <section class="card" id="oracle">
+      <div class="card-head">
+        <h2>Oracle (SQL Developer)</h2>
+        <span class="sub muted">Prosty eksport przez kopiowanie</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="step-title">1. Uruchom zapytanie w Worksheet</div>
+          <p class="sub">Podmień <strong>OWNER</strong> na nazwę swojej schemy (np. WIELKIMI literami):</p>
+
+          <div class="mt-12">
+            <button class="btn btn-secondary copy-btn" data-copy="#q-oracle">Kopiuj</button>
+          </div>
+
+<pre id="q-oracle" class="code mt-12">
+SELECT
+  OWNER,
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  DATA_LENGTH,
+  DATA_PRECISION,
+  DATA_SCALE,
+  NULLABLE
+FROM ALL_TAB_COLUMNS
+WHERE OWNER = 'HR'  -- &lt;-- PODMIEŃ NA SWOJĄ SCHEMĘ
+ORDER BY TABLE_NAME, COLUMN_ID;
+</pre>
+          <p class="note mt-8">Nie pamiętasz nazwy schemy? Użyj <code>SELECT USER FROM dual;</code></p>
+        </div>
+
+        <div class="card">
+          <div class="step-title">2. Skopiuj wynik i wklej w AI-SQL-Chat</div>
+          <ul class="sub" style="margin:8px 0 0 18px">
+            <li>Zaznacz całą tabelę wynikową i skopiuj (CTRL+C).</li>
+            <li>Wejdź na <a href="/schema-paste.html">schema-paste.html</a> i wklej w pole „Wklej schemat”.</li>
+          </ul>
+          <p class="note mt-8">AI-SQL-Chat rozpozna nazwy tabel i kolumn automatycznie.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="card">
+      <h2>FAQ / Inne bazy danych</h2>
+
+      <details class="mt-12">
+        <summary>► PostgreSQL</summary>
+<pre class="code">
+SELECT
+  table_name,
+  column_name,
+  data_type,
+  is_nullable
+FROM information_schema.columns
+WHERE table_schema = 'public'
+ORDER BY table_name, ordinal_position;
+</pre>
+      </details>
+
+      <details class="mt-12">
+        <summary>► SQL Server</summary>
+<pre class="code">
+SELECT
+  TABLE_SCHEMA,
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS
+ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION;
+</pre>
+      </details>
+
+      <details class="mt-12">
+        <summary>► SQLite</summary>
+<pre class="code">
+SELECT name, sql
+FROM sqlite_master
+WHERE type='table';
+</pre>
+      </details>
+    </section>
+
+    <section class="card cta-block" style="text-align:center">
+      <h3>Masz już skopiowany schemat?</h3>
+      <a class="btn btn-primary" href="/schema-paste.html">Wklej go i generuj SQL</a>
+    </section>
+  </main>
+
+  <div data-include="/partials/footer.html"></div>
+
+  <script src="/js/include.js"></script>
+  <script src="/js/header.js"></script>
+  <script defer src="/js/cookie-consent.js"></script>
+
+  <script>
+    document.querySelectorAll('.copy-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const el=document.querySelector(btn.getAttribute('data-copy'));
+        if(!el) return;
+        navigator.clipboard.writeText(el.innerText).then(()=>{
+          const old=btn.textContent;
+          btn.textContent='Skopiowano ✓';
+          setTimeout(()=>btn.textContent=old,1200);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

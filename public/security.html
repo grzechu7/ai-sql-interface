@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Bezpieczeństwo — AI-SQL-Chat</title>
+<meta name="description" content="Środki bezpieczeństwa: pojedynczy SELECT, filtry SQL, rate-limit, nagłówki HTTP, CORS, retencja, szyfrowanie i zgłaszanie podatności.">
+<link rel="canonical" href="https://aisql.pl/security.html">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"/>
+
+<link rel="canonical" href="https://aisql.pl/index.html">
+<link rel="alternate" hreflang="pl" href="https://aisql.pl/index.html">
+<link rel="alternate" hreflang="en" href="https://aisql.pl/en/index.html">
+<link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/index.html">
+
+<script>
+(function() {
+  if (window.location.pathname.startsWith("/en")) return;
+
+  const lang = navigator.language || navigator.userLanguage;
+
+  if (!lang.startsWith("pl")) {
+    const newPath = "/en" + window.location.pathname;
+    window.location.replace(newPath);
+  }
+})();
+</script>
+
+</head>
+<body>
+  <script src="/js/logout.js"></script>
+  <div class="bg-grid"></div>
+
+  <!-- HEADER -->
+  <div data-include="/partials/header.html"></div>
+
+  <main class="container">
+    <section class="card">
+      <div class="card-head">
+        <h1 style="font-size:28px; margin:0">Bezpieczeństwo w AI-SQL-Chat</h1>
+        <span class="note">Ostatnia aktualizacja: <time datetime="2025-01-01">1 stycznia 2025</time></span>
+      </div>
+
+      <div class="sub" style="font-size:16px; line-height:1.8">
+        <p>
+          Ten dokument opisuje techniczne i organizacyjne środki bezpieczeństwa wdrożone w <strong>AI-SQL-Chat</strong>.
+          Stawiamy na minimalny zakres danych, zabezpieczenia SQL by-design oraz wielowarstwową ochronę (defense-in-depth).
+        </p>
+
+        <!-- 1) (dawniej 7) -->
+        <h2>1) Dane i prywatność</h2>
+        <ul>
+          <li>Domyślnie wyniki zapytań nie są zapisywane trwale; dane przetwarzamy w pamięci na czas wykonania.</li>
+          <li>Logi techniczne minimalne (statusy, metryki, sygnatury błędów) — bez treści danych, o ile to możliwe.</li>
+          <li>Patrz <a href="/privacy.html">Polityka prywatności</a> w zakresie RODO i praw osób.</li>
+        </ul>
+
+        <!-- 2) (dawniej 8) -->
+        <h2>2) Szyfrowanie i tajemnice</h2>
+        <ul>
+          <li>HTTPS/TLS na całej ścieżce (w tym w Oracle Cloud LB).</li>
+          <li>Tajemnice (klucze API, hasła) przechowywane w zmiennych środowiskowych lub menedżerze sekretów; brak w repozytorium.</li>
+        </ul>
+
+        <!-- 3) (dawniej 1) -->
+        <h2>3) Model zagrożeń zabezpieczenia (skrót)</h2>
+        <ul>
+          <li>Wstrzyknięcia SQL i payloady omijające walidację.</li>
+          <li>Nadmierne obciążenia (DoS/DDoS, brute-force endpointów).</li>
+          <li>Nieautoryzowany dostęp do plików statycznych i przesłanych schematów.</li>
+          <li>Ataki na warstwę przeglądarki (XSS/CSRF), manipulacja nagłówkami.</li>
+          <li>Wycieki przez logi, błędną konfigurację CORS, lub zbyt szerokie uprawnienia.</li>
+        </ul>
+
+        <!-- 4) (dawniej 2) -->
+        <h2>4) Zasady projektowe</h2>
+        <ul>
+          <li><strong>Single-SELECT only.</strong> Generujemy i dopuszczamy wyłącznie jedną instrukcję <code>SELECT</code>.</li>
+          <li><strong>Domyślna minimalizacja danych.</strong> Brak trwałego przechowywania wyników; tymczasowe dane tylko w pamięci procesu.</li>
+          <li><strong>Bezpieczne wartości domyślne.</strong> Twarde limity, czarne listy wzorców, ograniczenia rozmiaru payloadu.</li>
+        </ul>
+
+        <!-- 5) (dawniej 3) -->
+        <h2>5) Ochrona SQL (middleware)</h2>
+        <p>Wyjście AI i zapytania użytkownika przechodzą przez filtr syntaktyczny i semantyczny:</p>
+<pre class="code">
+// pseudokod (Node/Express)
+const banned = /\b(INSERT|UPDATE|DELETE|DROP|TRUNCATE|ALTER|CREATE|RENAME|MERGE|CALL|EXEC|OUTFILE|INFILE|SLEEP|BENCHMARK)\b/i;
+
+function enforceSQL(req, res, next){
+  let sql = String(req.body.sql || req.body.question || '');
+  if(!/^\s*SELECT\b/i.test(sql)) return res.status(400).json({error:'Tylko SELECT'});
+  if(banned.test(sql))          return res.status(400).json({error:'Instrukcja zabroniona'});
+  if(!/\bLIMIT\b/i.test(sql))   sql = sql.replace(/;?\s*$/, ' LIMIT 1000;');
+
+  // opcjonalna biała lista schematu/kolumn bazująca na wgranym JSON
+  req.sql = sql;
+  next();
+}
+</pre>
+
+        <!-- 6) (dawniej 4) -->
+        <h2>6) Ograniczenia i limity</h2>
+        <ul>
+          <li><strong>Rate-limit & slowdown:</strong> limity per IP, łagodne opóźnienia przy nadużyciach.</li>
+          <li><strong>toobusy-like</strong> – szybkie 503 gdy pętla zdarzeń jest przeciążona.</li>
+          <li><strong>Body-limit:</strong> restrykcyjny rozmiar żądań; odrzucanie nietypowych typów MIME.</li>
+        </ul>
+
+        <!-- 7) (dawniej 5) -->
+        <h2>7) Nagłówki bezpieczeństwa (HTTP)</h2>
+        <p>Warstwa reverse-proxy (np. Nginx) dostarcza podstawowe nagłówki:</p>
+<pre class="code">
+add_header X-Frame-Options "SAMEORIGIN" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+# Prosta CSP (dostosuj do swoich domen/CDN):
+add_header Content-Security-Policy "
+  default-src 'self';
+  img-src 'self' data:;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com 'self';
+  script-src 'self';
+  connect-src 'self';
+" always;
+</pre>
+
+        <!-- 8) (dawniej 6) -->
+        <h2>8) CORS i statyki</h2>
+        <ul>
+          <li><strong>CORS:</strong> ścisła biała lista pochodzeń, brak <code>*</code> dla żądań uwierzytelnionych.</li>
+          <li><strong>Statyki:</strong> brak auto-listingu (<em>disable directory index</em>), bloki na <code>.key</code>, <code>.env</code>, ukryte pliki.</li>
+        </ul>
+
+        <!-- 9) (dawniej 9) -->
+        <h2>9) Dostępność i kopie</h2>
+        <ul>
+          <li>Automatyczne restarty procesu (np. PM2/systemd), health-checki.</li>
+          <li>Kopie konfiguracji i artefaktów deploymentu; schematy użytkownika zgodnie z ustawioną polityką retencji.</li>
+        </ul>
+
+        <!-- 10) (dawniej 10) -->
+        <h2>10) Zgłaszanie podatności (Responsible Disclosure)</h2>
+        <p>
+          Jeśli znalazłeś lukę, napisz na <a href="mailto:podkowa71@gmail.com">podkowa71@gmail.com</a> z tematem
+          <em>[SECURITY]</em>. Dołącz kroki odtworzenia, zakres i wpływ. Odpowiadamy niezwłocznie, zwykle w ciągu 7 dni.
+          Prosimy o rozsądną koordynację ujawnienia (bez publicznego POC do czasu łatki).
+        </p>
+
+        <!-- 11) (dawniej 11) -->
+        <h2>11) Reakcja na incydenty</h2>
+        <ol>
+          <li>Detekcja i triage (logi, metryki, alerty).</li>
+          <li>Izolacja i ograniczenie (rate-limit, blokada pochodzenia, wyłączenie funkcji).</li>
+          <li>Analiza przyczyn, poprawka i weryfikacja.</li>
+          <li>Informowanie Użytkowników, jeśli incydent mógł ich dotyczyć.</li>
+        </ol>
+
+        <!-- 12) (dawniej 12) -->
+        <h2>12) On-prem / VPC</h2>
+        <p>
+          Dla klientów biznesowych oferujemy konsultacje wdrożeniowe on-prem/VPC (segmentacja sieci, rotacja kluczy,
+          logowanie centralne, dodatki CSP, skanery SCA/DAST). Skontaktuj się: <a href="mailto:podkowa71@gmail.com">podkowa71@gmail.com</a>.
+        </p>
+
+        <!-- 13) (dawniej 13) -->
+        <h2>13) Przykładowa konfiguracja Nginx (statyki)</h2>
+<pre class="code">
+location / {
+  try_files $uri $uri/ =404;
+}
+
+location ~* \.(env|key|pem|log|bak)$ {
+  deny all;
+}
+
+autoindex off;
+client_max_body_size 512k;
+</pre>
+
+        <!-- 14) (dawniej 14) -->
+        <h2>14) Zmiany w dokumencie</h2>
+        <p>Ten dokument może być aktualizowany wraz z rozwojem Serwisu. Archiwum zmian: na życzenie.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <div data-include="/partials/footer.html"></div>
+
+  <!-- Skrypty wspólne -->
+  <script src="/js/include.js"></script>
+  <script src="/js/header.js"></script>
+  <script defer src="/js/cookie-consent.js"></script>
+</body>
+</html>

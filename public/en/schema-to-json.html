@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-36ZC4QTDE2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-36ZC4QTDE2');
+  </script>
+
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <!-- Basic SEO -->
+  <title>How to Generate schema.json (MySQL, Oracle) — Export Schema to JSON | AI-SQL-Chat</title>
+  <meta name="description" content="Step-by-step instructions: how to generate schema.json from your database. MySQL/MariaDB (phpMyAdmin) and Oracle (SQL Developer, json-formatted) + short methods for PostgreSQL and SQL Server. Upload the file to AI-SQL-Chat to generate safe SELECT queries." />
+  <link rel="canonical" href="https://aisql.pl/en/schema-to-json.html" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:site_name" content="AI-SQL-Chat" />
+  <meta property="og:title" content="How to Generate schema.json — Export Schema to JSON" />
+  <meta property="og:description" content="MySQL/MariaDB (phpMyAdmin) and Oracle (SQL Developer). Save the result to JSON and upload it to AI-SQL-Chat to generate safe SELECT queries." />
+  <meta property="og:url" content="https://aisql.pl/en/schema-to-json.html" />
+  <meta property="og:image" content="https://aisql.pl/img/og-cover.png" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="How to Generate schema.json — Export Schema to JSON" />
+  <meta name="twitter:description" content="Step-by-step for MySQL/MariaDB and Oracle + short versions for PostgreSQL/SQL Server." />
+  <meta name="twitter:image" content="https://aisql.pl/img/og-cover.png" />
+
+  <!-- Favicons / manifest -->
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="/img/favicon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"/>
+
+<link rel="canonical" href="https://aisql.pl/en/index.html">
+<link rel="alternate" hreflang="pl" href="https://aisql.pl/index.html">
+<link rel="alternate" hreflang="en" href="https://aisql.pl/en/index.html">
+<link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/index.html">
+
+  <style>
+    .grid-3{display:grid;gap:16px}
+    @media(min-width:1000px){.grid-3{grid-template-columns:repeat(3,1fr)}}
+    .muted{color:#64748b}
+    .copy-btn{margin-left:8px}
+    .step-title{font-weight:700;margin-bottom:6px}
+    .step-sub{color:#334155}
+    details summary{cursor:pointer; font-weight:600}
+    nav.breadcrumbs{font-size:13px;color:#64748b;margin:8px 0 0}
+    nav.breadcrumbs a{color:inherit;text-decoration:none}
+    nav.breadcrumbs a:hover{text-decoration:underline}
+  </style>
+
+
+
+</head>
+<body>
+  <script src="/js/logout.js"></script>
+  <div class="bg-grid"></div>
+
+  <!-- HEADER -->
+  <div data-include="/en/partials/header.html"></div>
+
+  <main class="container">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumbs" aria-label="breadcrumb">
+      <a href="/en/index.html">AI-SQL-Chat</a> › <span>Schema → JSON</span>
+    </nav>
+
+    <!-- HERO -->
+    <section class="card" style="padding-top:22px">
+      <div class="card-head">
+        <h1 style="font-size:26px; margin:0">How to Generate a <span class="grad">schema.json</span> File from Your Database</h1>
+        <span class="note">The easiest options: phpMyAdmin (MySQL/MariaDB) or Oracle SQL Developer</span>
+      </div>
+      <p class="sub" style="font-size:16px">
+        After exporting, save the file as <code>schema.json</code> and upload it to AI-SQL-Chat on the page
+        <a href="/en/schema-query.html">“Upload Schema”</a>. The generator will then create one <strong>safe SELECT query</strong>
+        tailored to your structure. Security details are described in the <a href="/en/security.html">Security</a> section.
+      </p>
+    </section>
+
+    <!-- ===================== MySQL / MariaDB ===================== -->
+    <section class="card" id="mysql">
+      <div class="card-head">
+        <h2>MySQL / MariaDB (phpMyAdmin) — 3 Steps</h2>
+        <span class="sub muted">The simplest workflow in phpMyAdmin</span>
+      </div>
+
+      <div class="grid-3">
+
+        <!-- Step 1 -->
+        <div class="card">
+          <div class="step-title">1. Run the SQL Query (phpMyAdmin)</div>
+          <div class="step-sub sub">
+            In phpMyAdmin open the <span class="kbd">SQL</span> tab and paste this query. Replace
+            <code>your_database</code> with the name of your schema:
+          </div>
+
+          <div class="mt-12">
+            <button class="btn btn-secondary copy-btn" data-copy="#q-mysql">Copy</button>
+            <span class="note">simple column list</span>
+          </div>
+
+<pre id="q-mysql" class="code mt-12">
+SELECT
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  IS_NULLABLE,
+  COLUMN_KEY
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'your_database'   -- <-- REPLACE
+ORDER BY TABLE_NAME, ORDINAL_POSITION;
+</pre>
+
+          <div class="note mt-12">
+            The result is a flat list: table/column/type — enough to build a JSON schema.
+          </div>
+
+          <details class="mt-12">
+            <summary>► Optional: MySQL 8+ Nested JSON (one-shot)</summary>
+            <p class="sub">For MySQL 8+ you can build a complete JSON object with tables and columns.</p>
+<pre class="code">
+SELECT JSON_OBJECTAGG(tbl.table_name, tbl.columns_json) AS schema_json
+FROM (
+  SELECT
+    c.TABLE_NAME AS table_name,
+    JSON_ARRAYAGG(
+      JSON_OBJECT(
+        'column', c.COLUMN_NAME,
+        'type',   c.DATA_TYPE,
+        'null',   c.IS_NULLABLE,
+        'key',    c.COLUMN_KEY
+      ) ORDER BY c.ORDINAL_POSITION
+    ) AS columns_json
+  FROM INFORMATION_SCHEMA.COLUMNS c
+  WHERE c.TABLE_SCHEMA = 'your_database'  -- <-- REPLACE
+  GROUP BY c.TABLE_NAME
+) AS tbl;
+</pre>
+          </details>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="card">
+          <div class="step-title">2. Export the Result to JSON</div>
+          <ul class="sub" style="margin:8px 0 0 18px">
+            <li>After running the query, click <strong>Export</strong> (under the results table).</li>
+            <li>Select <strong>Format: JSON</strong>.</li>
+            <li>Save the file as <code>schema.json</code>.</li>
+          </ul>
+          <div class="info-callout mt-12">
+            You can now upload this file on <a href="/en/schema-query.html">“Upload Schema”</a>.
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="card">
+          <div class="step-title">3. Upload the File to AI-SQL-Chat</div>
+          <p class="sub">
+            Go to <a href="/en/schema-query.html">/schema-query.html</a>, choose the <code>.json</code> file and click
+            <strong>Upload</strong>. The SQL generator will now use your schema.
+          </p>
+          <p class="note">The schema contains only table/column names — no data.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===================== ORACLE (SQL Developer) ===================== -->
+    <section class="card" id="oracle">
+      <div class="card-head">
+        <h2>Oracle (SQL Developer) — 3 Steps</h2>
+        <span class="sub muted">Metadata export to JSON (choose <strong>json-formatted</strong>!)</span>
+      </div>
+
+      <div class="grid-3">
+        <!-- Step 1 -->
+        <div class="card">
+          <div class="step-title">1. Run the Query in Worksheet</div>
+          <div class="step-sub sub">
+            In <strong>Oracle SQL Developer</strong> connect to the DB, open a Worksheet and paste this query.
+            <strong>Replace OWNER</strong> with your schema name (usually UPPERCASE):
+          </div>
+
+          <div class="mt-12">
+            <button class="btn btn-secondary copy-btn" data-copy="#q-oracle">Copy</button>
+            <span class="note">all columns of all tables</span>
+          </div>
+
+<pre id="q-oracle" class="code mt-12">
+SELECT
+  OWNER,
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  DATA_LENGTH,
+  DATA_PRECISION,
+  DATA_SCALE,
+  NULLABLE
+FROM ALL_TAB_COLUMNS
+WHERE OWNER = 'HR'  -- <-- REPLACE WITH YOUR SCHEMA
+ORDER BY TABLE_NAME, COLUMN_ID;
+</pre>
+
+          <div class="note mt-12">
+            Not sure of your schema name?
+            Use <code>SELECT USER FROM dual;</code> or <code>SELECT username FROM all_users;</code>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="card">
+          <div class="step-title">2. Export the Result to JSON</div>
+          <ul class="sub" style="margin:8px 0 0 18px">
+            <li>Right-click the results grid → <strong>Export…</strong> (or use the Export Wizard).</li>
+            <li><strong>Format:</strong> <span style="background:#fff3cd;border:1px solid #facc15;border-radius:6px;padding:2px 6px">json-formatted</span> — <em>critical</em>.</li>
+            <li><strong>Save As:</strong> Single File, name <code>schema.json</code>, <strong>Encoding:</strong> UTF-8.</li>
+          </ul>
+          <div class="info-callout mt-12">
+            Only <strong>json-formatted</strong> produces valid JSON for AI-SQL-Chat.
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="card">
+          <div class="step-title">3. Upload the File</div>
+          <p class="sub">
+            Open <a href="/en/schema-query.html">/schema-query.html</a>, choose your <code>schema.json</code>, and click
+            <strong>Upload</strong>. The SQL generator now knows your tables and columns.
+          </p>
+          <p class="note">We don't send or store business data — only metadata (names).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== OTHER ENGINES (short versions) ===================== -->
+    <section class="card">
+      <h2>Other Engines (Short Queries)</h2>
+
+      <details class="mt-12">
+        <summary>► PostgreSQL</summary>
+        <p class="sub">Using <code>information_schema</code>:</p>
+<pre class="code">
+SELECT
+  table_name   AS table_name,
+  column_name  AS column_name,
+  data_type    AS data_type,
+  is_nullable
+FROM information_schema.columns
+WHERE table_schema = 'public'       -- <-- replace
+ORDER BY table_name, ordinal_position;
+</pre>
+      </details>
+
+      <details class="mt-12">
+        <summary>► SQL Server</summary>
+        <p class="sub">Azure SQL / MS SQL:</p>
+<pre class="code">
+SELECT
+  TABLE_SCHEMA,
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS
+-- optional filter:
+-- WHERE TABLE_CATALOG = 'YourDB' AND TABLE_SCHEMA = 'dbo'
+ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION;
+</pre>
+      </details>
+
+      <details class="mt-12">
+        <summary>► Oracle (short)</summary>
+        <p class="sub">Your tables:</p>
+<pre class="code">
+SELECT
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  DATA_LENGTH,
+  DATA_PRECISION,
+  DATA_SCALE,
+  NULLABLE
+FROM USER_TAB_COLUMNS
+ORDER BY TABLE_NAME, COLUMN_ID;
+</pre>
+        <p class="sub">For a specific OWNER:</p>
+<pre class="code">
+SELECT
+  OWNER,
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  DATA_LENGTH,
+  DATA_PRECISION,
+  DATA_SCALE,
+  NULLABLE
+FROM ALL_TAB_COLUMNS
+WHERE OWNER = 'HR'  -- <-- REPLACE
+ORDER BY TABLE_NAME, COLUMN_ID;
+</pre>
+      </details>
+    </section>
+
+    <!-- CTA -->
+    <section class="card cta-block" style="text-align:center">
+      <h3>Already have your schema.json?</h3>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center">
+        <a class="btn btn-primary" href="/en/schema-query.html">Upload schema and generate SQL</a>
+        <a class="btn btn-secondary" href="/en/index.html">Back to homepage</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <div data-include="/en/partials/footer.html"></div>
+
+  <!-- Shared scripts -->
+  <script src="/js/include.js"></script>
+  <script src="/js/header.js"></script>
+  <script defer src="/js/cookie-consent.js"></script>
+
+  <!-- One-click SQL copying -->
+  <script>
+    document.querySelectorAll('.copy-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const sel = btn.getAttribute('data-copy');
+        const el = document.querySelector(sel);
+        if(!el) return;
+        const txt = el.innerText.replace(/\u00A0/g,' ');
+        navigator.clipboard.writeText(txt).then(()=>{
+          const old = btn.textContent;
+          btn.textContent = 'Copied ✓';
+          setTimeout(()=> btn.textContent = old, 1200);
+        });
+      });
+    });
+  </script>
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"BreadcrumbList",
+    "itemListElement":[
+      {"@type":"ListItem","position":1,"name":"AI-SQL-Chat","item":"https://aisql.pl/en/"},
+      {"@type":"ListItem","position":2,"name":"Schema → JSON","item":"https://aisql.pl/en/schema-to-json.html"}
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"HowTo",
+    "name":"How to Generate schema.json from Your Database",
+    "description":"Instructions for MySQL/MariaDB (phpMyAdmin) and Oracle (SQL Developer, json-formatted) + short queries for PostgreSQL and SQL Server.",
+    "totalTime":"PT10M",
+    "step":[
+      {"@type":"HowToStep","name":"MySQL/MariaDB — Run the query","url":"https://aisql.pl/en/schema-to-json.html#mysql"},
+      {"@type":"HowToStep","name":"MySQL/MariaDB — Export to JSON","url":"https://aisql.pl/en/schema-to-json.html#mysql"},
+      {"@type":"HowToStep","name":"Oracle — Run the query","url":"https://aisql.pl/en/schema-to-json.html#oracle"},
+      {"@type":"HowToStep","name":"Oracle — Export to json-formatted","url":"https://aisql.pl/en/schema-to-json.html#oracle"}
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebPage",
+    "name":"Schema → JSON — How-To",
+    "url":"https://aisql.pl/en/schema-to-json.html",
+    "description":"Step-by-step guide to export database schema to JSON (MySQL/MariaDB, Oracle) and use it in AI-SQL-Chat."
+  }
+  </script>
+
+<script src="/js/auth-check.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const schemaLinks = document.querySelectorAll('a[href="/en/schema-query.html"]');
+
+  async function isLoggedIn() {
+    try {
+      const res = await fetch("/api/auth/me", { credentials: "include" });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  schemaLinks.forEach(link => {
+    link.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const loggedIn = await isLoggedIn();
+      if (loggedIn) {
+        window.location.href = "/en/schema-query.html";
+      } else {
+        window.location.href = "/en/login.html";
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>

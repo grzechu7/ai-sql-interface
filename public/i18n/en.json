@@ -1,0 +1,22 @@
+{
+  "lang_pl": "Polish",
+  "lang_en": "English",
+  "header_upload": "Upload new JSON schema",
+
+  "inst.title": "Instructions",
+  "inst.body": "<p>This app generates SQL queries automatically based on a database schema stored in a JSON file (built-in or uploaded by the user).</p><p>On this page, in the field <strong>“Ask a question about the data”</strong>, write your request in natural language — the AI will turn it into an SQL query. You can display the query itself or immediately see the results as a table.</p><p>The demo dataset covers smart-home module sales and includes: object type (house/apartment), area, list of modules (e.g. shutter controller, lighting, RGB) and city. Use those attributes when asking for data.</p><div style=\"margin-top:10px\"><strong>Example questions:</strong><ul style=\"margin:8px 0 0 18px; line-height:1.5\"><li><code>show top 5 best-selling modules in Warsaw with prices</code></li><li><code>show number of sold modules split by house and apartment, include valuation</code></li><li><code>show total and count of module valuations per city</code></li></ul></div><p style=\"margin-top:10px\">Paste the examples into <strong>“Ask a question about the data”</strong> or write your own. To use your schema, click <strong>“Upload new JSON schema”</strong> in the top right — an upload dialog will appear. Here you will generate queries based on the provided JSON schema.</p>",
+
+  "ask.title": "Ask a question about the data",
+  "ask.subtitle": "Write in plain language — I'll turn it into SQL.",
+  "ask.placeholder": "e.g. show top 5 best-selling modules in Warsaw with prices",
+
+  "btn.send": "Send",
+  "btn.clear": "Clear",
+
+  "sql.title": "SQL",
+  "sql.copy": "Copy SQL",
+
+  "res.title": "Results",
+
+  "footer.note": "⚠️ SQL is generated automatically — always verify before using in critical places."
+}

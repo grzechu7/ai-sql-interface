@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-36ZC4QTDE2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-36ZC4QTDE2');
+</script>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI-SQL-Chat — Polityka prywatności</title>
+  <meta name="description" content="Polityka prywatności i cookies serwisu AI-SQL-Chat (aisql.pl). Informacje o przetwarzaniu danych, plikach cookie i bezpieczeństwie." />
+<link rel="canonical" href="https://aisql.pl/privacy.html">
+  <!-- Fonty (spójnie z resztą serwisu) -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Wspólny styl -->
+  <link rel="stylesheet" href="/style.css"/>
+  <style>
+    /* Drobny akcent tylko dla tej strony */
+    .toc { margin: 12px 0 0; padding-left: 18px; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .section { margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <!-- HEADER (include) -->
+  <div data-include="/partials/header.html"></div>
+
+  <main class="container">
+    <!-- HERO -->
+    <section class="card" style="padding:20px">
+      <h1 class="h1" style="margin:0 0 8px">Polityka prywatności</h1>
+      <p class="lead" style="margin:0">
+        Niniejszy dokument wyjaśnia, jak przetwarzamy dane w serwisie <strong>AI-SQL-Chat</strong> (aisql.pl),
+        w tym w szczególności: korzystanie z plików cookie, upload plików <code>JSON Schema</code>, generowanie zapytań SQL
+        i zabezpieczenia. Dokument przygotowano zgodnie z RODO (GDPR).
+      </p>
+      <ul class="toc">
+        <li><a href="#admin">Administrator i kontakt</a></li>
+        <li><a href="#zakres">Zakres i źródła danych</a></li>
+        <li><a href="#cele">Cele i podstawy prawne</a></li>
+        <li><a href="#cookies">Pliki cookie i podobne technologie</a></li>
+        <li><a href="#upload">Wgrywanie schematów JSON</a></li>
+        <li><a href="#api">Korzystanie z funkcji AI-SQL-Chat</a></li>
+        <li><a href="#logi">Logi serwera i bezpieczeństwo</a></li>
+        <li><a href="#udostepnianie">Udostępnianie danych</a></li>
+        <li><a href="#okres">Okres przechowywania</a></li>
+        <li><a href="#prawa">Prawa użytkownika</a></li>
+        <li><a href="#zmiany">Zmiany polityki</a></li>
+      </ul>
+      <div class="note mt-12">Ostatnia aktualizacja: <time datetime="2025-01-01">1 stycznia 2025</time></div>
+    </section>
+
+    <!-- ADMIN -->
+    <section id="admin" class="card section">
+      <div class="card-head"><h2>Administrator i kontakt</h2></div>
+      <p class="sub">
+        Administratorem danych osobowych jest <strong>AI-SQL-Chat</strong>.
+        W sprawach związanych z ochroną danych skontaktuj się: 
+        <a href="mailto:podkowa71@gmail.com">podkowa71@gmail.com</a>.
+      </p>
+    </section>
+
+    <!-- ZAKRES -->
+    <section id="zakres" class="card section">
+      <div class="card-head"><h2>Zakres i źródła danych</h2></div>
+      <ul class="sub" style="margin:0 0 0 18px">
+        <li>Dane eksploatacyjne: adres IP, znacznik czasu, nagłówki przeglądarki (zapisywane w logach serwera).</li>
+        <li>Dane podane dobrowolnie: treści wprowadzane w interfejsie (np. prompt, zapytania w języku naturalnym), wgrywane pliki <code>JSON</code> ze schematem bazy.</li>
+        <li>Brak kont użytkowników i logowania — serwis działa bez rejestracji.</li>
+        <li>Nie gromadzimy trwałych profili użytkowników i nie przechowujemy wyników zapytań SQL poza czasem niezbędnym do obsługi żądania.</li>
+      </ul>
+    </section>
+
+    <!-- CELE -->
+    <section id="cele" class="card section">
+      <div class="card-head"><h2>Cele i podstawy prawne</h2></div>
+      <ul class="sub" style="margin:0 0 0 18px">
+        <li><strong>Świadczenie usługi</strong> (generowanie zapytań SQL na podstawie promptu oraz wgranego schematu) — art. 6 ust. 1 lit. b RODO (niezbędne do wykonania umowy w rozumieniu regulaminu korzystania z serwisu).</li>
+        <li><strong>Bezpieczeństwo i utrzymanie</strong> (logi, rate-limit, ochrona przed nadużyciami) — art. 6 ust. 1 lit. f RODO (prawnie uzasadniony interes administratora).</li>
+        <li><strong>Cookies niezbędne</strong> — art. 173 ust. 3 Prawa telekomunikacyjnego / art. 6 ust. 1 lit. f RODO.</li>
+        <li><strong>Cookies opcjonalne</strong> (jeśli kiedyś włączymy) — art. 6 ust. 1 lit. a RODO (zgoda). Domyślnie nie używamy narzędzi analitycznych firm trzecich.</li>
+      </ul>
+    </section>
+
+    <!-- COOKIES -->
+    <section id="cookies" class="card section">
+      <div class="card-head"><h2>Pliki cookie i podobne technologie</h2></div>
+      <p class="sub">
+        Serwis używa wyłącznie <strong>niezbędnych</strong> plików cookie do zapewnienia działania interfejsu,
+        w tym zapamiętania Twojej decyzji z banera cookie (<code>cookie-consent</code>). Nie stosujemy zewnętrznych
+        trackerów ani reklamowych cookies. W razie wdrożenia dodatkowych kategorii (np. analityczne) poprosimy o zgodę.
+      </p>
+      <ul class="sub" style="margin:8px 0 0 18px">
+        <li><strong>cookie-consent</strong> — zapis stanu wyboru w banerze (czas trwania: do 12 miesięcy).</li>
+        <li><strong>techniczne</strong> — mogą być użyte do obsługi sesji/anty-nadużyć; nie służą profilowaniu.</li>
+      </ul>
+      <p class="note mt-8">Zarządzanie cookies: możesz w każdej chwili wyczyścić/zmienić zgodę w ustawieniach przeglądarki. Jeżeli baner jest ukryty, usuń cookie <code>cookie-consent</code>, aby pojawił się ponownie.</p>
+    </section>
+
+    <!-- UPLOAD -->
+    <section id="upload" class="card section">
+      <div class="card-head"><h2>Wgrywanie schematów JSON</h2></div>
+      <p class="sub">
+        Funkcja „Wgraj schemat JSON” zapisuje przesłany plik w katalogu <code>uploads/</code> na serwerze, aby mógł być użyty
+        do generowania zapytań SQL. Najnowszy wgrany plik jest wykorzystywany przez moduł AI-SQL-Chat. Pliki możesz usuwać z poziomu listy
+        schematów w aplikacji. Wgrywaj wyłącznie schematy, które nie zawierają danych osobowych ani tajemnic przedsiębiorstwa.
+      </p>
+    </section>
+
+    <!-- API / DZIAŁANIE -->
+    <section id="api" class="card section">
+      <div class="card-head"><h2>Korzystanie z funkcji AI-SQL-Chat</h2></div>
+      <ul class="sub" style="margin:0 0 0 18px">
+        <li><strong>Prompt → SQL:</strong> Na podstawie opisu w naturalnym języku oraz dostarczonego schematu generujemy <em>pojedyncze</em> zapytanie <code>SELECT</code> z wymuszonym <code>LIMIT</code> i filtrami anty-SQLi.</li>
+        <li><strong>Wyniki:</strong> Wyniki wykonania zapytania są prezentowane w przeglądarce i nie są trwale przechowywane po stronie serwera.</li>
+        <li><strong>Bezpieczeństwo:</strong> Odrzucamy instrukcje DDL/DML, <code>INFILE/OUTFILE</code>, sztuczne opóźnienia oraz sekwencje wieloinstrukcyjne.</li>
+      </ul>
+    </section>
+
+    <!-- LOGI -->
+    <section id="logi" class="card section">
+      <div class="card-head"><h2>Logi serwera i bezpieczeństwo</h2></div>
+      <p class="sub">
+        Serwer (Oracle Cloud) może automatycznie zapisywać standardowe logi dostępu: adres IP, datę i godzinę, żądany zasób, informacje o przeglądarce.
+        Dane te służą diagnostyce, bezpieczeństwu i statystyce działania usługi. Stosujemy mechanizmy ochronne (rate-limit, slowdown, filtry treści).
+      </p>
+    </section>
+
+    <!-- UDOSTĘPNIANIE -->
+    <section id="udostepnianie" class="card section">
+      <div class="card-head"><h2>Udostępnianie danych</h2></div>
+      <p class="sub">
+        Nie sprzedajemy danych i nie udostępniamy ich podmiotom trzecim w celach marketingowych. Dane mogą być powierzane
+        dostawcom hostingu/utrzymania wyłącznie w zakresie niezbędnym do świadczenia usług (na podstawie umowy powierzenia).
+      </p>
+    </section>
+
+    <!-- OKRES -->
+    <section id="okres" class="card section">
+      <div class="card-head"><h2>Okres przechowywania</h2></div>
+      <ul class="sub" style="margin:0 0 0 18px">
+        <li>Logi serwera — zgodnie z cyklem retencji dostawcy hostingu oraz potrzebami bezpieczeństwa.</li>
+        <li>Pliki w <code>uploads/</code> — do chwili usunięcia przez użytkownika lub administracyjnie (np. porządki/limit miejsca).</li>
+        <li>Cookie zgody — do 12 miesięcy lub do czasu wyczyszczenia ich przez użytkownika.</li>
+        <li>Wyniki zapytań — tylko w pamięci na czas niezbędny do obsługi żądania (brak trwałego składowania).</li>
+      </ul>
+    </section>
+
+    <!-- PRAWA -->
+    <section id="prawa" class="card section">
+      <div class="card-head"><h2>Prawa użytkownika</h2></div>
+      <p class="sub">
+        Przysługują Ci prawa: dostępu do danych, sprostowania, usunięcia, ograniczenia przetwarzania, sprzeciwu,
+        przenoszenia danych oraz wniesienia skargi do Prezesa UODO. Wniosek wyślij na:
+        <a href="mailto:podkowa71@gmail.com">podkowa71@gmail.com</a>.
+      </p>
+    </section>
+
+    <!-- ZMIANY -->
+    <section id="zmiany" class="card section">
+      <div class="card-head"><h2>Zmiany polityki</h2></div>
+      <p class="sub">
+        Polityka może być aktualizowana wraz z rozwojem serwisu. Opublikujemy nową wersję na tej stronie
+        i zaktualizujemy datę na górze dokumentu. Dalsze korzystanie z serwisu oznacza akceptację zmian.
+      </p>
+    </section>
+  </main>
+
+  <!-- FOOTER (include) -->
+  <div data-include="/partials/footer.html"></div>
+
+  <!-- Kolejność skryptów: najpierw include (wstrzykuje header/footer), potem logika headera, na końcu cookie banner -->
+  <script src="/js/include.js"></script>
+  <script src="/js/header.js"></script>
+  <script defer src="/js/cookie-consent.js"></script>
+</body>
+</html>

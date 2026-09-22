@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-36ZC4QTDE2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-36ZC4QTDE2');
+  </script>
+
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- SEO podstawowe -->
+  <title>Załaduj schemat JSON — generator SQL z języka naturalnego | AI-SQL-Chat</title>
+  <meta name="description" content="Wgraj plik schema.json z mapą tabel i kolumn i generuj jedno, bezpieczne zapytanie SELECT z opisu w języku naturalnym. Obsługa MySQL, PostgreSQL, SQL Server, Oracle. Brak zapisu wyników, filtry anty-SQLi, wymuszony LIMIT." />
+  <link rel="canonical" href="https://aisql.pl/schema-query.html" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pl_PL" />
+  <meta property="og:site_name" content="AI-SQL-Chat" />
+  <meta property="og:title" content="Załaduj schemat JSON — generator SQL z opisu" />
+  <meta property="og:description" content="Wgraj schema.json i generuj jedno, bezpieczne zapytanie SELECT z języka naturalnego. Tylko odczyt, z walidacją i limitem." />
+  <meta property="og:url" content="https://aisql.pl/schema-query.html" />
+  <meta property="og:image" content="https://aisql.pl/img/og-cover.png" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Załaduj schemat JSON — generator SQL z opisu" />
+  <meta name="twitter:description" content="Wgraj schema.json i generuj jedno, bezpieczne zapytanie SELECT z języka naturalnego." />
+  <meta name="twitter:image" content="https://aisql.pl/img/og-cover.png" />
+
+  <!-- Favicons / manifest -->
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate icon" href="/img/favicon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <!-- Fonty i styl -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"/>
+
+  <style>
+    /* drobna kosmetyka bloku SEO */
+    .seo-card h2{margin:0 0 8px}
+    .seo-card h3{margin:12px 0 6px}
+    .seo-card p, .seo-card li, .seo-card ol{line-height:1.8}
+    nav.breadcrumbs{font-size:13px;color:#64748b;margin:8px 0 0}
+    nav.breadcrumbs a{color:inherit;text-decoration:none}
+    nav.breadcrumbs a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+ 
+<script>
+// === SYSTEM SESJI (Passport + Express-Session) ===
+
+// Pomocniczy fetch, który zawsze wysyła cookie sesyjne
+async function apiFetch(path, options = {}) {
+  const url = path.startsWith('http') ? path : (path.startsWith('/api') ? path : '/api' + path);
+  return fetch(url, {
+    ...options,
+    credentials: 'include', // 🔑 kluczowe — wysyła ciasteczko aisql.sid
+  });
+}
+
+// Pomocnicze odczytanie błędu z odpowiedzi
+async function readError(res) {
+  const ct = res.headers.get('content-type') || '';
+  try {
+    if (ct.includes('application/json')) {
+      const j = await res.json();
+      return j.error || JSON.stringify(j);
+    }
+    return await res.text();
+  } catch {
+    return '(brak treści błędu)';
+  }
+}
+
+// Sprawdzenie czy użytkownik jest zalogowany
+async function checkLoginStatus() {
+  try {
+    const res = await apiFetch('/api/auth/me');
+    const loginBtn = document.querySelector('#loginBtn');
+    const logoutBtn = document.querySelector('#logoutBtn');
+
+    if (res.ok) {
+      // ✅ zalogowany
+      const data = await res.json();
+      console.log("Zalogowany jako:", data.user?.email);
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (logoutBtn) logoutBtn.style.display = 'inline-block';
+    } else {
+      // ❌ nie zalogowany
+      if (loginBtn) loginBtn.style.display = 'inline-block';
+      if (logoutBtn) logoutBtn.style.display = 'none';
+    }
+  } catch (err) {
+    console.error("❌ Błąd sprawdzania sesji:", err);
+  }
+}
+
+// Wywołaj po załadowaniu DOM
+document.addEventListener('DOMContentLoaded', async () => {
+  // czekamy aż include.js wstawi header
+  setTimeout(async () => {
+    await checkLoginStatus();
+    await loadSchemas();
+  }, 500);
+});
+</script>
+
+ 
+
+  <script src="/js/logout.js"></script>
+  <div class="bg-grid"></div>
+
+  <!-- HEADER (include) -->
+  <div data-include="/partials/header.html"></div>
+
+  <main class="container">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumbs" aria-label="okruszki">
+      <a href="/">AI-SQL-Chat</a> › <span>Załaduj schemat</span>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" style="padding-top:20px; padding-bottom:8px">
+      <h1 class="h1" style="margin:0 0 10px">
+        Załaduj <span class="grad">schema.json</span> i generuj bezpieczne SELECT
+      </h1>
+      <p class="lead" style="margin:0 0 16px">
+        Walidacja względem schematu, transparentne wyjaśnienia i dobre praktyki. Tylko odczyt — jedno zapytanie <strong>SELECT</strong> z wymuszonym <code>LIMIT</code>.
+      </p>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin:14px 0 10px">
+        <a class="btn btn-secondary" href="#upload">Użyj własnego pliku</a>
+        <a class="btn btn-ghost" href="/schema-to-json.html">Jak wygenerować schema JSON?</a>
+        <span class="pill">🔒 Brak wysyłki wyników poza przeglądarkę*</span>
+        <span class="pill">🧾 Log audytu i wersjonowanie</span>
+        <span class="pill">🔍 Tryb tylko-odczyt</span>
+      </div>
+    </section>
+
+    
+
+    <!-- Upload -->
+    <section class="card" id="upload">
+      <div class="card-head">
+        <h2>Wgraj schemat JSON</h2>
+        <span class="note">Akceptowane: *.json (rekomendowany rozmiar ≤ 512 KB)</span>
+      </div>
+
+      <form id="uploadForm" enctype="multipart/form-data" class="grid-2">
+        <input type="file" name="schemaFile" accept=".json,application/json" required class="file" aria-label="Wybierz plik schema.json"/>
+        <div style="display:flex; align-items:center; gap:10px">
+          <button class="btn btn-primary" type="submit">📂 Wgraj</button>
+          <div id="uploadResult" class="note" role="status" aria-live="polite"></div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Generate SQL (podgląd) -->
+    <section class="card">
+      <div class="card-head">
+        <h2>Wygeneruj SQL z najnowszego schematu (podgląd)</h2>
+        <span class="note">Zwraca tylko tekst zapytania (SELECT)</span>
+      </div>
+      <label for="prompt" class="note" style="display:block;margin-bottom:6px">Twoje pytanie po polsku</label>
+      <textarea id="prompt" class="input" rows="4" placeholder="Np. Pokaż projekty o powierzchni > 100..." aria-label="Wpisz prośbę w języku naturalnym"></textarea>
+      <div class="mt-12" style="display:flex; gap:10px; align-items:center">
+        <button class="btn btn-primary" id="genBtn">🧠 Generuj SQL</button>
+        <div id="genState" class="note" role="status" aria-live="polite"></div>
+      </div>
+      <pre id="sqlOutput" class="code mt-12" aria-label="Wynikowy SQL">-- Tu pojawi się wygenerowane zapytanie SQL</pre>
+    </section>
+
+    <!-- Lista wgranych schematów -->
+    <section class="card">
+      <div class="card-head">
+        <h2>Przesłane schematy</h2>
+        <button class="btn btn-secondary" id="refreshBtn" type="button">Odśwież</button>
+      </div>
+      <div id="schemasList" class="note" role="status" aria-live="polite">⏳ Ładowanie…</div>
+    </section>
+<!-- Blok SEO: objaśnienie strony -->
+    <section class="card seo-card">
+      <h2>Po co wgrywać schemat JSON?</h2>
+      <p class="sub" style="font-size:16px;color:#334155">
+        <strong>AI-SQL-Chat</strong> mapuje nazwy tabel i kolumn z Twojego pliku <code>schema.json</code>, aby generować
+        jedno poprawne zapytanie <strong>SELECT</strong> dokładnie pod tę strukturę. Dzięki temu odpowiedzi są trafne,
+        a ryzyko błędu mniejsze. Schemat przygotujesz w kilka minut w oparciu o
+        <a href="/schema-to-json.html">krótką instrukcję (MySQL/PostgreSQL/SQL Server/Oracle)</a>.
+      </p>
+
+      <h3>Jak to działa na tej stronie?</h3>
+      <ol style="margin:0; padding:0 0 0 18px; color:#0f172a">
+        <li>Wgraj plik <code>.json</code> ze strukturą tabel/kolumn (poniżej).</li>
+        <li>Wpisz prośbę po polsku — narzędzie zaproponuje jedno zapytanie <strong>SELECT</strong>.</li>
+        <li>Skopiuj SQL i użyj w swoim narzędziu/BI lub przejdź do <a href="/sql-query.html">wersji demo</a>.</li>
+      </ol>
+
+      <h3>Bezpieczeństwo</h3>
+      <ul style="margin:0; padding:0 0 0 18px; color:#0f172a">
+        <li>Filtrowanie anty-SQLi (blokada DDL/DML, OUTFILE/INFILE, SLEEP/BENCHMARK),</li>
+        <li>wymuszony <code>LIMIT</code> i tylko jedna instrukcja,</li>
+        <li>brak trwałego zapisu wyników (w przeglądarce),</li>
+        <li>szczegóły w sekcji <a href="/security.html">Bezpieczeństwo</a>.</li>
+      </ul>
+    </section>
+
+    <!-- Instrukcja (krótka) -->
+    <section class="card section-how">
+      <div class="card-head">
+        <h2>Instrukcja (skrót)</h2>
+      </div>
+      <div class="sub">
+        <p>Aplikacja generuje zapytania SQL na podstawie wgranego przez Ciebie pliku <code>schema.json</code> (mapa tabel i kolumn). Wpisujesz prośbę zwykłym językiem, a system zwraca <strong>jedno zapytanie SELECT</strong> zgodne ze schematem.</p>
+        <p><strong>Nie masz jeszcze pliku?</strong> Skorzystaj z poradnika: <a href="/schema-to-json.html">schema → JSON</a>.</p>
+      </div>
+    </section>
+    
+    <!-- FAQ (krótkie) -->
+    <section class="card">
+      <div class="card-head">
+        <h2>FAQ — schemat JSON</h2>
+      </div>
+      <details class="mt-12">
+        <summary>Jak przygotować plik schema.json?</summary>
+        <p class="sub">Użyj krótkich zapytań dla swojego silnika (MySQL/PostgreSQL/SQL Server/Oracle), a wynik wyeksportuj do JSON. Instrukcja: <a href="/schema-to-json.html">schema → JSON</a>.</p>
+      </details>
+      <details class="mt-12">
+        <summary>Czy wynik zapytania jest gdzieś zapisywany?</summary>
+        <p class="sub">Nie. Wyniki nie są trwale zapisywane — przetwarzamy je wyłącznie w pamięci przeglądarki na czas działania.</p>
+      </details>
+      <details class="mt-12">
+        <summary>Czy narzędzie wykonuje modyfikacje w bazie?</summary>
+        <p class="sub">Nie. System generuje i dopuszcza wyłącznie jedno zapytanie <strong>SELECT</strong> (tylko odczyt), z wymuszonym <code>LIMIT</code> oraz filtrami anty-SQLi.</p>
+      </details>
+    </section>
+  </main>
+
+  <!-- FOOTER (include) -->
+  <div data-include="/partials/footer.html"></div>
+
+  
+
+  <!-- Logika strony -->
+  <script>
+    // Upload schematu
+    document.getElementById('uploadForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const info = document.getElementById('uploadResult');
+      info.textContent = '⏳ Przesyłanie...';
+      try{
+        const fd = new FormData(e.target);
+        const res = await apiFetch('/api/schema/upload',{ method:'POST', body: fd });
+
+        const txt = await res.text();
+        if(!res.ok){
+          info.textContent = '❌ ' + (txt || ('HTTP '+res.status));
+        }else{
+          info.textContent = txt || '✅ Wgrano.';
+          loadSchemas();
+        }
+      }catch(err){
+        info.textContent = '❌ Błąd połączenia.';
+      }
+    });
+
+    // Generowanie SQL
+    document.getElementById('genBtn').addEventListener('click', generateSQL);
+    async function generateSQL(){
+      const p = document.getElementById('prompt').value.trim();
+      const out = document.getElementById('sqlOutput');
+      const state = document.getElementById('genState');
+      if(!p){ state.textContent='Wpisz treść zapytania.'; return; }
+      state.textContent='⏳ Generuję...'; out.textContent='';
+
+      try{
+        const res = await apiFetch('/api/ask', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ question: p }) // ✅ poprawione pole
+});
+
+        if(!res.ok){
+          const err = await readError(res);
+          state.textContent = `❌ Błąd serwera (${res.status}): ${err}`;
+          return;
+        }
+        const data = await res.json().catch(()=> ({}));
+        state.textContent = '✅ Gotowe';
+        out.textContent = data.sql || '-- (brak danych)';
+      }catch(e){
+        state.textContent = '❌ Błąd połączenia z serwerem.';
+      }
+    }
+
+    // Lista schematów
+    document.getElementById('refreshBtn').addEventListener('click', loadSchemas);
+    async function loadSchemas(){
+      const box = document.getElementById('schemasList');
+      box.textContent = '⏳ Ładowanie…';
+      try{
+        const res = await apiFetch('/api/schema/list');
+
+        if(!res.ok){
+          const err = await readError(res);
+          box.textContent = `❌ Błąd (${res.status}): ${err}`;
+          return;
+        }
+        const files = await res.json();
+        if(!Array.isArray(files) || files.length===0){ box.textContent = 'Brak plików.'; return; }
+
+        const ul = document.createElement('ul');
+        ul.style.listStyle='none'; ul.style.padding='0'; ul.style.margin='0';
+        files.forEach(name=>{
+          const li = document.createElement('li');
+          li.style.display='flex'; li.style.alignItems='center';
+          li.style.justifyContent='space-between';
+          li.style.padding='8px 0'; li.style.borderBottom='1px solid #e5e7eb';
+          li.innerHTML = `<span class="note">${name}</span>
+                          <button class="btn btn-secondary" data-del="${name}" type="button">Usuń</button>`;
+          ul.appendChild(li);
+        });
+        box.innerHTML=''; box.appendChild(ul);
+
+        box.querySelectorAll('button[data-del]').forEach(btn=>{
+          btn.addEventListener('click', async ()=>{
+            const fname = btn.getAttribute('data-del');
+            if(!confirm('Usunąć plik "'+fname+'"?')) return;
+            btn.disabled = true;
+            try{
+              const res = await apiFetch('/api/schema/delete/' + encodeURIComponent(fname), { method:'DELETE' });
+
+              const t = await res.text();
+              if(!res.ok){ alert('Błąd usuwania ('+res.status+'): '+t); }
+              loadSchemas();
+            }catch{ alert('Błąd połączenia przy usuwaniu.'); }
+            finally{ btn.disabled = false; }
+          });
+        });
+
+      }catch{ box.textContent = '❌ Nie udało się pobrać listy plików.'; }
+    }
+ 
+
+    // Uzupełnij rok w stopce po wstawieniu include
+    (function fillYear(){
+      const nodes = document.querySelectorAll('.js-year');
+      if (nodes.length) {
+        const y = new Date().getFullYear();
+        nodes.forEach(n => n.textContent = y);
+      } else {
+        setTimeout(fillYear, 120);
+      }
+    })();
+  </script>
+
+  <!-- Wspólne skrypty -->
+  <script src="/js/include.js"></script>
+  <script src="/js/header.js"></script>
+  <script defer src="/js/cookie-consent.js"></script>
+
+  <!-- JSON-LD: Breadcrumbs + WebPage + FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"BreadcrumbList",
+    "itemListElement":[
+      {"@type":"ListItem","position":1,"name":"AI-SQL-Chat","item":"https://aisql.pl/"},
+      {"@type":"ListItem","position":2,"name":"Załaduj schemat","item":"https://aisql.pl/schema-query.html"}
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebPage",
+    "name":"Załaduj schemat JSON — AI-SQL-Chat",
+    "url":"https://aisql.pl/schema-query.html",
+    "description":"Wgraj schema.json i generuj jedno, bezpieczne zapytanie SELECT z języka naturalnego. Obsługa MySQL, PostgreSQL, SQL Server, Oracle.",
+    "isPartOf":{"@type":"WebSite","name":"AI-SQL-Chat","url":"https://aisql.pl/"}
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"FAQPage",
+    "mainEntity":[
+      {
+        "@type":"Question",
+        "name":"Jak przygotować plik schema.json?",
+        "acceptedAnswer":{"@type":"Answer","text":"Użyj krótkich zapytań dla swojego silnika (MySQL/PostgreSQL/SQL Server/Oracle), a wynik wyeksportuj do JSON. Szczegóły w instrukcji schema → JSON."}
+      },
+      {
+        "@type":"Question",
+        "name":"Czy wynik zapytania jest gdzieś zapisywany?",
+        "acceptedAnswer":{"@type":"Answer","text":"Nie. Wyniki nie są trwale zapisywane — przetwarzamy je wyłącznie w pamięci przeglądarki na czas działania."}
+      },
+      {
+        "@type":"Question",
+        "name":"Czy narzędzie wykonuje modyfikacje w bazie?",
+        "acceptedAnswer":{"@type":"Answer","text":"Nie. System generuje i dopuszcza wyłącznie jedno zapytanie SELECT (tylko odczyt), z wymuszonym LIMIT oraz filtrami anty-SQLi."}
+      }
+    ]
+  }
+  </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Paste a schema and generate SQL — AI-SQL-Chat</title>
+
+  <link rel="canonical" href="https://aisql.pl/en/schema-paste.html"/>
+  <meta name="robots" content="index,follow"/>
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml"/>
+  <link rel="alternate icon" href="/img/favicon.png"/>
+  <link rel="manifest" href="/site.webmanifest"/>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"/>
+
+  <link rel="alternate" hreflang="pl" href="https://aisql.pl/schema-paste.html">
+  <link rel="alternate" hreflang="en" href="https://aisql.pl/en/schema-paste.html">
+  <link rel="alternate" hreflang="x-default" href="https://aisql.pl/en/schema-paste.html">
+
+  <style>
+    .grid-2 { display:grid; gap:16px; grid-template-columns:1fr; }
+    @media(min-width:980px){ .grid-2{ grid-template-columns:1.2fr .8fr; } }
+    .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  </style>
+
+</head>
+<body>
+  <script src="/js/logout.js"></script>
+  <div class="bg-grid"></div>
+  <div data-include="/en/partials/header.html"></div>
+
+  <main class="container">
+   <section class="hero" style="padding-top:28px; padding-bottom:8px">
+      <h1 class="h1">Paste your schema and <span class="grad">generate SQL</span></h1>
+      <p class="lead">
+        Paste the result of a query (e.g., from phpMyAdmin) or a ready JSON structure.
+        Then write your question in natural language — we will generate a single <strong>SELECT</strong> query.
+      </p>
+      <p class="sub" style="margin-top:8px; font-size:15px;">
+        🔍 Not sure how to extract your database schema?
+        Check the simple step-by-step guide:
+        <a href="/en/schema-copy.html" class="btn btn-ghost" style="margin-left:6px;">📘 How to copy a schema</a>
+      </p>
+    </section>
+
+    <section class="grid-2">
+      <!-- LEFT -->
+      <div class="card">
+        <div class="card-head">
+          <h2>1) Paste your schema</h2>
+          <span class="note">Supported: flat list (TSV/CSV/spaces) or JSON</span>
+        </div>
+
+        <textarea id="schemaInput" class="input mono" rows="12" placeholder="Paste the result:
+TABLE_NAME  COLUMN_NAME  DATA_TYPE
+module_prices  priceGross  decimal
+..."></textarea>
+
+        <div class="mt-12" style="display:flex; gap:10px; flex-wrap:wrap">
+          <button class="btn btn-secondary" id="parseBtn" type="button">Parse to JSON</button>
+          <button class="btn btn-ghost" id="downloadBtn" type="button">Download schema.json</button>
+          <span id="parseState" class="note"></span>
+        </div>
+
+        <!-- 2) QUESTION + RESULT -->
+        <div class="mt-16 card">
+          <div class="card-head">
+            <h3>2) Write your question in natural language</h3>
+            <span class="note">Example: “show 5 best selling modules in New York with their prices”</span>
+          </div>
+          <textarea id="prompt" class="input" rows="4" placeholder="e.g. modules and their prices"></textarea>
+          <div class="mt-12" style="display:flex; gap:10px; align-items:center">
+            <button class="btn btn-primary" id="genBtn" type="button">🧠 Generate SQL</button>
+            <span id="genState" class="note"></span>
+          </div>
+
+          <!-- SQL RESULT -->
+          <div class="mt-12">
+            <div style="display:flex; gap:8px">
+              <h3>3) Generated SQL query</h3>
+              <button class="btn btn-secondary" type="button" onclick="copySql()">📋 Copy</button>
+              <button class="btn btn-secondary" type="button" onclick="downloadSql()">⬇️ Download</button>
+            </div>
+            <pre id="sqlOut" class="code mono" style="min-height:140px;white-space:pre-wrap">— none —</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="card">
+        <div class="card-head">
+          <h2>Schema preview</h2>
+          <span class="note">Normalized JSON</span>
+        </div>
+        <label class="sub">Normalized schema (JSON)</label>
+        <pre id="schemaPreview" class="code mono" style="min-height:180px;white-space:pre-wrap">— none —</pre>
+      </div>
+    </section>
+
+    <section class="card mt-16">
+      <h2>SQL Generator from natural language</h2>
+      <p class="sub">
+        This generator is read-only — it does not connect to your database and does not execute queries.
+        It returns only a proposal of a <strong>SELECT</strong> statement based on the provided schema.
+      </p>
+    </section>
+  </main>
+
+ <div data-include="/en/partials/footer.html"></div>
+
+  <script src="/js/include.js"></script>
+  <script src="/js/header.js"></script>
+  <script defer src="/js/cookie-consent.js"></script>
+
+  <script>
+    const $ = sel => document.querySelector(sel);
+    const state = { schemaObj: null };
+
+    function sanitizeDump(text) {
+      const DROP_PATTERNS = [
+        /shown rows/i, /query execution/i, /phpmyadmin/i,
+        /information_schema\.columns/i, /^SELECT\b/i, /^FROM\b/i, /^WHERE\b/i,
+        /^#/, /^--/, /^TABLE_NAME/i, /^COLUMN_NAME/i
+      ];
+      return text
+        .split(/\r?\n/)
+        .map(l => l.replace(/\u00A0/g, ' ').trim())
+        .filter(l => !!l)
+        .filter(l => !DROP_PATTERNS.some(rx => rx.test(l)));
+    }
+
+    function isJsonLike(txt){ try{ JSON.parse(txt); return true; }catch{ return false; } }
+
+    function parseFlatColumns(text){
+      const lines = sanitizeDump(text);
+      const out = new Map();
+      for (const line of lines){
+        let parts = line.split('\t');
+        if (parts.length < 2) parts = line.split(',').map(s => s.trim());
+        if (parts.length < 2) parts = line.split(/\s+/);
+        const [t, c, type] = parts;
+        if (!t || !c) continue;
+        if (!out.has(t)) out.set(t, { name:t, columns:[] });
+        out.get(t).columns.push({ name:c, type:(type||'TEXT') });
+      }
+      return { tables: Array.from(out.values()) };
+    }
+
+    function normalizeSchema(text){
+      if (isJsonLike(text)){
+        const obj = JSON.parse(text);
+        if (!obj.tables && typeof obj === 'object'){
+          const tables = Object.entries(obj).map(([name, cols]) => ({
+            name,
+            columns:(cols||[]).map(x => (typeof x==='string'?{name:x,type:'TEXT'}:x))
+          }));
+          return { tables };
+        }
+        return obj;
+      }
+      return parseFlatColumns(text);
+    }
+
+    const pretty = obj => JSON.stringify(obj,null,2);
+
+    $('#parseBtn').addEventListener('click', ()=>{
+      const raw = $('#schemaInput').value.trim();
+      if (!raw){ $('#parseState').textContent='Paste the schema first.'; return; }
+      try{
+        state.schemaObj = normalizeSchema(raw);
+        $('#schemaPreview').textContent = pretty(state.schemaObj);
+        $('#parseState').textContent = '✅ OK — schema recognized.';
+      }catch(e){
+        $('#parseState').textContent='❌ Failed to parse schema: '+e.message;
+      }
+    });
+
+    $('#downloadBtn').addEventListener('click', ()=>{
+      if (!state.schemaObj){ $('#parseState').textContent='Parse the schema first.'; return; }
+      const blob = new Blob([JSON.stringify(state.schemaObj,null,2)],{type:'application/json;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='schema.json'; a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // --- Generate SQL ---
+    $('#genBtn').addEventListener('click', async ()=>{
+      const question = $('#prompt').value.trim();
+      if (!question){ $('#genState').textContent='Write a question.'; return; }
+
+      $('#genState').textContent = '⏳ Generating...';
+      $('#sqlOut').textContent = '...';
+
+      try {
+        const res = await fetch("/api/ask", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question,
+            schema: state.schemaObj,
+            dryRun: true
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+
+        $('#sqlOut').textContent = data.sql || '— (no data)';
+        $('#genState').textContent = '✅ Done';
+      } catch(e) {
+        $('#genState').textContent = '❌ ' + (e?.message || 'Generation error.');
+        $('#sqlOut').textContent = '—';
+      }
+    });
+    
+function copySql() {
+  const code = document.getElementById("sqlOut").textContent.trim();
+
+  if (!code || code === "— none —" || code === "—") {
+    alert("No code to copy.");
+    return;
+  }
+
+  navigator.clipboard.writeText(code)
+    .then(() => alert("Copied to clipboard!"))
+    .catch(() => alert("❌ Copy error"));
+}
+
+function downloadSql() {
+  const code = document.getElementById("sqlOut").textContent.trim();
+
+  if (!code || code === "— none —" || code === "—") {
+    alert("No code to download.");
+    return;
+  }
+
+  const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "generated.sql";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+  </script>
+</body>
+</html>

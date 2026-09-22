@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI-SQL-Chat</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+        }
+
+        button {
+            padding: 8px 16px;
+            margin-top: 8px;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 6px;
+        }
+
+        th {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>AI-SQL-Chat</h1>
+    <textarea id="q" placeholder="Zadaj pytanie…"></textarea><br />
+    <button onclick="ask()">Wyślij</button>
+    <pre id="sql" style="background:#fafafa;padding:10px;"></pre>
+    <div id="result"></div>
+
+    <script>
+  async function ask() {
+    try {
+      const question = document.getElementById('q').value.trim();
+      if (!question) {
+        alert('Wpisz pytanie przed wysłaniem.');
+        return;
+      }
+
+      const resp = await fetch('http://192.168.5.109:8080/api/ask', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ question })
+      });
+
+      if (!resp.ok) {
+        throw new Error(`Błąd serwera: ${resp.status}`);
+      }
+
+      const data = await resp.json();
+      if (data.error) {
+        alert(`Błąd: ${data.error}`);
+        return;
+      }
+
+      // 🧠 Pokaż wygenerowany SQL
+      document.getElementById('sql').textContent = data.sql;
+
+      // 📊 Renderuj tabelę wyników
+      const rows = data.rows;
+      if (!rows || !rows.length) {
+        document.getElementById('result').innerHTML = '<p>Brak wyników.</p>';
+        return;
+      }
+
+      const cols = Object.keys(rows[0]);
+      let html = '<table><thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+      rows.forEach(r => {
+        html += '<tr>' + cols.map(c => `<td>${r[c]}</td>`).join('') + '</tr>';
+      });
+      html += '</tbody></table>';
+      document.getElementById('result').innerHTML = html;
+
+    } catch (err) {
+      console.error('❌ Błąd zapytania:', err);
+      alert('Nie udało się połączyć z serwerem.');
+    }
+  }
+</script>
+
+</body>
+
+</html>

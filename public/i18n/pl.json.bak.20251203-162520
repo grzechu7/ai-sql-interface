@@ -1,0 +1,22 @@
+{
+  "lang_pl": "Polski",
+  "lang_en": "English",
+  "header_upload": "Załaduj nowy schemat JSON",
+
+  "inst.title": "Instrukcja",
+  "inst.body": "<p>Aplikacja służy do automatycznego generowania zapytań SQL na podstawie schematu bazy danych zapisanego w pliku JSON (wbudowanego lub wgranego przez użytkownika).</p><p>Na tej stronie, w polu <strong>„Zadaj pytanie o dane”</strong>, wpisz prośbę zwykłym językiem — AI przetworzy ją na zapytanie SQL. Możesz wyświetlić samo zapytanie lub od razu zobaczyć jego wynik w postaci tabeli.</p><p>Baza demonstracyjna dotyczy sprzedaży modułów do inteligentnego domu i zawiera m.in.: typ obiektu (dom/mieszkanie), powierzchnię, listę modułów (np. sterownik rolet, oświetlenia, RGB) oraz miejscowości. Wykorzystaj te atrybuty, formułując prośby o dane.</p><div style=\"margin-top:10px\"><strong>Przykładowe zapytania:</strong><ul style=\"margin:8px 0 0 18px; line-height:1.5\"><li><code>podaj 5 najlepiej sprzedających się modułów w warszawie wraz z cenami</code></li><li><code>podaj liczbę sprzedanych modułów w podziale na dom i mieszkanie dodaj wartości wyceny</code></li><li><code>podaj sumę i liczbę wyceny modułów w podziale na miasta</code></li></ul></div><p style=\"margin-top:10px\">Te zapytania możesz wkleić w pole <strong>„Zadaj pytanie o dane”</strong> lub wpisać własne. Jeśli chcesz użyć swojego schematu bazy danych, kliknij w prawym górnym rogu link <strong>„Załaduj nowy schemat JSON”</strong> — pojawi się okno do wgrania pliku. Na tej stronie wygenerujesz zapytania na podstawie dostarczonego schematu JSON.</p>",
+
+  "ask.title": "Zadaj pytanie o dane",
+  "ask.subtitle": "Napisz po ludzku — ja zrobię z tego SQL.",
+  "ask.placeholder": "np. podaj 5 najlepiej sprzedających się modułów w Warszawie wraz z cenami",
+
+  "btn.send": "Wyślij",
+  "btn.clear": "Wyczyść",
+
+  "sql.title": "SQL",
+  "sql.copy": "Kopiuj SQL",
+
+  "res.title": "Wyniki",
+
+  "footer.note": "⚠️ SQL generowany automatycznie — zawsze weryfikuj przed użyciem w krytycznych miejscach."
+}

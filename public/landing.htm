@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI-SQL-Chat — Pisz po ludzku, dostajesz SQL</title>
+  <meta name="description" content="AI-SQL-Chat generuje poprawny SQL z opisów w języku naturalnym. Wgraj schemat, zadaj pytanie, od razu zobacz wynik.">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1020; --bg2:#0f172a;
+      --panel:#0c1224; --panel2:#0e1630;
+      --text:#e5e7eb; --muted:#a3b0c6;
+      --accent:#00e0ff; --accent2:#7c3aed; --success:#22c55e;
+      --border:rgba(255,255,255,.08);
+      --shadow:0 18px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.03);
+      --radius:16px;
+      --mono:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--text); font-family:var(--sans);
+      background:
+        radial-gradient(1000px 600px at 90% -20%, rgba(124,58,237,.35), transparent 60%),
+        radial-gradient(800px 500px at -10% 110%, rgba(0,224,255,.20), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      overflow-x:hidden;
+    }
+    .bg-grid{position:fixed; inset:0; pointer-events:none; opacity:.25;
+      background:
+        linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size:28px 28px; mask-image:radial-gradient(800px 800px at 50% 30%, #000, transparent 70%);
+    }
+
+    /* Layout */
+    .wrap{max-width:1200px; margin:0 auto; padding:0 20px}
+    .btn{appearance:none; border:none; cursor:pointer; font-weight:600; letter-spacing:.2px}
+    .btn-lg{padding:14px 20px; border-radius:12px}
+    .btn-primary{color:#08101e; background:linear-gradient(90deg,var(--accent),var(--accent2)); box-shadow:0 8px 24px rgba(124,58,237,.35)}
+    .btn-ghost{color:var(--text); background:#ffffff10; border:1px solid var(--border)}
+    .btn-ghost:hover{background:#ffffff18}
+    .badge{font-size:12px; color:#0b1020; background:linear-gradient(90deg,var(--accent),var(--accent2)); padding:2px 8px; border-radius:999px}
+    .muted{color:var(--muted)}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow);
+    }
+    .section{padding:64px 0}
+    .section-sm{padding:36px 0}
+    .grid{display:grid; gap:16px}
+    .grid-2{grid-template-columns:1fr}
+    .grid-3{grid-template-columns:1fr}
+    @media (min-width:900px){
+      .grid-2{grid-template-columns:1.15fr .85fr}
+      .grid-3{grid-template-columns:repeat(3,1fr)}
+    }
+
+    /* Nav */
+    .nav{position:sticky; top:0; z-index:50; backdrop-filter:blur(10px); background:linear-gradient(180deg, rgba(11,16,32,.85), rgba(11,16,32,.55)); border-bottom:1px solid var(--border)}
+    .nav-inner{display:flex; align-items:center; justify-content:space-between; padding:14px 0}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:700}
+    .brand svg{color:var(--accent)}
+
+    .nav-actions{display:flex; align-items:center; gap:10px}
+    .mini-link{color:var(--text); text-decoration:none; opacity:.9}
+    .mini-link:hover{opacity:1}
+
+    /* Hero */
+    .hero{padding:72px 0 32px}
+    .hero h1{font-size:44px; line-height:1.1; margin:0 0 14px}
+    .hero p{font-size:18px; color:var(--muted); margin:0 0 20px}
+    .hero-cta{display:flex; flex-wrap:wrap; gap:10px}
+    .badge-line{display:flex; align-items:center; gap:10px; margin:10px 0 24px}
+    .pill{padding:6px 10px; border-radius:999px; background:#ffffff10; border:1px solid var(--border); color:var(--muted); font-size:12px}
+    .demo{padding:14px; border-radius:14px; display:grid; gap:10px}
+    .pane{border-radius:12px; border:1px solid var(--border); background:#050a1f; overflow:hidden}
+    .pane-head{display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:#0b1226; color:#bcd0ff; border-bottom:1px solid #0e1835; font-size:13px}
+    .pane-body{padding:12px; overflow:auto; max-height:280px}
+    .code{font-family:var(--mono); font-size:13.5px; color:#cbd5e1}
+    .kbd{display:inline-flex; align-items:center; gap:6px; background:#ffffff12; padding:6px 8px; border-radius:8px; border:1px solid var(--border); font-family:var(--mono); font-size:12.5px}
+    .green{color:#86efac}
+    .blue{color:#93c5fd}
+    .purple{color:#c4b5fd}
+
+    /* Steps / Features */
+    .step{padding:18px; border-radius:14px; border:1px solid var(--border); background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02))}
+    .step h3{margin:6px 0 6px}
+    .i{width:40px; height:40px; border-radius:10px; display:inline-grid; place-items:center; background:linear-gradient(180deg, #0f1a36, #0c1530); border:1px solid #1b2550; color:#92aaff}
+
+    /* Pricing */
+    .pricing{gap:18px}
+    .plan{padding:18px}
+    .price{font-size:28px; font-weight:700}
+    .plan ul{list-style:none; padding:0; margin:12px 0 0}
+    .plan li{display:flex; align-items:flex-start; gap:8px; margin:8px 0; color:var(--muted)}
+    .dot{width:8px; height:8px; border-radius:999px; background:linear-gradient(90deg,var(--accent),var(--accent2))}
+
+    /* FAQ */
+    .faq{max-width:1000px; margin:0 auto}
+    details{border:1px solid var(--border); border-radius:12px; padding:12px 14px; background:#ffffff08}
+    details+details{margin-top:10px}
+    summary{cursor:pointer; font-weight:600; outline:none}
+
+    /* Footer */
+    .footer{border-top:1px solid var(--border); padding:26px 0; color:#8ca0c0; font-size:13.5px}
+    .footer a{color:inherit; text-decoration:none}
+    .footer .row{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap}
+    .social{display:flex; gap:10px}
+    .pill-link{border:1px solid var(--border); padding:6px 10px; border-radius:999px; background:#ffffff10}
+    .cta-center{text-align:center; margin:54px 0 12px}
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="wrap nav-inner">
+      <div class="brand">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7c0-1.657 3.582-3 8-3s8 1.343 8 3-3.582 3-8 3-8-1.343-8-3Z" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M4 7v10c0 1.657 3.582 3 8 3s8-1.343 8-3V7" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M20 12c0 1.657-3.582 3-8 3s-8-1.343-8-3" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <span>AI-SQL-Chat</span>
+        <span class="badge">beta</span>
+      </div>
+      <div class="nav-actions">
+        <a class="mini-link" href="#features">Funkcje</a>
+        <a class="mini-link" href="#pricing">Cennik</a>
+        <a class="mini-link" href="#faq">FAQ</a>
+        <a class="btn btn-ghost btn-lg" href="schema-query.html">Załaduj schemat</a>
+        <a class="btn btn-primary btn-lg" href="/index.html">Wypróbuj demo</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="wrap grid grid-2">
+      <div>
+        <div class="badge-line">
+          <span class="pill">Generuj SQL z języka naturalnego</span>
+          <span class="pill">Bezpieczne wykonywanie zapytań</span>
+        </div>
+
+        <h1>Pisz po ludzku. <br/>Dostajesz <span style="background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent">poprawny SQL</span>.</h1>
+        <p>
+          Wgraj schemat bazy, zadaj pytanie i od razu zobacz wynik. <br/>
+          AI-SQL-Chat generuje jedno, bezpieczne zapytanie <strong>SELECT</strong> i wykonuje je na Twojej bazie.
+        </p>
+
+        <div class="hero-cta">
+          <a class="btn btn-primary btn-lg" href="/index.html">Uruchom aplikację</a>
+          <a class="btn btn-ghost btn-lg" href="schema-query.html">Załaduj własny schemat</a>
+        </div>
+
+        <div style="height:10px"></div>
+        <div class="muted">Nie zapisujemy wyników. Ograniczenia DDoS, rate-limit, ochrona przed DML/DDL.</div>
+      </div>
+
+      <div class="demo card">
+        <!-- PROMPT typing -->
+        <div class="pane">
+          <div class="pane-head">
+            <span>Prompt</span>
+            <span class="kbd">/ask&nbsp;<span class="muted">…</span></span>
+          </div>
+          <div class="pane-body code">
+            <span class="blue">„podaj liczbę sprzedanych modułów w podziale na dom i mieszkanie, dodaj wartość wycen”</span>
+            <pre id="typing" class="code" style="margin:10px 0 0"></pre>
+          </div>
+        </div>
+        <!-- SQL -->
+        <div class="pane">
+          <div class="pane-head">
+            <span>SQL</span>
+            <span class="muted">AI-SQL-Chat</span>
+          </div>
+          <div class="pane-body code">
+<pre>
+SELECT s_rodzajdomu.rodzajDomu,
+       SUM(wynik_wycenymoduly.liczbaModulow)     AS liczba_sprzedanych_modulow,
+       ROUND(SUM(wynik_wycenymoduly.cenaBrutto), 2) AS wartosc_wyceny
+FROM wynik_wycenymoduly
+JOIN dane_domu    ON wynik_wycenymoduly.id_dane_klienta = dane_domu.id_dane_klienta
+JOIN s_rodzajdomu ON dane_domu.rodzaj_domu = s_rodzajdomu.id_rodzajDomu
+GROUP BY s_rodzajdomu.rodzajDomu
+LIMIT 1000;
+</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="wrap">
+      <h2 style="margin:0 0 16px">Jak to działa</h2>
+      <p class="muted" style="margin:0 0 22px">Trzy proste kroki od pytania do wyniku.</p>
+      <div class="grid grid-3">
+        <div class="step">
+          <div class="i">1</div>
+          <h3>Wgraj schemat</h3>
+          <p class="muted">Wczytaj JSON ze strukturą tabel i kolumn. Możesz też użyć naszego przykładowego schematu.</p>
+        </div>
+        <div class="step">
+          <div class="i">2</div>
+          <h3>Zadaj pytanie</h3>
+          <p class="muted">Napisz zwykłym językiem. Silnik wygeneruje jedno <strong>SELECT</strong> z walidacją i limitami.</p>
+        </div>
+        <div class="step">
+          <div class="i">3</div>
+          <h3>Odbierz wynik</h3>
+          <p class="muted">Pokażemy SQL i tabelę wynikową. Liczby zaokrąglamy do 2 miejsc — gotowe do prezentacji.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="section">
+    <div class="wrap">
+      <h2 style="margin:0 0 16px">Dlaczego AI-SQL-Chat?</h2>
+      <p class="muted" style="margin:0 0 22px">Bezpieczeństwo, użyteczność i szybkość wdrożenia.</p>
+      <div class="grid grid-3">
+        <div class="step">
+          <div class="i">SQL</div>
+          <h3>Jedno bezpieczne SELECT</h3>
+          <p class="muted">Blokujemy DDL/DML, OUTFILE/INFILE, SLEEP/BENCHMARK. Wymuszamy LIMIT oraz pojedynczą instrukcję.</p>
+        </div>
+        <div class="step">
+          <div class="i">🛡️</div>
+          <h3>Ochrona & Rate-limit</h3>
+          <p class="muted">Slowdown, limity per IP, shedder na pętli zdarzeń — ochrony przed nadużyciami i DDoS.</p>
+        </div>
+        <div class="step">
+          <div class="i">⚙️</div>
+          <h3>Łatwa integracja</h3>
+          <p class="muted">Własny schemat JSON, prosty deployment (Node + Nginx), działa lokalnie i w chmurze.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECURITY -->
+  <section class="section">
+    <div class="wrap grid grid-2">
+      <div>
+        <h2>Bezpieczeństwo danych</h2>
+        <p class="muted">Projekt od początku zorientowany na bezpieczeństwo operacji SQL i odporność na nadużycia.</p>
+        <ul style="margin:14px 0 0; padding:0; list-style:none">
+          <li style="display:flex; gap:10px; align-items:flex-start; margin:10px 0">
+            <span class="dot"></span> Brak przechowywania wyników — wszystko w pamięci.
+          </li>
+          <li style="display:flex; gap:10px; align-items:flex-start; margin:10px 0">
+            <span class="dot"></span> Twarde filtrowanie SQL (pojedynczy SELECT + zakazane wzorce).
+          </li>
+          <li style="display:flex; gap:10px; align-items:flex-start; margin:10px 0">
+            <span class="dot"></span> Ograniczenia rozmiaru body, brak „index of” w statykach.
+          </li>
+          <li style="display:flex; gap:10px; align-items:flex-start; margin:10px 0">
+            <span class="dot"></span> Helmet, HPP, CORS whitelist, nocache, kompresja.
+          </li>
+        </ul>
+      </div>
+      <div class="card" style="padding:16px">
+        <div class="pane">
+          <div class="pane-head"><span>Wymuszenia</span><span class="muted">middleware</span></div>
+          <div class="pane-body code">
+<pre>
+if (!/^\s*SELECT\b/i.test(sql)) throw new Error('Tylko SELECT');
+if (banned.test(sql)) throw new Error('Niedozwolone instrukcje');
+if (!/\bLIMIT\b/i.test(sql)) sql = sql.replace(/;$/, '') + ' LIMIT 1000;';
+</pre>
+          </div>
+        </div>
+        <div style="height:10px"></div>
+        <div class="pane">
+          <div class="pane-head"><span>Ochrona</span><span class="muted">toobusy / rate-limit / slowdown</span></div>
+          <div class="pane-body code">
+<pre>
+if (toobusy()) return res.status(503).json({ error: 'Serwer przeciążony' });
+</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" class="section">
+    <div class="wrap">
+      <h2 style="margin:0 0 16px">Cennik</h2>
+      <p class="muted" style="margin:0 0 22px">Zacznij za darmo — przejdź na Pro, gdy będziesz gotowy.</p>
+      <div class="grid pricing grid-3">
+        <div class="plan card">
+          <div class="muted">FREE</div>
+          <div class="price">0 zł / mies.</div>
+          <ul>
+            <li><span class="dot"></span> Demo schema + limity zapytań</li>
+            <li><span class="dot"></span> Podgląd SQL i wyników</li>
+            <li><span class="dot"></span> Podstawowe zabezpieczenia</li>
+          </ul>
+          <div style="height:12px"></div>
+          <a class="btn btn-ghost btn-lg" href="/index.html">Wypróbuj</a>
+        </div>
+
+        <div class="plan card" style="border:1px solid #3b82f633">
+          <div class="muted">PRO</div>
+          <div class="price">49 zł / mies.</div>
+          <ul>
+            <li><span class="dot"></span> Własny schemat JSON</li>
+            <li><span class="dot"></span> Większe limity i priorytet</li>
+            <li><span class="dot"></span> Zaawansowane filtry SQL</li>
+          </ul>
+          <div style="height:12px"></div>
+          <a class="btn btn-primary btn-lg" href="/index.html">Kup Pro</a>
+        </div>
+
+        <div class="plan card">
+          <div class="muted">ENTERPRISE</div>
+          <div class="price">Indywidualnie</div>
+          <ul>
+            <li><span class="dot"></span> On-prem / VPC</li>
+            <li><span class="dot"></span> Integracje i SSO</li>
+            <li><span class="dot"></span> Wsparcie 24/7</li>
+          </ul>
+          <div style="height:12px"></div>
+          <a class="btn btn-ghost btn-lg" href="mailto:hello@example.com">Porozmawiajmy</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="section">
+    <div class="wrap faq">
+      <h2 style="margin:0 0 16px">FAQ</h2>
+      <details>
+        <summary>Czy modyfikujecie dane w bazie?</summary>
+        <p class="muted">Nie. System generuje i wykonuje wyłącznie jedno zapytanie <strong>SELECT</strong>, z wymuszonym LIMIT i filtrami anty-SQLi.</p>
+      </details>
+      <details>
+        <summary>Gdzie trafiają wyniki zapytań?</summary>
+        <p class="muted">Tylko do przeglądarki. Backend nie przechowuje wyników — są w pamięci procesu wyłącznie na czas wykonania.</p>
+      </details>
+      <details>
+        <summary>Czy mogę użyć własnego schematu?</summary>
+        <p class="muted">Tak, wgraj plik JSON ze strukturą tabel/kolumn na stronie „Załaduj schemat”.</p>
+      </details>
+      <details>
+        <summary>Czy mogę uruchomić on-premise?</summary>
+        <p class="muted">Tak — oferujemy wdrożenia on-prem / VPC. Skontaktuj się z nami.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section-sm">
+    <div class="wrap cta-center">
+      <h3 style="margin:0 0 10px">Gotów sprawdzić na swoich danych?</h3>
+      <a class="btn btn-primary btn-lg" href="/index.html">Uruchom AI-SQL-Chat</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="wrap row">
+      <div class="muted">© <span id="y"></span> AI-SQL-Chat. Wszystkie prawa zastrzeżone.</div>
+      <div class="social">
+        <a class="pill-link" href="mailto:hello@example.com">Kontakt</a>
+        <a class="pill-link" href="#pricing">Cennik</a>
+        <a class="pill-link" href="#faq">FAQ</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Rok w stopce
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Proste „pisanie” promptu w hero
+    const target = document.getElementById('typing');
+    const text = 'AI: Rozumiem. Przygotowuję zapytanie…';
+    let i = 0;
+    (function type(){
+      if(!target) return;
+      target.textContent = text.slice(0, i++);
+      if(i <= text.length){ setTimeout(type, 28); }
+    })();
+  </script>
+</body>
+</html>
