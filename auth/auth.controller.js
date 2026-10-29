@@ -2,6 +2,7 @@
 import passport from "passport";
 import bcrypt from "bcrypt";
 import { dbAuth } from "../db.js";
+import { unauthorizedMsg } from "../middleware/requireAuth.js";
 
 // ========================================
 // 🔹 Rejestracja użytkownika (tabela `users`)
@@ -92,7 +93,7 @@ export function logout(req, res) {
 export async function getProfile(req, res) {
   try {
     if (!req.isAuthenticated || !req.isAuthenticated()) {
-      return res.status(401).json({ error: "❌ Nieautoryzowany — zaloguj się ponownie." });
+      return res.status(401).json({ error: "❌ " + unauthorizedMsg(req) });
     }
 
     const user = req.user;

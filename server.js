@@ -17,7 +17,7 @@ import "./passport.js"; // passport-local + serialize/deserialize
 import { dbAuth, dbData } from "./db.js";
 import { parseUploadedSchema } from "./parse-schema.js";
 import authRoutes from "./auth/auth.routes.js";
-import { requireAuth } from "./middleware/requireAuth.js";
+import { requireAuth, unauthorizedMsg } from "./middleware/requireAuth.js";
 
 dotenv.config();
 
@@ -129,7 +129,7 @@ app.get("/api/auth/me", (req, res) => {
   if (req.isAuthenticated && req.isAuthenticated()) {
     res.json({ user: req.user });
   } else {
-    res.status(401).json({ error: "Nieautoryzowany" });
+    res.status(401).json({ error: unauthorizedMsg(req) });
   }
 });
 

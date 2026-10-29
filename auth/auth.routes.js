@@ -2,6 +2,7 @@
 import express from "express";
 import passport from "passport";
 import * as authController from "./auth.controller.js";
+import { unauthorizedMsg } from "../middleware/requireAuth.js";
 
 const router = express.Router();
 
@@ -59,7 +60,7 @@ router.get("/me", (req, res) => {
   if (req.isAuthenticated && req.isAuthenticated()) {
     res.json({ user: req.user });
   } else {
-    res.status(401).json({ error: "Nieautoryzowany" });
+    res.status(401).json({ error: unauthorizedMsg(req) });
   }
 });
 
