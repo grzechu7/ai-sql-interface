@@ -7,7 +7,9 @@
 
   try {
     const res = await fetch("https://ipapi.co/country/");
+    if (!res.ok) return; // np. 429 RateLimited — nie zgaduj kraju
     const country = (await res.text()).trim().toUpperCase();
+    if (!/^[A-Z]{2}$/.test(country)) return; // odpowiedź to nie kod kraju
 
     // jeśli USER NIE JEST z Polski — przełącz na EN
     if (country !== "PL") {
