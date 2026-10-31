@@ -4,6 +4,10 @@ import bcrypt from "bcrypt";
 import { dbAuth } from "../db.js";
 import { unauthorizedMsg } from "../middleware/requireAuth.js";
 
+// Prosta walidacja pól rejestracji (odrzuca payloady skanerów)
+const EMAIL_RE = /^[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
+const NAME_RE = /^[\p{L}\p{M}0-9 .'_-]{1,100}$/u;
+
 // ========================================
 // 🔹 Rejestracja użytkownika (tabela `users`)
 // ========================================
@@ -13,6 +17,16 @@ export async function register(req, res) {
 
     if (!email || !password) {
       return res.status(400).json({ error: "Email i hasło są wymagane." });
+    }
+    if (typeof email !== "string" || email.length > 254 || !EMAIL_RE.test(email)) {
+      return res.status(400).json({ error: "Podaj poprawny adres email." });
+    }
+    // bcrypt uwzględnia tylko pierwsze 72 bajty hasła
+    if (typeof password !== "string" || password.length < 8 || Buffer.byteLength(password) > 72) {
+      return res.status(400).json({ error: "Hasło musi mieć od 8 do 72 znaków." });
+    }
+    if (full_name != null && full_name !== "" && (typeof full_name !== "string" || !NAME_RE.test(full_name))) {
+      return res.status(400).json({ error: "Imię i nazwisko zawiera niedozwolone znaki." });
     }
 
     // Sprawdź, czy użytkownik już istnieje

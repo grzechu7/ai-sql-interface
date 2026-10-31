@@ -17,6 +17,7 @@ import "./passport.js"; // passport-local + serialize/deserialize
 import { dbAuth, dbData } from "./db.js";
 import { parseUploadedSchema } from "./parse-schema.js";
 import authRoutes from "./auth/auth.routes.js";
+import adminRoutes from "./admin/admin.routes.js";
 import contactRoutes from "./contact/contact.routes.js";
 import { requireAuth, unauthorizedMsg } from "./middleware/requireAuth.js";
 
@@ -95,6 +96,7 @@ app.use((req, res, next) => {
 
 // === AUTH ===
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api/contact", contactRoutes);
 
 // 🔹 Logowanie sesyjne (Passport local)
@@ -169,7 +171,7 @@ Zasady:
 `;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo",
+    model: "gpt-4o-mini",
     temperature: 0.2,
     messages: [
       { role: "system", content: rules },

@@ -31,6 +31,7 @@
         <a class="link nav-quiet" href="/en/register.html" id="registerLink">Register</a>
       </span>
       <a class="link" href="#" id="logoutLink" style="display:none;">Logout</a>
+      <a class="link" href="/admin.html" id="adminLink" style="display:none;">Admin</a>
       <a class="link" href="/en/schema-query.html" id="loadSchemaBtn" style="display:none;">Schema</a>
       <a class="btn btn-primary" href="/en/sql-query.html">Try the demo</a>
     </nav>
@@ -87,11 +88,14 @@ async function checkSessionAndToggleButtons() {
   const register = document.getElementById("registerLink");
   const logout = document.getElementById("logoutLink");
   const loadSchema = document.getElementById("loadSchemaBtn");
+  const adminLink = document.getElementById("adminLink");
 
   try {
     const res = await apiFetch("/api/auth/me");
 
     if (res.ok) {
+      const me = await res.clone().json().catch(() => ({}));
+      if (adminLink) adminLink.style.display = me.isAdmin ? "inline-block" : "none";
       if (login) login.style.display = "none";
       if (register) register.style.display = "none";
       if (logout) logout.style.display = "inline-block";
@@ -101,6 +105,7 @@ async function checkSessionAndToggleButtons() {
       if (register) register.style.display = "inline-block";
       if (logout) logout.style.display = "none";
       if (loadSchema) loadSchema.style.display = "none";
+      if (adminLink) adminLink.style.display = "none";
     }
   } catch (err) {
     console.warn("Session check error:", err);

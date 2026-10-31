@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dokumentacja — schemat bazy i bezpieczny SELECT | AI-SQL-Chat</title>
-  <meta name="description" content="Jak przygotować schemat JSON dla AI-SQL-Chat: zapytania dla MySQL, PostgreSQL, SQL Server, Oracle i SQLite oraz zasady tylko-SELECT." />
+  <title>Jak zacząć — dokumentacja | AI-SQL-Chat</title>
+  <meta name="description" content="Zacznij pracować ze swoimi danymi bez znajomości SQL: pokaż strukturę bazy, zadaj pytanie zwykłym językiem i odbierz gotowe zapytanie SQL. Instrukcje dla MySQL, Oracle, PostgreSQL, SQL Server i SQLite." />
   <link rel="canonical" href="https://aisql.pl/docs.html" />
   <link rel="alternate" hreflang="pl" href="https://aisql.pl/docs.html">
   <link rel="alternate" hreflang="en" href="https://aisql.pl/en/docs.html">
@@ -19,46 +19,49 @@
   <main class="container">
     <header class="docs-hero">
       <p class="kicker">Dokumentacja</p>
-      <h1>Schemat, pytania, bezpieczny SELECT</h1>
-      <p class="lead">Tu jest materiał, który wcześniej zajmował stronę główną: jak wyjąć strukturę bazy i czego narzędzie nie zrobi z danymi.</p>
+      <h1>Zacznij pracować ze swoimi danymi</h1>
+      <p class="lead">Nie musisz znać SQL. Pokaż narzędziu, jak wygląda Twoja baza, zadaj pytanie zwykłym językiem i odbierz gotowe zapytanie.</p>
       <div class="doc-links">
         <a class="btn btn-primary" href="/sql-query.html">Wypróbuj demo</a>
-        <a class="btn btn-secondary" href="/schema-paste.html">Wklej schemat</a>
-        <a class="btn btn-ghost" href="/schema-to-json.html">Instrukcja: schema → JSON</a>
+        <a class="btn btn-secondary" href="/schema-paste.html">Dodaj własny schemat</a>
       </div>
     </header>
 
-    <section class="card">
-      <h2>Jak zacząć</h2>
-      <ol>
-        <li>Wyjmij nazwy tabel i kolumn zapytaniem dla swojego silnika (niżej) albo skorzystaj z <a href="/schema-copy.html">instrukcji wklejania schematu</a>.</li>
-        <li>Na stronie <a href="/schema-paste.html">Wklej schemat</a> wygenerujesz SQL bez konta.</li>
-        <li>Żeby wracać do tego samego schematu, zaloguj się i wgraj JSON na stronie <a href="/schema-query.html">Załaduj schemat</a>.</li>
-      </ol>
+    <section class="docs-section" id="jak-to-dziala">
+      <h2>Jak to działa</h2>
+      <p class="intro">Trzy kroki — od struktury bazy do gotowego zapytania.</p>
+      <div class="cards-3">
+        <div class="persona"><span class="step-num">1</span><svg class="ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/></svg><h3>Pokaż strukturę bazy</h3><p>Skopiuj listę tabel i kolumn z własnej bazy i wklej ją w narzędziu. Rekordów nie potrzebujemy.</p></div>
+        <div class="persona"><span class="step-num">2</span><svg class="ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><h3>Zadaj pytanie zwykłym językiem</h3><p>Na przykład: „Pokaż 10 największych klientów”.</p></div>
+        <div class="persona"><span class="step-num">3</span><svg class="ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg><h3>Otrzymaj gotowe zapytanie SQL</h3><p>Dostajesz zapytanie SELECT dopasowane do nazw Twoich tabel i kolumn.</p></div>
+      </div>
     </section>
 
-    <section class="card" id="faq">
-      <h2>FAQ</h2>
-      <details class="mt-12" open>
-        <summary>Czy modyfikujecie dane w bazie?</summary>
-        <p class="sub">Nie. System przepuszcza wyłącznie jedno zapytanie SELECT, z wymuszonym LIMIT i filtrami instrukcji modyfikujących.</p>
-      </details>
-      <details class="mt-12">
-        <summary>Gdzie trafiają wyniki zapytań?</summary>
-        <p class="sub">Do przeglądarki. Nie zapisujemy ich na stałe.</p>
-      </details>
-      <details class="mt-12">
-        <summary>Czy mogę uruchomić to u siebie?</summary>
-        <p class="sub">Tak, w modelu konsultacji on-prem / VPC. Szczegóły ochrony są na stronie <a href="/security.html">Bezpieczeństwo</a>.</p>
-      </details>
+    <section class="docs-section" id="schemat">
+      <h2>Czym jest schemat bazy danych?</h2>
+      <p class="intro">Schemat to „plan” bazy: jakie są tabele, jakie mają kolumny i jak się ze sobą łączą. To nie to samo co dane.</p>
+      <div class="compare">
+        <div class="persona ok"><p class="role">Potrzebujemy: struktura</p><ul><li>nazwy tabel, np. <code>klienci</code></li><li>nazwy i typy kolumn, np. <code>imie</code>, <code>data_zamowienia</code></li></ul></div>
+        <div class="persona no"><p class="role">Nie potrzebujemy: dane</p><ul><li>imiona i nazwiska klientów</li><li>kwoty, adresy, numery zamówień</li></ul></div>
+      </div>
+      <p class="sub">Przykład: dwie tabele połączone relacją — jeden klient może mieć wiele zamówień.</p>
+      <div class="erd">
+        <table><caption>klienci</caption><tr><th>id</th><td>numer klienta</td></tr><tr><th>nazwa</th><td>nazwa firmy</td></tr></table>
+        <div class="rel">1 klient → wiele zamówień<br>(<code>zamowienia.klient_id</code> = <code>klienci.id</code>)</div>
+        <table><caption>zamowienia</caption><tr><th>id</th><td>numer zamówienia</td></tr><tr><th>klient_id</th><td>kto zamówił</td></tr><tr><th>kwota</th><td>wartość</td></tr></table>
+      </div>
+      <p><strong>Nie musisz przesyłać rekordów z bazy</strong> — wystarczy sama struktura.</p>
     </section>
 
-    <section class="card">
-      <h2>Jak wygenerować schemat (tabele i kolumny)</h2>
-      <p class="sub">Wklej odpowiednie zapytanie w swojej bazie i wyeksportuj wynik. Podmień nazwę bazy albo schemy.</p>
-
-      <h3>MySQL / MariaDB</h3>
-<pre class="code">SELECT
+    <section class="docs-section" id="przygotuj-schemat">
+      <h2>Jak przygotować schemat?</h2>
+      <p class="intro">Wybierz swój silnik bazy danych i rozwiń instrukcję. W każdej: gdzie wejść, co skopiować i gdzie wkleić.</p>
+      <div class="db-list">
+      <details id="mysql">
+        <summary>MySQL / MariaDB</summary>
+        <ol><li>Otwórz phpMyAdmin (albo MySQL Workbench) i wybierz swoją bazę.</li><li>Wejdź w zakładkę <strong>SQL</strong>.</li><li>Wklej poniższe zapytanie i podmień <code>twoja_baza</code> na nazwę swojej bazy.</li><li>Uruchom je i skopiuj wynik.</li></ol>
+        <button class="btn btn-secondary copy-btn" type="button" data-copy="#q-mysql">Kopiuj zapytanie</button>
+<pre id="q-mysql" class="code">SELECT
   TABLE_NAME,
   COLUMN_NAME,
   DATA_TYPE,
@@ -67,37 +70,13 @@
 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_SCHEMA = 'twoja_baza'
 ORDER BY TABLE_NAME, ORDINAL_POSITION;</pre>
-
-      <h3>PostgreSQL</h3>
-<pre class="code">SELECT
-  table_name,
-  column_name,
-  data_type,
-  is_nullable
-FROM information_schema.columns
-WHERE table_schema = 'public'
-ORDER BY table_name, ordinal_position;</pre>
-
-      <h3>SQL Server</h3>
-<pre class="code">SELECT
-  TABLE_SCHEMA,
-  TABLE_NAME,
-  COLUMN_NAME,
-  DATA_TYPE,
-  IS_NULLABLE
-FROM INFORMATION_SCHEMA.COLUMNS
-ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION;</pre>
-
-      <h3>SQLite</h3>
-<pre class="code">SELECT name AS table_name
-FROM sqlite_master
-WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
-ORDER BY name;
-
-PRAGMA table_info('twoja_tabela');</pre>
-
-      <h3>Oracle — Twoje tabele</h3>
-<pre class="code">SELECT
+        <p class="note mt-8">Wynik zaznacz w całości (Ctrl+A), skopiuj (Ctrl+C) i wklej na stronie <a href="/schema-paste.html">Wklej schemat</a>.</p>
+      </details>
+      <details id="oracle">
+        <summary>Oracle</summary>
+        <ol><li>Otwórz SQL Developer i połącz się z bazą.</li><li>Otwórz okno <strong>Worksheet</strong>.</li><li>Wklej zapytanie dla swoich tabel (poniżej) i uruchom je. Jeśli potrzebujesz innej schemy, użyj wariantu z OWNER.</li><li>Skopiuj wynik.</li></ol>
+        <button class="btn btn-secondary copy-btn" type="button" data-copy="#q-oracle">Kopiuj zapytanie</button>
+<pre id="q-oracle" class="code">SELECT
   TABLE_NAME,
   COLUMN_NAME,
   DATA_TYPE,
@@ -107,10 +86,10 @@ PRAGMA table_info('twoja_tabela');</pre>
   NULLABLE
 FROM USER_TAB_COLUMNS
 ORDER BY TABLE_NAME, COLUMN_ID;</pre>
-
-      <h3>Oracle — konkretny OWNER</h3>
-      <p class="sub">OWNER to nazwa schemy, zwykle wielkimi literami, np. <code>HR</code>. Sprawdzisz ją przez <code>SELECT USER FROM dual;</code></p>
-<pre class="code">SELECT
+        <h3>Oracle — konkretny OWNER</h3>
+        <p class="sub">OWNER to nazwa schemy, zwykle wielkimi literami, np. <code>HR</code>. Sprawdzisz ją przez <code>SELECT USER FROM dual;</code> Podmień <code>HR</code> na swoją.</p>
+        <button class="btn btn-secondary copy-btn" type="button" data-copy="#q-oracle-owner">Kopiuj zapytanie</button>
+<pre id="q-oracle-owner" class="code">SELECT
   OWNER,
   TABLE_NAME,
   COLUMN_NAME,
@@ -119,6 +98,109 @@ ORDER BY TABLE_NAME, COLUMN_ID;</pre>
 FROM ALL_TAB_COLUMNS
 WHERE OWNER = 'HR'
 ORDER BY TABLE_NAME, COLUMN_ID;</pre>
+        <p class="note mt-8">Wynik zaznacz w całości (Ctrl+A), skopiuj (Ctrl+C) i wklej na stronie <a href="/schema-paste.html">Wklej schemat</a>.</p>
+      </details>
+      <details id="postgresql">
+        <summary>PostgreSQL</summary>
+        <ol><li>Otwórz pgAdmin (<em>Query Tool</em>) albo <code>psql</code> i połącz się z bazą.</li><li>Wklej zapytanie. Jeśli tabele są w innej schemie niż <code>public</code>, podmień jej nazwę.</li><li>Uruchom je i skopiuj wynik.</li></ol>
+        <button class="btn btn-secondary copy-btn" type="button" data-copy="#q-postgresql">Kopiuj zapytanie</button>
+<pre id="q-postgresql" class="code">SELECT
+  table_name,
+  column_name,
+  data_type,
+  is_nullable
+FROM information_schema.columns
+WHERE table_schema = 'public'
+ORDER BY table_name, ordinal_position;</pre>
+        <p class="note mt-8">Wynik zaznacz w całości (Ctrl+A), skopiuj (Ctrl+C) i wklej na stronie <a href="/schema-paste.html">Wklej schemat</a>.</p>
+      </details>
+      <details id="sqlserver">
+        <summary>SQL Server</summary>
+        <ol><li>Otwórz SQL Server Management Studio i połącz się z bazą.</li><li>Wybierz swoją bazę i kliknij <strong>New Query</strong>.</li><li>Wklej zapytanie, uruchom je i skopiuj wynik.</li></ol>
+        <button class="btn btn-secondary copy-btn" type="button" data-copy="#q-sqlserver">Kopiuj zapytanie</button>
+<pre id="q-sqlserver" class="code">SELECT
+  TABLE_SCHEMA,
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS
+ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION;</pre>
+        <p class="note mt-8">Wynik zaznacz w całości (Ctrl+A), skopiuj (Ctrl+C) i wklej na stronie <a href="/schema-paste.html">Wklej schemat</a>.</p>
+      </details>
+      <details id="sqlite">
+        <summary>SQLite</summary>
+        <ol><li>Otwórz plik bazy w DB Browser for SQLite (zakładka <strong>Execute SQL</strong>) albo w konsoli <code>sqlite3</code>.</li><li>Pierwsze zapytanie zwraca listę tabel. Drugie (<code>PRAGMA</code>) pokazuje kolumny jednej tabeli — podmień <code>twoja_tabela</code> i powtórz dla każdej tabeli, której potrzebujesz.</li><li>Skopiuj wyniki.</li></ol>
+        <button class="btn btn-secondary copy-btn" type="button" data-copy="#q-sqlite">Kopiuj zapytanie</button>
+<pre id="q-sqlite" class="code">SELECT name AS table_name
+FROM sqlite_master
+WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
+ORDER BY name;
+
+PRAGMA table_info('twoja_tabela');</pre>
+        <p class="note mt-8">Wynik zaznacz w całości (Ctrl+A), skopiuj (Ctrl+C) i wklej na stronie <a href="/schema-paste.html">Wklej schemat</a>.</p>
+      </details>
+      </div>
+      <p class="more-link">Potrzebujesz bardziej szczegółowego opisu? Zobacz <a href="/schema-copy.html">pełną instrukcję kopiowania schematu</a>. Masz schemat w formacie JSON? Zobacz <a href="/schema-to-json.html">instrukcję schema → JSON</a>.</p>
+    </section>
+
+    <section class="docs-section" id="przyklady">
+      <h2>Przykładowe pytania</h2>
+      <p class="intro">Tak możesz pytać — własnymi słowami.</p>
+      <div class="cards-3">
+        <div class="scene"><q>Pokaż sprzedaż według regionów</q><p>Zestawienie sprzedaży pogrupowane po regionach.</p><a class="btn btn-secondary" href="/sql-query.html">Wypróbuj w demo</a></div>
+        <div class="scene"><q>Które produkty sprzedawały się najlepiej?</q><p>Ranking produktów według sprzedaży.</p><a class="btn btn-secondary" href="/sql-query.html">Wypróbuj w demo</a></div>
+        <div class="scene"><q>Porównaj przychody miesiąc do miesiąca</q><p>Przychody w kolejnych miesiącach obok siebie.</p><a class="btn btn-secondary" href="/sql-query.html">Wypróbuj w demo</a></div>
+        <div class="scene"><q>Pokaż 10 największych klientów</q><p>Klienci o najwyższych obrotach.</p><a class="btn btn-secondary" href="/sql-query.html">Wypróbuj w demo</a></div>
+      </div>
+    </section>
+
+    <section class="docs-section" id="bezpieczenstwo">
+      <h2>Bezpieczeństwo</h2>
+      <p class="intro">Co faktycznie robi narzędzie.</p>
+      <div class="card">
+        <ul class="checks">
+          <li><strong>Nie musisz podłączać swojej bazy.</strong> Wystarczy wkleić strukturę (tabele i kolumny).</li>
+          <li><strong>Tylko SELECT.</strong> Akceptujemy wyłącznie zapytania zaczynające się od SELECT — odczyt, bez zmian w danych.</li>
+          <li><strong>LIMIT.</strong> Jeśli w zapytaniu nie ma limitu wierszy, serwer dopisuje <code>LIMIT 100</code>.</li>
+          <li><strong>Wyniki nie są zapisywane na stałe.</strong> W trybie demo trafiają do Twojej przeglądarki. Zapisujemy tylko plik schematu, który sam wgrasz po zalogowaniu.</li>
+          <li><strong>Co jest wysyłane do AI.</strong> Do wygenerowania zapytania serwer wysyła Twoje pytanie i strukturę schematu do dostawcy modelu AI (OpenAI).</li>
+        </ul>
+        <p class="more-link">Pełny opis: <a href="/security.html">Bezpieczeństwo</a> · <a href="/privacy.html">Polityka prywatności</a>.</p>
+      </div>
+    </section>
+
+    <section class="docs-section faq" id="faq">
+      <h2>FAQ</h2>
+      <details open>
+        <summary>Czy potrzebuję wiedzy SQL?</summary>
+        <p>Nie. Zadajesz pytanie po polsku, a narzędzie zwraca gotowe zapytanie. Wystarczy, że skopiujesz strukturę bazy według instrukcji wyżej.</p>
+      </details>
+      <details>
+        <summary>Czy muszę zakładać konto?</summary>
+        <p>Nie, żeby wygenerować SQL: <a href="/sql-query.html">demo</a> i <a href="/schema-paste.html">wklejanie schematu</a> działają bez konta. Konto jest potrzebne tylko, by zapisać schemat na później.</p>
+      </details>
+      <details>
+        <summary>Czy przekazuję AI swoje dane?</summary>
+        <p>Nie przesyłasz rekordów z bazy. Do modelu AI trafia Twoje pytanie i struktura schematu (nazwy tabel i kolumn). Szczegóły: <a href="/security.html">Bezpieczeństwo</a> i <a href="/privacy.html">Polityka prywatności</a>.</p>
+      </details>
+      <details>
+        <summary>Czy mogę korzystać z Oracle/MySQL?</summary>
+        <p>Tak. Dla MySQL/MariaDB, Oracle, PostgreSQL, SQL Server i SQLite znajdziesz instrukcję <a href="#przygotuj-schemat">wyżej</a>.</p>
+      </details>
+      <details>
+        <summary>Czy mogę zapisać swój schemat?</summary>
+        <p>Tak — po zalogowaniu wgraj plik JSON na stronie <a href="/schema-query.html">Załaduj schemat</a>, a przy kolejnych wizytach zostanie użyty automatycznie.</p>
+      </details>
+    </section>
+
+    <section class="home-cta">
+      <h2>Gotowy na pierwsze zapytanie?</h2>
+      <p>Zacznij od demo albo wklej własny schemat.</p>
+      <div class="doc-links" style="justify-content:center">
+        <a class="btn btn-primary" href="/sql-query.html">Wypróbuj demo</a>
+        <a class="btn btn-secondary" href="/schema-paste.html">Dodaj własny schemat</a>
+      </div>
     </section>
   </main>
   <div data-include="/partials/footer.html"></div>
@@ -136,6 +218,20 @@ ORDER BY TABLE_NAME, COLUMN_ID;</pre>
         } catch (err) {
           window.location.href = "/login.html";
         }
+      });
+    });
+    document.querySelectorAll('.copy-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const el = document.querySelector(btn.getAttribute('data-copy'));
+        if (!el) return;
+        navigator.clipboard.writeText(el.innerText).then(() => {
+          const old = btn.textContent;
+          btn.textContent = 'Skopiowano ✓';
+          setTimeout(() => btn.textContent = old, 1200);
+        }).catch(() => {
+          const r = document.createRange(); r.selectNodeContents(el);
+          const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        });
       });
     });
   });

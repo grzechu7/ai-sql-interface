@@ -1,16 +1,34 @@
 // === auth.routes.js ===
 import express from "express";
+import rateLimit from "express-rate-limit";
 import passport from "passport";
 import * as authController from "./auth.controller.js";
+import { isAdminUser } from "../admin/admin.routes.js";
 import { unauthorizedMsg } from "../middleware/requireAuth.js";
 
 const router = express.Router();
 
+// Limity przeciw masowej rejestracji i zgadywaniu haseł (per IP)
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Zbyt wiele prób rejestracji. Spróbuj ponownie później." },
+});
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Zbyt wiele prób logowania. Spróbuj ponownie za kilka minut." },
+});
+
 // ✅ Rejestracja użytkownika
-router.post("/register", authController.register);
+router.post("/register", registerLimiter, authController.register);
 
 // ✅ Logowanie sesyjne (Passport Local)
-router.post("/login", (req, res, next) => {
+router.post("/login", loginLimiter, (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) return next(err);
 
@@ -58,7 +76,8 @@ router.post("/logout", (req, res) => {
 // ✅ Dane aktualnego użytkownika (sprawdzenie sesji)
 router.get("/me", (req, res) => {
   if (req.isAuthenticated && req.isAuthenticated()) {
-    res.json({ user: req.user });
+    const { password_hash, ...user } = req.user;
+    res.json({ user, isAdmin: isAdminUser(req.user) });
   } else {
     res.status(401).json({ error: unauthorizedMsg(req) });
   }

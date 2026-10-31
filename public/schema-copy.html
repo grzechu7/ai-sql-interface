@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
+  <script>
+(function() {
+  if (window.location.pathname.startsWith("/en")) return;
+
+  const lang = navigator.language || navigator.userLanguage;
+
+  if (!lang.startsWith("pl")) {
+    const newPath = "/en" + window.location.pathname;
+    window.location.replace(newPath);
+  }
+})();
+</script>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-36ZC4QTDE2"></script>
   <script>
@@ -56,18 +68,6 @@
     nav.breadcrumbs a:hover{text-decoration:underline}
   </style>
 
-<script>
-(function() {
-  if (window.location.pathname.startsWith("/en")) return;
-
-  const lang = navigator.language || navigator.userLanguage;
-
-  if (!lang.startsWith("pl")) {
-    const newPath = "/en" + window.location.pathname;
-    window.location.replace(newPath);
-  }
-})();
-</script>
 
 
 </head>

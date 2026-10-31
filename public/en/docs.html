@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Docs — database schema and safe SELECT | AI-SQL-Chat</title>
-  <meta name="description" content="How to prepare a JSON schema for AI-SQL-Chat: queries for MySQL, PostgreSQL, SQL Server, Oracle, and SQLite, plus SELECT-only rules." />
+  <title>Getting started — documentation | AI-SQL-Chat</title>
+  <meta name="description" content="Work with your data without knowing SQL: show your database structure, ask a question in plain language and get a ready SQL query. Guides for MySQL, Oracle, PostgreSQL, SQL Server and SQLite." />
   <link rel="canonical" href="https://aisql.pl/en/docs.html" />
   <link rel="alternate" hreflang="pl" href="https://aisql.pl/docs.html">
   <link rel="alternate" hreflang="en" href="https://aisql.pl/en/docs.html">
@@ -19,85 +19,64 @@
   <main class="container">
     <header class="docs-hero">
       <p class="kicker">Docs</p>
-      <h1>Schema, questions, safe SELECT</h1>
-      <p class="lead">This is the material that used to fill the homepage: how to extract your database structure, and what the tool will not do with data.</p>
+      <h1>Start working with your data</h1>
+      <p class="lead">You do not need to know SQL. Show the tool what your database looks like, ask a question in plain language and get a ready query.</p>
       <div class="doc-links">
         <a class="btn btn-primary" href="/en/sql-query.html">Try the demo</a>
-        <a class="btn btn-secondary" href="/en/schema-paste.html">Paste schema</a>
-        <a class="btn btn-ghost" href="/en/schema-to-json.html">Guide: schema → JSON</a>
+        <a class="btn btn-secondary" href="/en/schema-paste.html">Add your own schema</a>
       </div>
     </header>
 
-    <section class="card">
-      <h2>How to start</h2>
-      <ol>
-        <li>Pull table and column names with the query for your engine (below), or follow the <a href="/en/schema-copy.html">paste-schema guide</a>.</li>
-        <li>On <a href="/en/schema-paste.html">Paste schema</a> you can generate SQL without an account.</li>
-        <li>To keep the same schema, sign in and upload JSON on <a href="/en/schema-query.html">Load schema</a>.</li>
-      </ol>
+    <section class="docs-section" id="jak-to-dziala">
+      <h2>How it works</h2>
+      <p class="intro">Three steps — from your database structure to a ready query.</p>
+      <div class="cards-3">
+        <div class="persona"><span class="step-num">1</span><svg class="ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/></svg><h3>Show your database structure</h3><p>Copy the list of tables and columns from your database and paste it into the tool. We do not need your records.</p></div>
+        <div class="persona"><span class="step-num">2</span><svg class="ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><h3>Ask a question in plain language</h3><p>For example: “Show the 10 biggest customers”.</p></div>
+        <div class="persona"><span class="step-num">3</span><svg class="ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg><h3>Get a ready SQL query</h3><p>You get a SELECT query matched to the names of your tables and columns.</p></div>
+      </div>
     </section>
 
-    <section class="card" id="faq">
-      <h2>FAQ</h2>
-      <details class="mt-12" open>
-        <summary>Do you modify data in the database?</summary>
-        <p class="sub">No. Only one SELECT is allowed, with a forced LIMIT and filters on statements that change data.</p>
-      </details>
-      <details class="mt-12">
-        <summary>Where do query results go?</summary>
-        <p class="sub">To the browser. We do not store them permanently.</p>
-      </details>
-      <details class="mt-12">
-        <summary>Can I run this on my own infrastructure?</summary>
-        <p class="sub">Yes, as an on-prem / VPC consultation. Protection details are on the <a href="/en/security.html">Security</a> page.</p>
-      </details>
+    <section class="docs-section" id="schemat">
+      <h2>What is a database schema?</h2>
+      <p class="intro">A schema is the “blueprint” of a database: which tables exist, what columns they have and how they connect. It is not the same as the data.</p>
+      <div class="compare">
+        <div class="persona ok"><p class="role">We need: structure</p><ul><li>table names, e.g. <code>customers</code></li><li>column names and types, e.g. <code>first_name</code>, <code>order_date</code></li></ul></div>
+        <div class="persona no"><p class="role">We do not need: data</p><ul><li>customer names</li><li>amounts, addresses, order numbers</li></ul></div>
+      </div>
+      <p class="sub">Example: two tables linked by a relation — one customer can have many orders.</p>
+      <div class="erd">
+        <table><caption>customers</caption><tr><th>id</th><td>customer number</td></tr><tr><th>name</th><td>company name</td></tr></table>
+        <div class="rel">1 customer → many orders<br>(<code>orders.customer_id</code> = <code>customers.id</code>)</div>
+        <table><caption>orders</caption><tr><th>id</th><td>order number</td></tr><tr><th>customer_id</th><td>who ordered</td></tr><tr><th>amount</th><td>value</td></tr></table>
+      </div>
+      <p><strong>You do not need to upload records from your database</strong> — the structure alone is enough.</p>
     </section>
 
-    <section class="card">
-      <h2>How to generate a schema (tables and columns)</h2>
-      <p class="sub">Run the matching query in your database and export the result. Replace the database or schema name.</p>
-
-      <h3>MySQL / MariaDB</h3>
-<pre class="code">SELECT
+    <section class="docs-section" id="przygotuj-schemat">
+      <h2>How to prepare a schema?</h2>
+      <p class="intro">Pick your database engine and expand the guide. Each one says where to go, what to copy and where to paste it.</p>
+      <div class="db-list">
+      <details id="mysql">
+        <summary>MySQL / MariaDB</summary>
+        <ol><li>Open phpMyAdmin (or MySQL Workbench) and select your database.</li><li>Go to the <strong>SQL</strong> tab.</li><li>Paste the query below and replace <code>twoja_baza</code> with the name of your database.</li><li>Run it and copy the result.</li></ol>
+        <button class="btn btn-secondary copy-btn" type="button" data-copy="#q-mysql">Copy query</button>
+<pre id="q-mysql" class="code">SELECT
   TABLE_NAME,
   COLUMN_NAME,
   DATA_TYPE,
   IS_NULLABLE,
   COLUMN_KEY
 FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_SCHEMA = 'your_database'
+WHERE TABLE_SCHEMA = 'twoja_baza'
 ORDER BY TABLE_NAME, ORDINAL_POSITION;</pre>
-
-      <h3>PostgreSQL</h3>
-<pre class="code">SELECT
-  table_name,
-  column_name,
-  data_type,
-  is_nullable
-FROM information_schema.columns
-WHERE table_schema = 'public'
-ORDER BY table_name, ordinal_position;</pre>
-
-      <h3>SQL Server</h3>
-<pre class="code">SELECT
-  TABLE_SCHEMA,
-  TABLE_NAME,
-  COLUMN_NAME,
-  DATA_TYPE,
-  IS_NULLABLE
-FROM INFORMATION_SCHEMA.COLUMNS
-ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION;</pre>
-
-      <h3>SQLite</h3>
-<pre class="code">SELECT name AS table_name
-FROM sqlite_master
-WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
-ORDER BY name;
-
-PRAGMA table_info('your_table');</pre>
-
-      <h3>Oracle — your tables</h3>
-<pre class="code">SELECT
+        <p class="note mt-8">Select the whole result (Ctrl+A), copy it (Ctrl+C) and paste it on the <a href="/en/schema-paste.html">Paste schema</a> page.</p>
+      </details>
+      <details id="oracle">
+        <summary>Oracle</summary>
+        <ol><li>Open SQL Developer and connect to your database.</li><li>Open a <strong>Worksheet</strong> window.</li><li>Paste the query for your own tables (below) and run it. If you need a different schema, use the OWNER variant.</li><li>Copy the result.</li></ol>
+        <button class="btn btn-secondary copy-btn" type="button" data-copy="#q-oracle">Copy query</button>
+<pre id="q-oracle" class="code">SELECT
   TABLE_NAME,
   COLUMN_NAME,
   DATA_TYPE,
@@ -107,10 +86,10 @@ PRAGMA table_info('your_table');</pre>
   NULLABLE
 FROM USER_TAB_COLUMNS
 ORDER BY TABLE_NAME, COLUMN_ID;</pre>
-
-      <h3>Oracle — a specific OWNER</h3>
-      <p class="sub">OWNER is the schema name, usually uppercase, for example <code>HR</code>. Check it with <code>SELECT USER FROM dual;</code></p>
-<pre class="code">SELECT
+        <h3>Oracle — a specific OWNER</h3>
+        <p class="sub">OWNER is the schema name, usually in capital letters, e.g. <code>HR</code>. You can check yours with <code>SELECT USER FROM dual;</code> Replace <code>HR</code> with your own.</p>
+        <button class="btn btn-secondary copy-btn" type="button" data-copy="#q-oracle-owner">Copy query</button>
+<pre id="q-oracle-owner" class="code">SELECT
   OWNER,
   TABLE_NAME,
   COLUMN_NAME,
@@ -119,11 +98,143 @@ ORDER BY TABLE_NAME, COLUMN_ID;</pre>
 FROM ALL_TAB_COLUMNS
 WHERE OWNER = 'HR'
 ORDER BY TABLE_NAME, COLUMN_ID;</pre>
+        <p class="note mt-8">Select the whole result (Ctrl+A), copy it (Ctrl+C) and paste it on the <a href="/en/schema-paste.html">Paste schema</a> page.</p>
+      </details>
+      <details id="postgresql">
+        <summary>PostgreSQL</summary>
+        <ol><li>Open pgAdmin (<em>Query Tool</em>) or <code>psql</code> and connect to your database.</li><li>Paste the query. If your tables are in a schema other than <code>public</code>, replace its name.</li><li>Run it and copy the result.</li></ol>
+        <button class="btn btn-secondary copy-btn" type="button" data-copy="#q-postgresql">Copy query</button>
+<pre id="q-postgresql" class="code">SELECT
+  table_name,
+  column_name,
+  data_type,
+  is_nullable
+FROM information_schema.columns
+WHERE table_schema = 'public'
+ORDER BY table_name, ordinal_position;</pre>
+        <p class="note mt-8">Select the whole result (Ctrl+A), copy it (Ctrl+C) and paste it on the <a href="/en/schema-paste.html">Paste schema</a> page.</p>
+      </details>
+      <details id="sqlserver">
+        <summary>SQL Server</summary>
+        <ol><li>Open SQL Server Management Studio and connect to your database.</li><li>Select your database and click <strong>New Query</strong>.</li><li>Paste the query, run it and copy the result.</li></ol>
+        <button class="btn btn-secondary copy-btn" type="button" data-copy="#q-sqlserver">Copy query</button>
+<pre id="q-sqlserver" class="code">SELECT
+  TABLE_SCHEMA,
+  TABLE_NAME,
+  COLUMN_NAME,
+  DATA_TYPE,
+  IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS
+ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION;</pre>
+        <p class="note mt-8">Select the whole result (Ctrl+A), copy it (Ctrl+C) and paste it on the <a href="/en/schema-paste.html">Paste schema</a> page.</p>
+      </details>
+      <details id="sqlite">
+        <summary>SQLite</summary>
+        <ol><li>Open the database file in DB Browser for SQLite (<strong>Execute SQL</strong> tab) or in the <code>sqlite3</code> console.</li><li>The first query returns the list of tables. The second (<code>PRAGMA</code>) shows the columns of one table — replace <code>twoja_tabela</code> and repeat for each table you need.</li><li>Copy the results.</li></ol>
+        <button class="btn btn-secondary copy-btn" type="button" data-copy="#q-sqlite">Copy query</button>
+<pre id="q-sqlite" class="code">SELECT name AS table_name
+FROM sqlite_master
+WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
+ORDER BY name;
+
+PRAGMA table_info('twoja_tabela');</pre>
+        <p class="note mt-8">Select the whole result (Ctrl+A), copy it (Ctrl+C) and paste it on the <a href="/en/schema-paste.html">Paste schema</a> page.</p>
+      </details>
+      </div>
+      <p class="more-link">Need more detail? See the <a href="/en/schema-copy.html">full guide to copying a schema</a>. Have a schema in JSON? See the <a href="/en/schema-to-json.html">schema → JSON guide</a>.</p>
+    </section>
+
+    <section class="docs-section" id="przyklady">
+      <h2>Example questions</h2>
+      <p class="intro">This is how you can ask — in your own words.</p>
+      <div class="cards-3">
+        <div class="scene"><q>Show sales by region</q><p>Sales grouped by region.</p><a class="btn btn-secondary" href="/en/sql-query.html">Try it in the demo</a></div>
+        <div class="scene"><q>Which products sold best?</q><p>Products ranked by sales.</p><a class="btn btn-secondary" href="/en/sql-query.html">Try it in the demo</a></div>
+        <div class="scene"><q>Compare revenue month over month</q><p>Revenue for consecutive months side by side.</p><a class="btn btn-secondary" href="/en/sql-query.html">Try it in the demo</a></div>
+        <div class="scene"><q>Show the 10 biggest customers</q><p>Customers with the highest turnover.</p><a class="btn btn-secondary" href="/en/sql-query.html">Try it in the demo</a></div>
+      </div>
+    </section>
+
+    <section class="docs-section" id="bezpieczenstwo">
+      <h2>Security</h2>
+      <p class="intro">What the tool actually does.</p>
+      <div class="card">
+        <ul class="checks">
+          <li><strong>You do not have to connect your database.</strong> Just paste the structure (tables and columns).</li>
+          <li><strong>SELECT only.</strong> We accept only queries that start with SELECT — read access, no changes to data.</li>
+          <li><strong>LIMIT.</strong> If the query has no row limit, the server appends <code>LIMIT 100</code>.</li>
+          <li><strong>Results are not stored permanently.</strong> In demo mode they go to your browser. We only store the schema file that you upload yourself after signing in.</li>
+          <li><strong>What is sent to the AI.</strong> To generate the query, the server sends your question and the schema structure to the AI model provider (OpenAI).</li>
+        </ul>
+        <p class="more-link">Full details: <a href="/en/security.html">Security</a> · <a href="/en/privacy.html">Privacy Policy</a>.</p>
+      </div>
+    </section>
+
+    <section class="docs-section faq" id="faq">
+      <h2>FAQ</h2>
+      <details open>
+        <summary>Do I need to know SQL?</summary>
+        <p>No. You ask a question in plain language and the tool returns a ready query. You only need to copy your database structure following the guides above.</p>
+      </details>
+      <details>
+        <summary>Do I need an account?</summary>
+        <p>Not to generate SQL: the <a href="/en/sql-query.html">demo</a> and <a href="/en/schema-paste.html">schema pasting</a> work without an account. An account is only needed to save a schema for later.</p>
+      </details>
+      <details>
+        <summary>Do I hand my data to the AI?</summary>
+        <p>You do not upload records from your database. The AI model receives your question and the schema structure (table and column names). Details: <a href="/en/security.html">Security</a> and <a href="/en/privacy.html">Privacy Policy</a>.</p>
+      </details>
+      <details>
+        <summary>Can I use Oracle/MySQL?</summary>
+        <p>Yes. You will find guides for MySQL/MariaDB, Oracle, PostgreSQL, SQL Server and SQLite <a href="#przygotuj-schemat">above</a>.</p>
+      </details>
+      <details>
+        <summary>Can I save my schema?</summary>
+        <p>Yes — after signing in, upload a JSON file on the <a href="/en/schema-query.html">Load schema</a> page and it will be used automatically on later visits.</p>
+      </details>
+    </section>
+
+    <section class="home-cta">
+      <h2>Ready for your first query?</h2>
+      <p>Start with the demo or paste your own schema.</p>
+      <div class="doc-links" style="justify-content:center">
+        <a class="btn btn-primary" href="/en/sql-query.html">Try the demo</a>
+        <a class="btn btn-secondary" href="/en/schema-paste.html">Add your own schema</a>
+      </div>
     </section>
   </main>
   <div data-include="/en/partials/footer.html"></div>
   <script src="/js/include.js"></script>
   <script src="/js/header.js"></script>
   <script defer src="/js/cookie-consent.js"></script>
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('a[href="/en/schema-query.html"]').forEach((link) => {
+      link.addEventListener("click", async (e) => {
+        e.preventDefault();
+        try {
+          const res = await fetch("/api/auth/me", { credentials: "include" });
+          window.location.href = res.ok ? "/en/schema-query.html" : "/en/login.html";
+        } catch (err) {
+          window.location.href = "/en/login.html";
+        }
+      });
+    });
+    document.querySelectorAll('.copy-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const el = document.querySelector(btn.getAttribute('data-copy'));
+        if (!el) return;
+        navigator.clipboard.writeText(el.innerText).then(() => {
+          const old = btn.textContent;
+          btn.textContent = 'Copied ✓';
+          setTimeout(() => btn.textContent = old, 1200);
+        }).catch(() => {
+          const r = document.createRange(); r.selectNodeContents(el);
+          const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        });
+      });
+    });
+  });
+  </script>
 </body>
 </html>

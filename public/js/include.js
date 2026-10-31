@@ -26,6 +26,18 @@ document.addEventListener("DOMContentLoaded", () => {
         new CustomEvent("include:loaded", { detail: url })
       );
 
+      // footer: pokaż link Admin tylko zalogowanemu adminowi
+      if (url.includes("footer.html")) {
+        fetch("/api/auth/me", { credentials: "include" })
+          .then((r) => (r.ok ? r.json() : null))
+          .then((me) => {
+            if (me && me.isAdmin) {
+              el.querySelectorAll(".js-admin-link, .js-admin-sep").forEach((n) => (n.style.display = ""));
+            }
+          })
+          .catch(() => {});
+      }
+
       // jeśli załadowano header – uruchom logikę sesji
       if (url.includes("header.html")) {
         setTimeout(() => {

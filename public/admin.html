@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Panel admina | AI-SQL-Chat</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .admin-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 16px 64px; }
+    .admin-wrap h1 { margin: 0 0 4px; font-size: 1.6rem; }
+    .admin-wrap .sub { color: var(--muted); margin: 0 0 20px; max-width: 640px; }
+    .tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+    .tab { padding: 10px 14px; font-weight: 600; border-bottom: 2px solid var(--accent); color: var(--text); }
+    .toolbar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+    .toolbar input { max-width: 320px; }
+    .toolbar .count { color: var(--muted); font-size: .9rem; }
+    .table-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow-x: auto; }
+    table.users { width: 100%; border-collapse: collapse; min-width: 760px; }
+    table.users th, table.users td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: .93rem; }
+    table.users th { font-weight: 700; }
+    table.users tr:last-child td { border-bottom: 0; }
+    .muted { color: var(--muted); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #eef0ff; color: var(--accent); font-size: .78rem; font-weight: 600; }
+    .del { background: none; border: 0; cursor: pointer; color: var(--muted); padding: 4px 8px; border-radius: 8px; font-size: 1.05rem; }
+    .del:hover { color: var(--err); background: #fef2f2; }
+    #msg { padding: 24px; text-align: center; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a class="brand" href="/index.html" aria-label="AI-SQL-Chat - strona główna">
+        <span class="name">AI-SQL-Chat</span>
+      </a>
+      <nav class="nav">
+        <a class="link" href="/index.html">Strona główna</a>
+        <a class="link" href="#" id="logout">Wyloguj</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="admin-wrap">
+    <h1>Panel admina</h1>
+    <p class="sub">Zarządzaj zarejestrowanymi użytkownikami.</p>
+    <div class="tabs"><span class="tab">Raporty</span></div>
+
+    <h2>Klienci</h2>
+    <p class="sub">Konta użytkowników, którzy ukończyli rejestrację (hasło lub Google). Usunięcie użytkownika kasuje też jego schematy.</p>
+
+    <div class="toolbar">
+      <input class="input" id="q" type="search" placeholder="Szukaj po nazwie lub e-mailu" />
+      <span class="count" id="count"></span>
+    </div>
+
+    <div class="table-card">
+      <div id="msg">Ładowanie…</div>
+      <table class="users" id="tbl" hidden>
+        <thead>
+          <tr><th>Imię i nazwisko</th><th>Email</th><th>Logowanie</th><th>Data rejestracji</th><th>Schematy</th><th></th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let users = [];
+
+    const fmt = (iso) => new Date(iso).toLocaleString("pl-PL", {
+      day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
+    });
+
+    function cell(text, cls) {
+      const td = document.createElement("td");
+      td.textContent = text;
+      if (cls) td.className = cls;
+      return td;
+    }
+
+    function render() {
+      const q = $("q").value.trim().toLowerCase();
+      const list = users.filter((u) =>
+        !q || (u.fullName || "").toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
+      $("count").textContent = `${list.length} z ${users.length}`;
+      const body = $("rows");
+      body.replaceChildren();
+      for (const u of list) {
+        const tr = document.createElement("tr");
+        tr.append(cell(u.fullName || "—"), cell(u.email));
+        const tdP = document.createElement("td");
+        const b = document.createElement("span");
+        b.className = "badge";
+        b.textContent = u.provider === "google" ? "Google" : "Hasło";
+        tdP.append(b);
+        tr.append(tdP, cell(fmt(u.createdAt)),
+          cell(u.schemas.length ? u.schemas.join(", ") : "—", u.schemas.length ? "" : "muted"));
+        const tdD = document.createElement("td");
+        const btn = document.createElement("button");
+        btn.className = "del";
+        btn.title = "Usuń użytkownika";
+        btn.textContent = "🗑";
+        btn.onclick = () => remove(u);
+        tdD.append(btn);
+        tr.append(tdD);
+        body.append(tr);
+      }
+      $("msg").hidden = list.length > 0;
+      $("msg").textContent = "Brak wyników.";
+      $("tbl").hidden = list.length === 0;
+    }
+
+    async function remove(u) {
+      if (!confirm(`Usunąć ${u.email} wraz ze schematami (${u.schemas.length})? Tej operacji nie można cofnąć.`)) return;
+      const r = await fetch(`/api/admin/users/${u.id}`, { method: "DELETE", credentials: "include" });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) return alert(d.error || "Błąd usuwania");
+      users = users.filter((x) => x.id !== u.id);
+      render();
+    }
+
+    async function load() {
+      const r = await fetch("/api/admin/users", { credentials: "include" });
+      if (r.status === 401) { location.href = "/login.html"; return; }
+      if (r.status === 403) { $("msg").textContent = "Brak uprawnień administratora."; return; }
+      if (!r.ok) { $("msg").textContent = "Błąd pobierania danych."; return; }
+      users = await r.json();
+      render();
+    }
+
+    $("q").addEventListener("input", render);
+    $("logout").addEventListener("click", async (e) => {
+      e.preventDefault();
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+      location.href = "/login.html";
+    });
+    load();
+  </script>
+</body>
+</html>
