@@ -17,6 +17,7 @@ import "./passport.js"; // passport-local + serialize/deserialize
 import { dbAuth, dbData } from "./db.js";
 import { parseUploadedSchema } from "./parse-schema.js";
 import authRoutes from "./auth/auth.routes.js";
+import contactRoutes from "./contact/contact.routes.js";
 import { requireAuth, unauthorizedMsg } from "./middleware/requireAuth.js";
 
 dotenv.config();
@@ -94,6 +95,7 @@ app.use((req, res, next) => {
 
 // === AUTH ===
 app.use("/api/auth", authRoutes);
+app.use("/api/contact", contactRoutes);
 
 // 🔹 Logowanie sesyjne (Passport local)
 app.post("/api/auth/session-login", passport.authenticate("local", { session: true }), (req, res) => {
